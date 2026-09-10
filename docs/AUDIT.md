@@ -92,6 +92,12 @@ Worth recording, because it shaped how conservative the changes could be:
 
 ### 3.1 Catalogue: 27 → 8, one per occasion
 
+> **Superseded.** The catalogue was rebuilt again afterwards, to 13 designs
+> across nine occasions, and `mandala` and `serene` were reinstated by exactly
+> the three steps this section describes. The record below is kept as the
+> history of the cut; `docs/LAYOUT-SPEC.md` describes the catalogue as it
+> stands.
+
 | Theme | Occasion | Layout | Hero scene | Ornament motif |
 |---|---|---|---|---|
 | `emerald` | Wedding | poetic | petals | petals |

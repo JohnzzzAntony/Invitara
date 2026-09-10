@@ -5,13 +5,18 @@
  * client-rendered routes.
  *
  * `event` filters the design grid to one of the ids in EVER_EVENTS
- * (wedding, birthday, anniversary, housewarming, baptism, baby, gala).
- * Capability pages leave it null and show a mixed selection.
+ * (wedding, engagement, birthday, anniversary, housewarming, baptism, baby,
+ * graduation, gala). Capability pages leave it null and show a mixed selection.
  *
  * All copy here is original. The page STRUCTURE follows the pattern
  * documented in DESIGN.md (hero → designs → how it works → why → FAQ → CTA);
  * the words are ours.
+ *
+ * Any sentence that states HOW MANY designs exist must interpolate from
+ * catalogue.mjs rather than spell a number out. A hand-typed "14 wedding
+ * designs" survived long past the four weddings it described.
  */
+import { DESIGN_COUNT, countFor } from './catalogue.mjs';
 
 export const PAGES = [
   {
@@ -19,7 +24,7 @@ export const PAGES = [
     event: 'wedding',
     title: 'Wedding Invitation Websites with Online RSVP',
     description:
-      'Send a wedding invitation your guests can open on any phone, and collect every RSVP through one link. 14 wedding designs, from AED 58, paid once.',
+      `Send a wedding invitation your guests can open on any phone, and collect every RSVP through one link. ${countFor('wedding')} wedding designs, from AED 58, paid once.`,
     keywords:
       'wedding invitation website, online wedding invitation, wedding rsvp online, digital wedding invitation, wedding website with rsvp',
     kicker: 'Wedding invitations',
@@ -347,7 +352,7 @@ export const PAGES = [
     event: null,
     title: 'Digital Invitations — A Whole Website, Not Just a Picture',
     description:
-      'A digital invitation that is a real web page: story, schedule, gallery, map, gift list and RSVP. 8 designs, from AED 58, paid once.',
+      `A digital invitation that is a real web page: story, schedule, gallery, map, gift list and RSVP. ${DESIGN_COUNT} designs, from AED 58, paid once.`,
     keywords:
       'digital invitation, online invitation, electronic invitation, e-invite, invitation website, paperless invitation',
     kicker: 'Digital invitations',

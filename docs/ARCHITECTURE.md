@@ -34,7 +34,7 @@ product.** `src/app/` is two files that keep the App Router valid.
 ```
 public/                  ← THE PRODUCT. This folder is the deployable.
   index.html               Landing page
-  create.html              Design gallery — 8 designs, one per occasion
+  create.html              Design gallery — 13 designs across 9 occasions
   checkout.html            One-time $25 payment (front-end demo — see DEPLOY.md §5)
   editor.html              The builder: control sidebar + live preview
   design.html              Design detail: preview, sections, plans, price
@@ -90,7 +90,7 @@ exports, no build.
 |---|---|
 | `app.js` | Shared UI: toast, mobile menu, reveal animations, carousel, FAQ accordion, demo modal, "Continue editing", footer year |
 | `commerce.js` | **The commerce domain** — plans, feature permissions, theme pricing, the price calculator, projects, the purchase state machine, orders, publish validation and the invitation link. See §11 |
-| `templates.js` | The v4 engine — layout registry, 8 themes across 8 layouts covering 7 occasion types, custom-design CRUD, `EVER_renderSite` / `EVER_renderSiteMini`, state v1→v4 migration, countdowns |
+| `templates.js` | The v4 engine — layout registry, 13 themes across 10 layouts covering 9 occasion types, custom-design CRUD, `EVER_renderSite` / `EVER_renderSiteMini`, state v1→v4 migration, countdowns |
 | `mu.js` | Shared layout runtime every layout is built on: header, section titles, vanilla slider (no jQuery), RSVP form, footer, mini-preview scaler |
 | `layouts/*.js` | Eight layout modules. Each self-registers its section structure, field specs and `render()` / `mini()` per [LAYOUT-SPEC.md](LAYOUT-SPEC.md) |
 | `site-scene.js` | Mounts a design's WebGL hero scene when its theme names one. Loads three.js on demand; a design without a scene costs nothing |
@@ -237,8 +237,8 @@ an explanation. There is no login because there are no accounts.
 A **layout** is a genuinely different page structure — its own section list,
 editor field specs and defaults. All ten are ports of the Muhibbi wedding
 template's invitation home pages, re-themeable via five core colours plus a
-display font. 8 themes span 7 occasion types across 8 layouts — one design per
-occasion, plus a second wedding, and no two designs sharing a page structure.
+display font. 13 themes span 9 occasion types across all 10 layouts — at least
+one design per occasion, four for weddings, and every layout in use.
 
 Switching design *within* a layout re-themes instantly. Switching *across*
 layouts rebuilds both the page structure and the editor sidebar from the new
@@ -348,17 +348,26 @@ bun run dev        # then exercise the pages in a browser
 ```
 
 `public/layouts-test.html` renders every layout × theme combination on one page
-— the fastest way to eyeball a change across all 8 designs.
+— the fastest way to eyeball a change across all 13 designs.
 
 ## 13. Regenerating derived files
 
-Four files in `public/` are generated. Re-run the generator; never hand-edit.
+Several files in `public/` are generated. Re-run the generator; never hand-edit.
 
 | Output | Generator | Source |
 |---|---|---|
 | `public/css/mu.css` | `scripts/scope-css.mjs` | `vendor/muhibbi-template/assets` |
 | photo library in `public/js/templates.js` | `scripts/gen-photos.mjs` | `public/mu/images` |
 | `public/_headers`, `netlify.toml`, `vercel.json` | `scripts/gen-deploy-headers.mjs` | `config/security-headers.mjs` |
+| the nine SEO landing pages | `scripts/gen-landing.mjs` | `scripts/landing-content.mjs` |
+| JSON-LD design lists and every design count | `scripts/sync-seo.mjs` | `THEMES` in `public/js/templates.js` |
+
+**After editing `THEMES`, run `gen-landing.mjs` then `sync-seo.mjs`.** Both read
+the catalogue through `scripts/catalogue.mjs`, which parses `THEMES` out of the
+source because templates.js is a browser script and cannot be imported. That
+single parse is why "13 designs" only has to be true in one place. It was
+previously typed by hand in three, and all three disagreed: the landing
+generator emitted "8 designs" onto pages whose own copy advertised 27.
 
 ## 14. Motion
 

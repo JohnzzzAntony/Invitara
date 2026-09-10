@@ -15,6 +15,7 @@ import { writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PAGES } from './landing-content.mjs';
+import { DESIGN_COUNT, LAYOUT_COUNT } from './catalogue.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const HOST = 'https://your-domain.example';
@@ -197,7 +198,7 @@ ${header(p.slug)}
         <p class="section-sub center">Every price shown includes the design and its entry plan, paid once.</p>
         <div class="pick-grid" id="pick-grid" data-event="${esc(p.event || '')}"></div>
         <div class="picker-more">
-          <a href="create.html" class="btn btn-primary btn-lg">See all 8 designs</a>
+          <a href="create.html" class="btn btn-primary btn-lg">See all ${DESIGN_COUNT} designs</a>
         </div>
       </div>
     </section>
@@ -222,7 +223,7 @@ ${p.intro
         <p class="kicker center">How it works</p>
         <h2 class="section-title center">Four steps, about ten minutes</h2>
         <ol class="steps">
-          <li class="step"><span class="step-num" aria-hidden="true">1</span><h3>Pick a design</h3><p>Choose from 8 designs, one for each kind of occasion.</p></li>
+          <li class="step"><span class="step-num" aria-hidden="true">1</span><h3>Pick a design</h3><p>Choose from ${DESIGN_COUNT} designs across ${LAYOUT_COUNT} layouts.</p></li>
           <li class="step"><span class="step-num" aria-hidden="true">2</span><h3>Make it yours</h3><p>Edit every word, photo and colour in a live editor.</p></li>
           <li class="step"><span class="step-num" aria-hidden="true">3</span><h3>Preview and pay</h3><p>See exactly what guests will see, then pay once.</p></li>
           <li class="step"><span class="step-num" aria-hidden="true">4</span><h3>Publish and share</h3><p>Send one link. Replies come back to you.</p></li>

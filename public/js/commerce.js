@@ -225,7 +225,9 @@
     calm:      { basePrice: 32, editorLevel: 'pro',      plans: ['basic', 'pro', 'advanced'] },
     terra:     { basePrice: 32, editorLevel: 'pro',      plans: ['basic', 'pro', 'advanced'] },
     crescent:  { basePrice: 39, editorLevel: 'advanced', plans: ['basic', 'pro', 'advanced'] },
-    heritage:  { basePrice: 42, editorLevel: 'advanced', plans: ['pro', 'advanced'] }
+    heritage:  { basePrice: 42, editorLevel: 'advanced', plans: ['pro', 'advanced'] },
+    mandala:   { basePrice: 42, editorLevel: 'advanced', plans: ['pro', 'advanced'] },
+    serene:    { basePrice: 35, editorLevel: 'pro',      plans: ['basic', 'pro', 'advanced'] }
   };
 
   /* Visual style, used by the marketplace style filter. Derived from the

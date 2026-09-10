@@ -1,9 +1,9 @@
 /* ==========================================================================
    Invitara — core engine v4: multi-layout template catalog
-   8 layouts (poetic, herald, atrium, editorial, calm, terra, crescent,
-   heritage) x 8 premium themes — one per event type, plus a second wedding.
-   Each layout is a port of one Muhibbi invitation home page; they live in
-   js/layouts/*.js, share js/mu.js and register themselves through
+   10 layouts (poetic, herald, atrium, editorial, calm, terra, crescent,
+   heritage, mandala, serene) x 13 premium themes, spread across nine event
+   types. Each layout is a port of one Muhibbi invitation home page; they
+   live in js/layouts/*.js, share js/mu.js and register themselves through
    EVER_registerLayout (see docs/LAYOUT-SPEC.md).
    ========================================================================== */
 (function () {
@@ -244,11 +244,13 @@
    * ------------------------------------------------------------------ */
   var EVENTS = {
     wedding:      { label: 'Wedding',              tagline: 'Ceremonies & receptions' },
+    engagement:   { label: 'Engagement',           tagline: 'Say it out loud' },
     birthday:     { label: 'Birthday',             tagline: 'Every milestone age' },
     anniversary:  { label: 'Anniversary',          tagline: 'Renew & remember' },
     housewarming: { label: 'Housewarming',         tagline: 'New address, open doors' },
     baptism:      { label: 'Baptism & Christening',tagline: 'A blessed beginning' },
     baby:         { label: 'Baby Shower & Kids',   tagline: 'Welcome little ones' },
+    graduation:   { label: 'Graduation',           tagline: 'Years of work, one day' },
     gala:         { label: 'Gala & Evening',       tagline: 'Formal affairs' }
   };
 
@@ -373,7 +375,11 @@
   }
 
   /* ------------------------------------------------------------------ *
-   *  Theme catalog — 8 designs, one per occasion, each on its own layout *
+   *  Theme catalog — 13 designs across nine occasions.                  *
+   *                                                                     *
+   *  Every layout carries at least one theme and every hero scene is     *
+   *  claimed by one, so nothing in js/layouts/ or js/invites/ is dead     *
+   *  code. Weddings get four because they are the deepest category.      *
    *                                                                     *
    *  Every layout is a port of one Muhibbi invitation home page. A theme *
    *  re-colours it (5 core colours + a display font), names its hero     *
@@ -392,39 +398,100 @@
    *  `motion` — drifting ornament motif, js/site-motion.js              *
    * ------------------------------------------------------------------ */
   var THEMES = [
-    /* ---- wedding · poetic — the classic, and the reference layout --- */
-    { id: 'emerald', name: 'Emerald & Gold', event: 'wedding', layout: 'poetic',
+    /* ---- wedding · poetic — the flagship, and the reference layout -- */
+    { id: 'ivory', name: 'Ivory & Sable', event: 'wedding', layout: 'poetic',
       category: 'Classic', scene: 'petals', motion: 'petals',
-      dark: '#17301f', gold: '#a8843f', bg: '#f7f4ea', ink: '#22301f', soft: '#e3e5d5',
+      dark: '#2c2a26', gold: '#a08a5f', bg: '#faf8f3', ink: '#2e2b26', soft: '#ece6da',
       nameFont: 'derivia', ornament: 'floral',
       content: {
-        basics: { nameA: 'Ananya', nameB: 'Rohan', brand: 'A & R',
-          venue: 'Rosewood Barn', city: 'Kent', dress: 'Garden formal' },
+        basics: { nameA: 'Elena', nameB: 'Theo', brand: 'E & T',
+          time: '04:30 PM onwards', venue: 'The Old Rectory', city: 'Dorset',
+          dress: 'Garden formal' },
         sections: {
-          hero: { headline: 'Let the party begin' },
-          couple: { nameA: 'Ananya Iyer', nameB: 'Rohan Mehra' },
-          cta: { title: 'We can’t wait to see you there',
-            text: 'Please be with us — your presence is the only gift the day really needs.' },
-          rsvp: { title: 'Welcome to our big day' },
-          contact: { thanks: 'We can’t wait to see all of our beloved friends and family on our special day.' }
+          hero: { kicker: 'Save the date', headline: 'Come as you are, leave as family',
+            photo: 'mu-hero-1', photoL: 'mu-hero-2', photoR: 'mu-hero-3' },
+          couple: { nameA: 'Elena Vasquez',
+            textA: 'Grew up three streets from the church and swore she would never marry locally. The rectory is four minutes from her mother’s front door.',
+            photo: 'mu-couple-1',
+            nameB: 'Theo Brandt',
+            textB: 'Moved here for a six-month contract in 2019 and has since learned the name of every dog in the village.' },
+          event: { items: [
+            { icon: 'icon-1.svg', title: 'The rectory', text: 'The Old Rectory, Dorset — the lane is narrow, so do come slowly and park on the grass.', link: '', linkText: 'Open map' },
+            { icon: 'icon-2.svg', title: 'The ceremony', text: 'Doors from four; we begin at half past, in the walled garden if the weather allows.', link: '', linkText: '' },
+            { icon: 'icon-3.svg', title: 'The evening', text: 'Long tables under the beams, one short speech, and dancing once the plates are cleared.', link: '', linkText: '' }
+          ] },
+          countdown: { title: 'Counting the days', label: 'Until we marry',
+            quote: 'Two families, one very long table.' },
+          gallery: { title: 'A few of our favourites', items: [
+            { src: 'mu-gallery-1' }, { src: 'mu-gallery-2' }, { src: 'mu-gallery-3' },
+            { src: 'mu-gallery-4' }, { src: 'mu-gallery-5' }, { src: 'mu-gallery-6' }
+          ] },
+          wishes: { items: [
+            { text: 'They have been quietly inseparable for nine years. It is about time the rest of us got a party out of it.', name: 'Priya & Sam', meta: 'Friends since university' },
+            { text: 'Elena brought him home for one Sunday lunch and never quite took him back. We are delighted.', name: 'The Vasquez family', meta: 'Dorset' }
+          ] },
+          video: { photo: 'mu-video', url: 'https://www.youtube.com/watch?v=IvBToRiExbk' },
+          registry: { title: 'If you would like to give something', items: [
+            { photo: 'mu-product-1', name: 'The long table', note: 'Towards the dinner itself', url: '', btn: 'Contribute' },
+            { photo: 'mu-product-2', name: 'Two weeks in Puglia', note: 'The honeymoon fund', url: '', btn: 'Contribute' },
+            { photo: 'mu-product-3', name: 'The kitchen', note: 'We are still cooking on two rings', url: '', btn: 'Contribute' },
+            { photo: 'mu-product-4', name: 'The village hall roof', note: 'In place of a gift, if you prefer', url: '', btn: 'Donate' }
+          ] },
+          facts: { title: '', items: [
+            { value: '9', suffix: '', label: 'Years together' },
+            { value: '2', suffix: '', label: 'Countries' },
+            { value: '118', suffix: '', label: 'Guests invited' },
+            { value: '1', suffix: '', label: 'Walled garden' }
+          ] },
+          cta: { title: 'We would very much like you there',
+            text: 'No gift, no speech, no obligation — just you, in the garden, on the day.',
+            btn: 'Reply now' },
+          updates: { title: 'Things worth knowing', items: [
+            { photo: 'mu-blog-1', date: 'October 12, 2026', meta: 'Travel', title: 'Getting to Dorset',
+              text: 'Trains to Dorchester South run hourly. We will have two cars meeting the 3.10 and the 4.10.' },
+            { photo: 'mu-blog-2', date: 'November 03, 2026', meta: 'Stay', title: 'Where to sleep',
+              text: 'Rooms held at the Acorn and the White Hart until January — mention the wedding when you book.' },
+            { photo: 'mu-blog-3', date: 'January 20, 2027', meta: 'On the day', title: 'What to expect',
+              text: 'Grass underfoot for most of it, so heels are a brave choice. Bring a layer for the evening.' }
+          ] },
+          photos: { items: [
+            { src: 'mu-portfolio-1' }, { src: 'mu-portfolio-2' }, { src: 'mu-portfolio-3' }, { src: 'mu-portfolio-4' },
+            { src: 'mu-portfolio-5' }, { src: 'mu-portfolio-6' }, { src: 'mu-portfolio-7' }
+          ] },
+          rsvp: { title: 'Will you be with us?',
+            note: 'The garden holds everyone; dinner needs numbers. Kindly reply by',
+            showPhone: true, showMsg: true, guestsMax: 4,
+            yes: 'Yes, gladly', no: 'Sadly, I can’t come',
+            meals: ['Eats anything', 'Vegetarian', 'Vegan', 'No shellfish'],
+            submit: 'Send reply',
+            success: 'Thank you — you are on the list, and we could not be happier about it.' },
+          contact: { thanks: 'Thank you to everyone who has fed us, housed us and put up with the planning.',
+            address: 'The Old Rectory, Dorset', credit: 'Made with ♥' }
         } } },
 
     /* ---- wedding · crescent — nikah and walima ---------------------- */
     { id: 'crescent', name: 'Crescent Green', event: 'wedding', layout: 'crescent',
       category: 'Classic', scene: 'crystal', motion: 'sparkle',
-      dark: '#123329', gold: '#b08d4d', bg: '#f5f8f4', ink: '#1a2f26', soft: '#dfe9de',
+      dark: '#12332a', gold: '#b08d4d', bg: '#f5f8f4', ink: '#1a2f26', soft: '#dfe9de',
       nameFont: 'derivia', ornament: 'geo',
       content: {
         basics: { nameA: 'Aisha', nameB: 'Bilal', brand: 'A & B',
-          venue: 'Al Naseem Ballroom', city: 'Dubai', dress: 'Modest formal' },
+          time: '04:00 PM', venue: 'Al Naseem Ballroom', city: 'Dubai',
+          dress: 'Modest formal' },
         sections: {
-          hero: { note: 'With the blessings of our families, we invite you to share our joy.',
-            address: 'Al Naseem Ballroom, Jumeirah, Dubai' },
-          couple: { nameA: 'Bilal Rahman', nameB: 'Aisha Kareem' },
+          hero: { showCrest: true, dateLine: 'Friday, the twenty-fifth',
+            address: 'Al Naseem Ballroom, Jumeirah, Dubai',
+            note: 'With the blessings of our families, we invite you to share our joy.' },
+          countdown: { title: 'Until the nikah', date: '' },
+          couple: { nameA: 'Bilal Rahman',
+            textA: 'Asked for her hand over mint tea, having rehearsed the sentence for a fortnight and then forgotten most of it.',
+            photo: 'mu-couple-13',
+            nameB: 'Aisha Kareem',
+            textB: 'Said yes before he had finished, which he maintains was unfair, and which she maintains was merciful.' },
           event: { items: [
-            { icon: 'icon-1.svg', title: 'Venue', text: 'Al Naseem Ballroom, Jumeirah — entrance on the north side.' },
-            { icon: 'icon-2.svg', title: 'Nikah', text: 'Four in the afternoon, followed by refreshments.' },
-            { icon: 'icon-3.svg', title: 'Walima', text: 'Dinner from eight; family and friends most welcome.' }
+            { icon: 'icon-1.svg', title: 'The venue', text: 'Al Naseem Ballroom, Jumeirah — the north entrance is closest to the hall.' },
+            { icon: 'icon-2.svg', title: 'The nikah', text: 'Four in the afternoon, with refreshments served straight after.' },
+            { icon: 'icon-3.svg', title: 'The walima', text: 'Dinner from eight. Families, friends and children all most welcome.' }
           ] },
           story: { title: 'How our families came together', items: [
             { photoA: 'mu-story-24', photoB: 'mu-story-25', title: 'The first meeting',
@@ -434,11 +501,158 @@
           ] },
           rsvp: { title: 'Will you join us?',
             note: 'It would mean a great deal to have you there. Kindly reply by',
+            showPhone: true, showMsg: true, guestsMax: 6,
             yes: 'Yes, with pleasure', no: 'Sadly, I can’t attend',
-            meals: ['No preference', 'Vegetarian', 'No nuts', 'Other — I’ll note it below'],
+            meals: ['No preference', 'Vegetarian', 'No nuts', 'Other — noted below'],
+            submit: 'Send reply',
             success: 'Thank you — your reply has reached us, and we look forward to welcoming you.' },
           contact: { thanks: 'We would be honoured to have you with us as we begin this new chapter.',
-            address: 'Al Naseem Ballroom, Jumeirah, Dubai' }
+            address: 'Al Naseem Ballroom, Jumeirah, Dubai', credit: 'Made with ♥' }
+        } } },
+
+    /* ---- wedding · serene — coastal, whitewashed -------------------- */
+    { id: 'amalfi', name: 'Amalfi Blue', event: 'wedding', layout: 'serene',
+      category: 'Coastal', scene: 'clouds', motion: 'bubbles',
+      /* Accent is a mid sea-blue, not the lemon it started as: the serene
+         hero paints its headline in --ws-gold at 50px, and lemon on this
+         near-white ground measured 2.2:1 — under the 3:1 large-text floor. */
+      dark: '#123449', gold: '#2e6d8c', bg: '#f6fafc', ink: '#183040', soft: '#dceaf2',
+      nameFont: 'vibes', ornament: 'floral',
+      content: {
+        basics: { nameA: 'Giulia', nameB: 'Marco', brand: 'G & M',
+          time: '06:00 PM onwards', venue: 'Villa Serena', city: 'Ravello',
+          dress: 'Linen and light colours' },
+        sections: {
+          hero: { photo1: 'mu-hero-14', photo2: 'mu-hero-15', photo3: 'mu-hero-16',
+            headline: 'Come to the coast',
+            meta: 'Villa Serena, Ravello · Two days, one very long lunch' },
+          gallery: { items: [
+            { src: 'mu-gallery-25' }, { src: 'mu-gallery-26' }, { src: 'mu-gallery-27' },
+            { src: 'mu-gallery-31', caption: 'The terrace, most evenings' }, { src: 'mu-gallery-28' },
+            { src: 'mu-gallery-29' }, { src: 'mu-gallery-30' }
+          ] },
+          video: { photo: 'mu-video-2', url: 'https://www.youtube.com/watch?v=IvBToRiExbk' },
+          story: { title: 'How we ended up here', items: [
+            { photoA: 'mu-story-20', photoB: 'mu-story-21', title: 'A wrong turn',
+              text: 'She was looking for the ferry. He was closing up the shop. Neither of us made it where we were going.' },
+            { photoA: 'mu-story-22', photoB: 'mu-story-23', title: 'Every August since',
+              text: 'Seven summers on the same stretch of coast, and one obvious conclusion.' }
+          ] },
+          event: { items: [
+            { icon: 'icon-1.svg', title: 'The villa', text: 'Villa Serena sits above the town — the shuttle from the piazza runs all afternoon.' },
+            { icon: 'icon-2.svg', title: 'The ceremony', text: 'Six in the evening on the lower terrace, facing the water.' },
+            { icon: 'icon-3.svg', title: 'Dinner', text: 'Served at eight under the lemon trees, for as long as anyone stays.' }
+          ] },
+          countdown: { title: 'Counting the days', label: 'Until the terrace',
+            quote: 'Bring flat shoes. The steps are the price of the view.' },
+          rsvp: { title: 'Can you make it to the coast?',
+            note: 'Travel takes planning, so the earlier the better. Kindly reply by',
+            showPhone: true, showMsg: true, guestsMax: 4,
+            yes: 'Yes, we’ll be there', no: 'Sorry, too far this time',
+            meals: ['Eats anything', 'Vegetarian', 'No shellfish', 'Gluten-free'],
+            submit: 'Send reply',
+            success: 'Wonderful — we will send travel notes and a map of the steps closer to the time.' },
+          photos: { items: [
+            { src: 'mu-portfolio-8' }, { src: 'mu-portfolio-9' }, { src: 'mu-portfolio-10' },
+            { src: 'mu-portfolio-11' }, { src: 'mu-portfolio-12' }, { src: 'mu-portfolio-13' }
+          ] },
+          contact: { thanks: 'Thank you for crossing water and country to be with us. It means everything.',
+            address: 'Villa Serena, Ravello', credit: 'Made with ♥' }
+        } } },
+
+    /* ---- wedding · mandala — marigold and saffron ------------------- */
+    { id: 'marigold', name: 'Marigold Mandap', event: 'wedding', layout: 'mandala',
+      category: 'Festive', scene: 'gilded', motion: 'petals',
+      /* Deep saffron rather than bright marigold: mandala sets its hero
+         kicker in --ws-gold at 40px, where the brighter tone measured
+         2.0:1 on this cream. The marigold itself lives in `soft`. */
+      dark: '#6b1d18', gold: '#a86a10', bg: '#fff6e6', ink: '#4a2115', soft: '#fbe2b8',
+      nameFont: 'cinzel', ornament: 'floral',
+      content: {
+        basics: { nameA: 'Ishani', nameB: 'Aditya', brand: 'I & A',
+          time: '03:00 PM onwards', venue: 'The Rambagh Lawns', city: 'Jaipur',
+          dress: 'Traditional, and bring colour' },
+        sections: {
+          hero: { kicker: 'Three days, one family',
+            meta: 'The Rambagh Lawns, Jaipur · Haldi, wedding and reception',
+            items: [{ src: 'mu-hero-17' }, { src: 'mu-hero-18' }] },
+          countdown: { title: 'Until the mandap', date: '' },
+          couple: { nameA: 'Aditya Nair', photoA: 'mu-couple-10',
+            textA: 'Introduced himself to her grandmother before he introduced himself to her, which turned out to be the correct order.',
+            photoMid: 'mu-couple-12',
+            nameB: 'Ishani Rao', photoB: 'mu-couple-11',
+            textB: 'Has been planning the flowers since long before there was anything to plan them for. There will be a great many flowers.' },
+          gallery: { items: [
+            { src: 'mu-gallery-38' }, { src: 'mu-gallery-39' }, { src: 'mu-gallery-40' },
+            { src: 'mu-gallery-44' },
+            { src: 'mu-gallery-41' }, { src: 'mu-gallery-42' }, { src: 'mu-gallery-43' }
+          ] },
+          event: { title: 'Three days, in order', photo: 'mu-event-4', items: [
+            { photo: 'mu-event-5', name: 'The Haldi',
+              l1: 'Welcome', t1: '10:00 AM', l2: 'Ceremony', t2: '11:30 AM', l3: 'Lunch', t3: '01:00 PM' },
+            { photo: 'mu-event-6', name: 'The Wedding',
+              l1: 'Baraat', t1: '03:00 PM', l2: 'Pheras', t2: '06:00 PM', l3: 'Vidaai', t3: '09:00 PM' },
+            { photo: 'mu-event-7', name: 'The Reception',
+              l1: 'Drinks', t1: '07:00 PM', l2: 'Dinner', t2: '08:30 PM', l3: 'Dancing', t3: '10:00 PM' }
+          ] },
+          rsvp: { title: 'Which days can you join us?',
+            note: 'Tell us how many of you and which functions, so we can arrange rooms and cars. Please reply by',
+            showPhone: true, showMsg: true, guestsMax: 8,
+            yes: 'Yes, count us in', no: 'Sorry, we can’t come',
+            meals: ['Vegetarian', 'Jain', 'No onion or garlic', 'Non-vegetarian'],
+            submit: 'Send reply',
+            success: 'Thank you — we have you down. Room and travel details will follow by message.' },
+          photos: { items: [
+            { src: 'mu-portfolio-14' }, { src: 'mu-portfolio-15' }, { src: 'mu-portfolio-16' },
+            { src: 'mu-portfolio-17' }, { src: 'mu-portfolio-18' }, { src: 'mu-portfolio-19' }
+          ] },
+          contact: { thanks: 'Our families thank you for travelling, for helping, and for every bit of it.',
+            address: 'The Rambagh Lawns, Jaipur', credit: 'Made with ♥' }
+        } } },
+
+    /* ---- engagement · editorial — the announcement ------------------ */
+    { id: 'firstlight', name: 'First Light', event: 'engagement', layout: 'editorial',
+      category: 'Floral', scene: 'halo', motion: 'petals',
+      dark: '#6d4a4a', gold: '#c48b7a', bg: '#fdf7f5', ink: '#4a3634', soft: '#f4e2dc',
+      nameFont: 'paris', ornament: 'lines',
+      content: {
+        basics: { nameA: 'Clara', nameB: 'Jonah', brand: 'C & J',
+          time: '07:00 PM', venue: 'The Glasshouse', city: 'Edinburgh',
+          dress: 'Smart, and warm enough for the terrace' },
+        sections: {
+          hero: { kicker: 'We’re engaged',
+            left: 'Saturday the fourteenth, from seven',
+            right: 'The Glasshouse, Edinburgh' },
+          quote: { title: 'He asked at six in the morning, on a hill, in the cold, and she said yes anyway.',
+            text: 'There is no wedding date yet and no plan beyond this evening. We simply wanted the people we love in one room while the news is still new.' },
+          couple: { nameA: 'Jonah Ellis', photoA: 'mu-couple-4',
+            textA: 'Carried the ring up Arthur’s Seat in a coat pocket for three hours, terrified of the zip.',
+            photoMid: 'mu-couple-7',
+            nameB: 'Clara Whitfield', photoB: 'mu-couple-6',
+            textB: 'Had guessed by the second hour but let him get all the way to the top, which he considers the greater act of love.' },
+          story: { title: 'How it happened', items: [
+            { photo: 'mu-story-7', year: '2022', title: 'The introduction',
+              text: 'A mutual friend’s kitchen, far too many people, and the only two arguing about the same book.' },
+            { photo: 'mu-story-8', year: '2024', title: 'The flat',
+              text: 'One bedroom, no storage, and a window that made the whole thing worth it.' },
+            { photo: 'mu-story-9', year: 'This spring', title: 'The hill',
+              text: 'Six in the morning, minus two degrees, and a question he had been carrying since February.' }
+          ] },
+          countdown: { title: 'Counting down', label: 'Until the party',
+            quote: 'No date set. No plan made. Come anyway.' },
+          rsvp: { title: 'Come and celebrate with us',
+            note: 'It is drinks and small things to eat, not a dinner. Let us know by',
+            showPhone: false, showMsg: true, guestsMax: 2,
+            yes: 'Yes, I’ll be there', no: 'Can’t make it, but congratulations',
+            meals: ['Eats anything', 'Vegetarian', 'Vegan', 'Gluten-free'],
+            submit: 'Send reply',
+            success: 'Lovely — see you at the Glasshouse. Bring nothing but yourself.' },
+          photos: { items: [
+            { src: 'mu-portfolio-8' }, { src: 'mu-portfolio-9' }, { src: 'mu-portfolio-10' },
+            { src: 'mu-portfolio-11' }, { src: 'mu-portfolio-12' }, { src: 'mu-portfolio-13' }
+          ] },
+          contact: { thanks: 'Thank you for the messages, the calls and the entirely unnecessary champagne.',
+            address: 'The Glasshouse, Edinburgh', credit: 'No gifts — the flat is small' }
         } } },
 
     /* ---- anniversary · heritage — a golden jubilee ------------------ */
@@ -448,7 +662,7 @@
       nameFont: 'cinzel', ornament: 'floral',
       content: {
         basics: { nameA: 'Rose', nameB: 'Albert', brand: '50 Years',
-          time: '06:00 PM onwards', venue: 'The Assembly Rooms', city: 'Richardson',
+          time: '06:00 PM onwards', venue: 'The Assembly Rooms', city: 'Harrogate',
           dress: 'Evening dress' },
         sections: {
           hero: { headline: 'Fifty golden years', items: [
@@ -466,78 +680,41 @@
             { photo: 'mu-story-32', year: 'Today', title: 'Still here',
               text: 'Children, grandchildren, and the same unresolved argument about the thermostat.' }
           ] },
-          gallery: { title: 'Fifty years in photographs' },
+          gallery: { title: 'Fifty years in photographs', items: [
+            { src: 'mu-gallery-32' }, { src: 'mu-gallery-33' }, { src: 'mu-gallery-34' },
+            { src: 'mu-gallery-35' }, { src: 'mu-gallery-36' }, { src: 'mu-gallery-37' }
+          ] },
           event: { items: [
-            { icon: 'icon-4.svg', title: 'Venue', text: 'The Assembly Rooms, Richardson — lift to the first floor.' },
-            { icon: 'icon-5.svg', title: 'Drinks', text: 'From six in the long gallery.' },
-            { icon: 'icon-6.svg', title: 'Dinner', text: 'Served at eight, with a few short speeches after.' }
+            { icon: 'icon-4.svg', title: 'The rooms', text: 'The Assembly Rooms, Harrogate — there is a lift to the first floor.' },
+            { icon: 'icon-5.svg', title: 'Drinks', text: 'From six in the long gallery, where the photographs are.' },
+            { icon: 'icon-6.svg', title: 'Dinner', text: 'Served at eight, with a few short speeches after. We have promised they will be short.' }
           ] },
           countdown: { title: 'Counting down', label: 'Until the evening',
             quote: 'Fifty years, and the party is still worth the trouble.' },
           rsvp: { title: 'Will you be joining us?',
             note: 'There is a seat with your name on it. Kindly reply by',
+            showPhone: true, showMsg: true, guestsMax: 4,
             yes: 'Yes, I’ll be there', no: 'Sorry, I can’t make it',
             meals: ['Roast', 'Fish', 'Vegetarian', 'Something light'],
-            success: 'Thank you — we have you down, and we are glad you can come.' },
-          contact: { thanks: 'Fifty years of friends and family, and we would love to see as many of you as possible.' }
+            submit: 'Send reply',
+            success: 'Thank you — we have you down, and we are very glad you can come.' },
+          photos: { items: [
+            { src: 'mu-portfolio-8' }, { src: 'mu-portfolio-9' }, { src: 'mu-portfolio-10' },
+            { src: 'mu-portfolio-11' }, { src: 'mu-portfolio-12' }, { src: 'mu-portfolio-13' }
+          ] },
+          contact: { thanks: 'Fifty years of friends and family, and we would love to see as many of you as possible.',
+            address: 'The Assembly Rooms, Harrogate', credit: 'No gifts, please — just come' }
         } } },
 
-    /* ---- gala · herald — black tie, in aid of something ------------- */
-    { id: 'gala', name: 'Midnight Gala', event: 'gala', layout: 'herald',
-      category: 'Elegant', scene: 'nocturne', motion: 'sparkle',
-      dark: '#0d0c11', gold: '#c9a45c', bg: '#17161c', ink: '#ece9e2', soft: '#232129',
-      nameFont: 'cinzel', ornament: 'lines',
-      content: {
-        basics: { nameA: 'The Ashford', nameB: 'Society', brand: 'ASHFORD',
-          time: '07:00 PM', venue: 'The Ashford Rooms', city: 'Dubai', dress: 'Black tie' },
-        sections: {
-          hero: { items: [
-            { photo: 'mu-hero-4', kicker: 'The Ashford Society invites you to', line1: 'An Evening',
-              line2: 'of Note', meta: 'Black tie · Doors at seven' },
-            { photo: 'mu-hero-5', kicker: 'In aid of the Harbour Fund', line1: 'An Evening',
-              line2: 'of Note', meta: 'Dinner, auction and music until late' }
-          ] },
-          quote: { title: 'One evening a year, in aid of something that lasts the other fifty-one.',
-            text: 'Every seat taken is a term of school fees covered. Come for the dinner and the music; stay because the auction gets competitive.',
-            btn: 'Reserve a seat' },
-          couple: { nameA: 'Dr Amina Farouk', photoA: 'mu-couple-2',
-            textA: 'Co-chair. Twelve years with the Harbour Fund, and still the first to arrive and the last to leave.',
-            nameB: 'Julian Ashford', photoB: 'mu-couple-3',
-            textB: 'Co-chair. Founded the evening in 2014 on the theory that people give more after a good dinner. He was right.' },
-          story: { title: 'What the evening has paid for so far', btn: 'Reserve a seat', items: [
-            { photoA: 'mu-story-1', photoB: 'mu-story-2', year: '2019', title: 'The first classroom',
-              text: 'Forty guests, one long table, and enough raised to fit out a single room in the harbour district.' },
-            { photoA: 'mu-story-3', photoB: 'mu-story-4', year: '2025', title: 'Nine schools on',
-              text: 'The same evening, rather more guests, and nine hundred children now in classrooms because of it.' }
-          ] },
-          event: { items: [
-            { icon: 'icon-1.svg', title: 'Venue', text: 'The Ashford Rooms — valet parking from the east entrance.', photo: 'mu-event-1' },
-            { icon: 'icon-2.svg', title: 'Reception', text: 'Champagne and the silent auction from seven.', photo: 'mu-event-2' },
-            { icon: 'icon-3.svg', title: 'Dinner', text: 'Served at eight thirty, live auction and music to follow.', photo: 'mu-event-3' }
-          ] },
-          countdown: { title: 'Counting down', label: 'Until the evening',
-            quote: 'Black tie. Open heart. Closed bidding.' },
-          rsvp: { title: 'Reserve your seat',
-            note: 'Tables seat ten. Let us know who you would like to sit with. Please reply by',
-            showPhone: true, showMsg: true, guestsMax: 10,
-            yes: 'Yes, reserve my seat', no: 'Unable to attend — I’d like to donate',
-            meals: ['Meat', 'Fish', 'Vegetarian', 'Vegan'],
-            submit: 'Reserve seat',
-            success: 'Thank you — your seat is reserved. Table details will follow by email closer to the evening.' },
-          contact: { thanks: 'The Ashford Society is grateful to every guest, donor and volunteer who makes this evening possible.',
-            email: 'gala@example.com', address: 'The Ashford Rooms, Dubai',
-            credit: 'In aid of the Harbour Fund' }
-        } } },
-
-    /* ---- birthday · terra — a child's party ------------------------- */
+    /* ---- birthday · terra — a child’s party ------------------------- */
     { id: 'balloon', name: 'Balloon Pop', event: 'birthday', layout: 'terra',
       category: 'Playful', scene: 'confetti', motion: 'confetti',
       dark: '#3b1f4a', gold: '#e0567f', bg: '#fdf4f8', ink: '#3a2440', soft: '#f8dce6',
       nameFont: 'baloo', ornament: 'geo',
       content: {
         basics: { nameA: 'Maya', nameB: '', brand: 'MAYA IS 8',
-          time: '03:00 PM to 06:00 PM', venue: 'The Garden Room',
-          city: 'Dubai', dress: 'Come as your favourite animal' },
+          time: '03:00 PM to 06:00 PM', venue: 'The Garden Room', city: 'Dubai',
+          dress: 'Come as your favourite animal' },
         sections: {
           hero: { items: [
             { photo: 'mu-hero-12', kicker: 'Maya is turning eight', line1: 'Maya',
@@ -562,7 +739,7 @@
             { photoBig: 'mu-story-19', photoSmall: 'mu-story-18', title: 'And now eight',
               text: 'Reads about sharks at breakfast. Can name more of them than either of us can.' }
           ] },
-          countdown: { title: 'Counting down to the party' },
+          countdown: { title: 'Counting down to the party', date: '' },
           event: { title: 'Everything you need to know', items: [
             { icon: 'icon-1.svg', title: 'Where', text: 'The Garden Room — the gate on the park side is easiest.' },
             { icon: 'icon-2.svg', title: 'When', text: 'Three until six. Do come a little early if you can.' },
@@ -579,6 +756,58 @@
             address: 'The Garden Room, Dubai', credit: 'No presents needed — just turn up' }
         } } },
 
+    /* ---- birthday · atrium — a sixteenth, after dark ---------------- */
+    { id: 'neon', name: 'Neon Sixteen', event: 'birthday', layout: 'atrium',
+      category: 'Modern', scene: 'aurora', motion: 'confetti',
+      dark: '#0f0d18', gold: '#a855f7', bg: '#16121f', ink: '#ece7f5', soft: '#241d33',
+      nameFont: 'jost', ornament: 'geo',
+      content: {
+        basics: { nameA: 'Tara', nameB: '', brand: 'TARA · 16',
+          time: '08:00 PM to 01:00 AM', venue: 'The Warehouse', city: 'Manchester',
+          dress: 'Wear something that shows up under UV' },
+        sections: {
+          hero: { headline: 'Tara is sixteen',
+            meta: 'The Warehouse, Manchester · Doors at eight',
+            photoMid: 'mu-hero-6', photoRight: 'mu-hero-7' },
+          couple: { quote: 'Sixteen years, and she has picked the playlist for every one of them.',
+            nameA: 'Tara', photoA: 'mu-couple-4',
+            textA: 'Has been building the set list since June. Requests are welcome but will almost certainly be ignored.',
+            photoMid: 'mu-couple-5',
+            text: 'One room, a proper sound system, and everyone she has known since primary school in the same place for the first time in years.',
+            btn: 'Say you’re coming',
+            nameB: 'Hosted by her parents', photoB: 'mu-couple-6',
+            textB: 'Upstairs, out of the way, and available for lifts home at midnight. No lifts after one.' },
+          story: { title: 'Sixteen years, abridged', items: [
+            { title: 'The first record', year: '2013', photoB: 'mu-story-6', photoA: 'mu-story-5',
+              text: 'Played the same seven-inch until it wore through. We can still hum the crackle.' },
+            { title: 'The first gig', year: '2024', photoB: 'mu-story-29', photoA: 'mu-story-28',
+              text: 'Second row, lost voice, and a decision about what she wants to do with her life.' }
+          ] },
+          event: { title: 'The practical bits', items: [
+            { photo: 'mu-event-1', icon: 'icon-1.svg', title: 'Getting there',
+              text: 'The Warehouse is behind the station — the door is on the canal side, not the road.' },
+            { photo: 'mu-event-2', icon: 'icon-2.svg', title: 'Doors',
+              text: 'Eight until one. Under-eighteens only; there are adults on the door all night.' },
+            { photo: 'mu-event-3', icon: 'icon-3.svg', title: 'Food',
+              text: 'Pizza at ten, and enough of it. Tell us below if you can’t eat something.' }
+          ] },
+          countdown: { title: 'Counting down', label: 'Until doors',
+            quote: 'Sixteen. Loud. Once.' },
+          rsvp: { title: 'Are you in?',
+            note: 'We need a name on the door for everyone coming. Reply by',
+            showPhone: true, showMsg: true, guestsMax: 2,
+            yes: 'Yes, I’m in', no: 'Can’t make it',
+            meals: ['Eats anything', 'Vegetarian', 'Vegan', 'No dairy'],
+            submit: 'Put me on the list',
+            success: 'You’re on the list. Bring ID if you look older than you are — the door is strict.' },
+          photos: { items: [
+            { src: 'mu-portfolio-8' }, { src: 'mu-portfolio-9' }, { src: 'mu-portfolio-10' },
+            { src: 'mu-portfolio-11' }, { src: 'mu-portfolio-12' }, { src: 'mu-portfolio-13' }
+          ] },
+          contact: { thanks: 'Thanks to everyone lending decks, lights and patience.',
+            address: 'The Warehouse, Manchester', credit: 'Pick-up from the canal door at 1 am' }
+        } } },
+
     /* ---- baby shower · calm ---------------------------------------- */
     { id: 'sunshine', name: 'Sunshine Sprinkle', event: 'baby', layout: 'calm',
       category: 'Soft', scene: 'bloom', motion: 'bubbles',
@@ -586,12 +815,13 @@
       nameFont: 'baloo', ornament: 'geo',
       content: {
         basics: { nameA: 'Baby', nameB: 'Rae', brand: 'HELLO SUNSHINE',
-          time: '11:00 AM', venue: 'The Orangery', city: 'Dubai', dress: 'Anything sunny' },
+          time: '11:00 AM', venue: 'The Orangery', city: 'Dubai',
+          dress: 'Anything sunny' },
         sections: {
           hero: { headline: 'A little sunshine is on the way',
             meta: 'Come and help us welcome her',
             items: [{ src: 'mu-hero-9' }, { src: 'mu-hero-10' }, { src: 'mu-hero-11' }] },
-          countdown: { title: 'Counting down to the shower' },
+          countdown: { title: 'Counting down to the shower', date: '' },
           story: { title: 'How we got here', items: [
             { heading: '', photoBig: 'mu-story-10', photoA: 'mu-story-11', photoB: 'mu-story-12',
               title: 'The news', text: 'Told the family over a Sunday lunch that went on considerably longer than planned.' },
@@ -626,15 +856,60 @@
             address: 'The Orangery, Dubai', credit: 'No gifts expected' }
         } } },
 
-    /* ---- housewarming · atrium ------------------------------------- */
+    /* ---- baptism · editorial --------------------------------------- */
+    { id: 'lamb', name: 'Little Lamb', event: 'baptism', layout: 'editorial',
+      category: 'Soft', scene: 'doves', motion: 'feathers',
+      dark: '#46524b', gold: '#9aa79d', bg: '#f8faf8', ink: '#38423c', soft: '#e6ece7',
+      nameFont: 'corm', ornament: 'lines',
+      content: {
+        basics: { nameA: 'Noor', nameB: '', brand: 'NOOR',
+          time: '10:30 AM', venue: 'St Mary’s', city: 'Dubai',
+          dress: 'Sunday best' },
+        sections: {
+          hero: { kicker: 'The christening of', nameA: 'Noor', nameB: 'Elise',
+            left: 'Sunday, at half past ten',
+            right: 'St Mary’s, followed by lunch' },
+          quote: { title: 'A small person, a great deal of love, and one morning to say so out loud.',
+            text: 'We would be glad of your company at Noor’s christening, and gladder still of it at lunch afterwards, where the behaviour is less formal all round.' },
+          couple: { nameA: 'Hannah Poulos', photoA: 'mu-couple-4',
+            textA: 'Godmother. Has already promised to teach her the piano, and will be held to it.',
+            photoMid: 'mu-couple-7',
+            nameB: 'Sami Haddad', photoB: 'mu-couple-6',
+            textB: 'Godfather. Volunteered for the job before anyone thought to ask him.' },
+          story: { title: 'Her first year, briefly', items: [
+            { photo: 'mu-story-7', year: 'March', title: 'The day she arrived',
+              text: 'Early, loudly, and entirely on her own schedule.' },
+            { photo: 'mu-story-8', year: 'August', title: 'First laugh',
+              text: 'At the dog, not at either of us, which we are choosing not to take personally.' },
+            { photo: 'mu-story-9', year: 'Now', title: 'Nearly walking',
+              text: 'Three steps, then a sit-down. The three steps count.' }
+          ] },
+          countdown: { title: 'Counting down', label: 'Until the christening',
+            quote: 'Held, named, and very much loved.' },
+          rsvp: { title: 'Will you join us?',
+            note: 'The church seats plenty; lunch needs numbers. Kindly reply by',
+            showPhone: false, showMsg: true, guestsMax: 4,
+            yes: 'Yes, for church and lunch', no: 'Sorry, I can’t come',
+            meals: ['Eats anything', 'Vegetarian', 'No fish', 'Child’s portion'],
+            submit: 'Send reply',
+            success: 'Thank you — we have you down for lunch, and we are so glad you can come.' },
+          photos: { items: [
+            { src: 'mu-portfolio-8' }, { src: 'mu-portfolio-9' }, { src: 'mu-portfolio-10' },
+            { src: 'mu-portfolio-11' }, { src: 'mu-portfolio-12' }, { src: 'mu-portfolio-13' }
+          ] },
+          contact: { thanks: 'Thank you to her godparents, her grandparents, and everyone who has held her since March.',
+            address: 'St Mary’s, Dubai', credit: 'Made with ♥' }
+        } } },
+
+    /* ---- housewarming · atrium — terracotta and oat ----------------- */
     { id: 'newkeys', name: 'New Keys', event: 'housewarming', layout: 'atrium',
-      category: 'Modern', scene: 'aurora', motion: 'leaves',
-      dark: '#233240', gold: '#5d8aa8', bg: '#f4f7f9', ink: '#22303a', soft: '#dfe8ee',
+      category: 'Minimal', scene: 'hearth', motion: 'leaves',
+      dark: '#4a2c1e', gold: '#c2703f', bg: '#fbf6ef', ink: '#3d2a1e', soft: '#e9e2cd',
       nameFont: 'jost', ornament: 'geo',
       content: {
         basics: { nameA: 'The Mehtas', nameB: '', brand: 'No. 42',
-          time: '04:00 PM onwards', venue: 'No. 42 Willow Court',
-          city: 'Dubai', dress: 'Come comfortable' },
+          time: '04:00 PM onwards', venue: 'No. 42 Willow Court', city: 'Dubai',
+          dress: 'Come comfortable' },
         sections: {
           hero: { headline: 'Our new address',
             meta: 'No. 42 Willow Court · Open house from four',
@@ -678,48 +953,104 @@
             address: 'No. 42 Willow Court, Dubai', credit: 'Please, no housewarming gifts' }
         } } },
 
-    /* ---- baptism · editorial --------------------------------------- */
-    { id: 'lamb', name: 'Little Lamb', event: 'baptism', layout: 'editorial',
-      category: 'Soft', scene: 'doves', motion: 'feathers',
-      dark: '#3b4450', gold: '#9fb4c7', bg: '#f7f9fb', ink: '#333c47', soft: '#e5edf3',
-      nameFont: 'corm', ornament: 'lines',
+    /* ---- gala · herald — black tie, in aid of something ------------- */
+    { id: 'gala', name: 'Midnight Gala', event: 'gala', layout: 'herald',
+      category: 'Luxe', scene: 'nocturne', motion: 'sparkle',
+      dark: '#0d0c11', gold: '#c9a45c', bg: '#17161c', ink: '#ece9e2', soft: '#232129',
+      nameFont: 'cinzel', ornament: 'lines',
       content: {
-        basics: { nameA: 'Noor', nameB: '', brand: 'NOOR',
-          time: '10:30 AM', venue: 'St Mary’s', city: 'Dubai', dress: 'Sunday best' },
+        basics: { nameA: 'The Ashford', nameB: 'Society', brand: 'ASHFORD',
+          time: '07:00 PM', venue: 'The Ashford Rooms', city: 'Dubai',
+          dress: 'Black tie' },
         sections: {
-          hero: { kicker: 'The christening of', nameA: 'Noor', nameB: 'Elise',
-            left: 'Sunday, at half past ten',
-            right: 'St Mary’s, followed by lunch' },
-          quote: { title: 'A small person, a great deal of love, and one morning to say so out loud.',
-            text: 'We would be glad of your company at Noor’s christening, and gladder still of it at lunch afterwards, where the behaviour is less formal all round.' },
-          couple: { nameA: 'Hannah Poulos', photoA: 'mu-couple-4',
-            textA: 'Godmother. Has already promised to teach her the piano, and will be held to it.',
-            photoMid: 'mu-couple-7',
-            nameB: 'Sami Haddad', photoB: 'mu-couple-6',
-            textB: 'Godfather. Volunteered for the job before anyone thought to ask him.' },
-          story: { title: 'Her first year, briefly', items: [
-            { photo: 'mu-story-7', year: 'March', title: 'The day she arrived',
-              text: 'Early, loudly, and entirely on her own schedule.' },
-            { photo: 'mu-story-8', year: 'August', title: 'First laugh',
-              text: 'At the dog, not at either of us, which we are choosing not to take personally.' },
-            { photo: 'mu-story-9', year: 'Now', title: 'Nearly walking',
-              text: 'Three steps, then a sit-down. The three steps count.' }
+          hero: { items: [
+            { photo: 'mu-hero-4', kicker: 'The Ashford Society invites you to', line1: 'An Evening',
+              line2: 'of Note', meta: 'Black tie · Doors at seven' },
+            { photo: 'mu-hero-5', kicker: 'In aid of the Harbour Fund', line1: 'An Evening',
+              line2: 'of Note', meta: 'Dinner, auction and music until late' }
           ] },
-          countdown: { title: 'Counting down', label: 'Until the christening',
-            quote: 'Held, named, and very much loved.' },
-          rsvp: { title: 'Will you join us?',
-            note: 'The church seats plenty; lunch needs numbers. Kindly reply by',
-            showPhone: false, showMsg: true, guestsMax: 4,
-            yes: 'Yes, for church and lunch', no: 'Sorry, I can’t come',
-            meals: ['Eats anything', 'Vegetarian', 'No fish', 'Child’s portion'],
-            submit: 'Send reply',
-            success: 'Thank you — we have you down for lunch, and we are so glad you can come.' },
+          quote: { title: 'One evening a year, in aid of something that lasts the other fifty-one.',
+            text: 'Every seat taken is a term of school fees covered. Come for the dinner and the music; stay because the auction gets competitive.',
+            btn: 'Reserve a seat' },
+          couple: { nameA: 'Dr Amina Farouk', photoA: 'mu-couple-2',
+            textA: 'Co-chair. Twelve years with the Harbour Fund, and still the first to arrive and the last to leave.',
+            nameB: 'Julian Ashford', photoB: 'mu-couple-3',
+            textB: 'Co-chair. Founded the evening in 2014 on the theory that people give more after a good dinner. He was right.' },
+          story: { title: 'What the evening has paid for so far', btn: 'Reserve a seat', items: [
+            { photoA: 'mu-story-1', photoB: 'mu-story-2', year: '2019', title: 'The first classroom',
+              text: 'Forty guests, one long table, and enough raised to fit out a single room in the harbour district.' },
+            { photoA: 'mu-story-3', photoB: 'mu-story-4', year: '2025', title: 'Nine schools on',
+              text: 'The same evening, rather more guests, and nine hundred children now in classrooms because of it.' }
+          ] },
+          event: { items: [
+            { icon: 'icon-1.svg', title: 'The rooms', text: 'The Ashford Rooms — valet parking from the east entrance.', photo: 'mu-event-1' },
+            { icon: 'icon-2.svg', title: 'Reception', text: 'Champagne and the silent auction from seven.', photo: 'mu-event-2' },
+            { icon: 'icon-3.svg', title: 'Dinner', text: 'Served at eight thirty, live auction and music to follow.', photo: 'mu-event-3' }
+          ] },
+          countdown: { title: 'Counting down', label: 'Until the evening',
+            quote: 'Black tie. Open heart. Closed bidding.' },
+          rsvp: { title: 'Reserve your seat',
+            note: 'Tables seat ten. Let us know who you would like to sit with. Please reply by',
+            showPhone: true, showMsg: true, guestsMax: 10,
+            yes: 'Yes, reserve my seat', no: 'Unable to attend — I’d like to donate',
+            meals: ['Meat', 'Fish', 'Vegetarian', 'Vegan'],
+            submit: 'Reserve seat',
+            success: 'Thank you — your seat is reserved. Table details will follow by email closer to the evening.' },
           photos: { items: [
-            { src: 'mu-portfolio-8' }, { src: 'mu-portfolio-9' }, { src: 'mu-portfolio-10' },
-            { src: 'mu-portfolio-11' }, { src: 'mu-portfolio-12' }, { src: 'mu-portfolio-13' }
+            { src: 'mu-portfolio-1' }, { src: 'mu-portfolio-2' }, { src: 'mu-portfolio-3' },
+            { src: 'mu-portfolio-4' }, { src: 'mu-portfolio-5' }, { src: 'mu-portfolio-6' }
           ] },
-          contact: { thanks: 'Thank you to her godparents, her grandparents, and everyone who has held her since March.',
-            address: 'St Mary’s, Dubai', credit: 'Made with ♥' }
+          contact: { thanks: 'The Ashford Society is grateful to every guest, donor and volunteer who makes this evening possible.',
+            email: 'gala@example.com', address: 'The Ashford Rooms, Dubai',
+            credit: 'In aid of the Harbour Fund' }
+        } } },
+
+    /* ---- graduation · calm — the end of a long degree --------------- */
+    { id: 'summa', name: 'Summa', event: 'graduation', layout: 'calm',
+      category: 'Elegant', scene: 'aurora', motion: 'leaves',
+      dark: '#14213d', gold: '#b08b4f', bg: '#f7f4ec', ink: '#1b2a44', soft: '#e2dcc9',
+      nameFont: 'pfd', ornament: 'lines',
+      content: {
+        basics: { nameA: 'Amara', nameB: 'Osei', brand: 'AMARA · BSc',
+          time: '12:30 PM', venue: 'The Great Hall', city: 'Leeds',
+          dress: 'Smart — there will be photographs' },
+        sections: {
+          hero: { headline: 'Four years, one afternoon',
+            meta: 'Amara graduates — and then there is lunch',
+            items: [{ src: 'mu-hero-9' }, { src: 'mu-hero-10' }, { src: 'mu-hero-11' }] },
+          countdown: { title: 'Counting down to the ceremony', date: '' },
+          story: { title: 'How it went', items: [
+            { heading: '', photoBig: 'mu-story-10', photoA: 'mu-story-11', photoB: 'mu-story-12',
+              title: 'First year', text: 'One suitcase, a shared kitchen, and a module she nearly dropped in week three.' },
+            { heading: '', photoBig: 'mu-story-13', photoA: 'mu-story-14', photoB: 'mu-story-15',
+              title: 'Final year', text: 'A dissertation on coastal erosion, written mostly between two and five in the morning.' }
+          ] },
+          gallery: { items: [
+            { src: 'mu-gallery-7' }, { src: 'mu-gallery-8' }, { src: 'mu-gallery-9' },
+            { src: 'mu-gallery-31', caption: 'The last week of term' },
+            { src: 'mu-gallery-12' },
+            { src: 'mu-gallery-11', caption: 'The library, at four in the morning' },
+            { src: 'mu-gallery-13' }, { src: 'mu-gallery-14' }
+          ] },
+          event: { title: 'The order of the day', items: [
+            { icon: 'icon-1.svg', title: 'The ceremony', text: 'The Great Hall, half past twelve. Guest tickets are limited to two each.' },
+            { icon: 'icon-2.svg', title: 'Photographs', text: 'On the lawn straight after, weather permitting, gowns until three.' },
+            { icon: 'icon-3.svg', title: 'Lunch', text: 'A long table booked for half past three, for anyone who can stay.' }
+          ] },
+          rsvp: { title: 'Can you be there?',
+            note: 'Ceremony tickets are limited, so tell us if you want one. Please reply by',
+            showPhone: true, showMsg: true, guestsMax: 2,
+            yes: 'Yes — ceremony and lunch', no: 'Can’t come, but congratulations',
+            meals: ['Eats anything', 'Vegetarian', 'Vegan', 'Gluten-free'],
+            submit: 'Send reply',
+            success: 'Thank you — we will send your ticket and the seating details nearer the time.' },
+          photos: { items: [
+            { src: 'mu-portfolio-1' }, { src: 'mu-portfolio-2' }, { src: 'mu-portfolio-3' },
+            { src: 'mu-portfolio-4' }, { src: 'mu-portfolio-5' }, { src: 'mu-portfolio-6' },
+            { src: 'mu-portfolio-7' }
+          ] },
+          contact: { thanks: 'Thank you to everyone who proofread, funded, fed and phoned across four long years.',
+            address: 'The Great Hall, Leeds', credit: 'Made with ♥' }
         } } }
   ];
 

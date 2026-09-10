@@ -9,19 +9,9 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { THEMES as themes, DESIGN_COUNT as N, LAYOUT_COUNT as L } from './catalogue.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const tplSrc = readFileSync(resolve(ROOT, 'public/js/templates.js'), 'utf8');
-
-/* THEMES entries: { id: 'x', name: 'Y', event: 'z', layout: 'w', … } */
-const themes = [...tplSrc.matchAll(/\{ id: '([a-z0-9-]+)', name: '([^']+)', event: '([a-z]+)', layout: '([a-z]+)'/g)]
-  .map(([, id, name, event, layout]) => ({ id, name, event, layout }));
-
-if (themes.length < 2) throw new Error('could not read THEMES from templates.js');
-
-const layouts = [...new Set(themes.map((t) => t.layout))];
-const N = themes.length;
-const L = layouts.length;
 
 const rows = themes.map((t, i) => {
   const pos = String(i + 1);
@@ -44,8 +34,20 @@ for (const page of ['public/index.html', 'public/create.html']) {
     (m, head, tail) => head + rows + tail);
   s = s.replace(/("@type": "ItemList",[\s\S]*?)"numberOfItems": \d+/g,
     (m, head) => head + `"numberOfItems": ${N}`);
-  /* Prose copy is deliberately NOT rewritten here — it describes the
-     designs and needs a human eye. Grep for “layouts” after adding one. */
+
+  /* Bare counts in titles and meta are mechanical, not prose, and they drift:
+     both pages advertised "27 Event Website Templates" over a catalogue of
+     eight. These two shapes are the only ones that state a number, so they
+     are safe to rewrite; anything that describes the designs in words is
+     still left alone below. */
+  s = s.replace(/\b\d+ (Event Website Templates)/g, (m, tail) => `${N} ${tail}`);
+  s = s.replace(/\b\d+ (designs across) \d+ (layouts)/g,
+    (m, a, b) => `${N} ${a} ${L} ${b}`);
+  /* "one of N designs" / "all N designs" — whole-catalogue counts. Anchored on
+     those two words so a future "4 wedding designs" is not swept up with them. */
+  s = s.replace(/\b(one of|all) \d+ designs\b/g, (m, lead) => `${lead} ${N} designs`);
+  /* Descriptive prose is deliberately NOT rewritten here — it characterises
+     the designs and needs a human eye. Grep for “layouts” after adding one. */
 
   if (s !== before) { writeFileSync(path, s); touched++; }
   console.log(page, s === before ? '(unchanged)' : 'updated');

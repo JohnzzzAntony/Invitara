@@ -9,10 +9,12 @@ markup/behaviour helpers from `public/js/mu.js` and styling from
 
 ## Goal
 
-Every template is built from ONE of 8 **layouts** (genuinely different page
+Every template is built from ONE of 10 **layouts** (genuinely different page
 structures, each a Muhibbi home-page port) + a **theme** (palette / fonts /
 ornament) + **content defaults** specific to its event type (wedding,
-birthday, anniversary, housewarming, baptism, baby & kids, gala…). The editor
+engagement, birthday, anniversary, housewarming, baptism, baby & kids,
+graduation, gala…). There are 13 themes; every layout carries at least
+one, so nothing in `public/js/layouts/` is dead code. The editor
 renders its sidebar groups dynamically from the layout's field specs, so every
 field of every layout is fully customizable with zero editor changes.
 
@@ -30,6 +32,8 @@ public/js/layouts/calm.js      Korean Wedding Home
 public/js/layouts/terra.js     African Wedding Home
 public/js/layouts/crescent.js  Muslim Wedding Home
 public/js/layouts/heritage.js  Senior Wedding Home
+public/js/layouts/mandala.js   Indian Wedding Home
+public/js/layouts/serene.js    Indo-Malay Wedding Home
 public/css/mu.css              GENERATED (scripts/scope-css.mjs) — the whole
                                 Muhibbi design system, every selector scoped to `.ws`
 public/css/mu-extra.css        hand-written companion: slider/menu/lightbox behaviour
@@ -95,7 +99,7 @@ Dotted keys (`'social.wa'`) are supported for nested values.
 {
   v: 4,
   layoutId: 'poetic',         // which layout renders this site
-  templateId: 'emerald',      // theme id (builtin or custom-*)
+  templateId: 'ivory',        // theme id (builtin or custom-*)
   nameFont: '',               // '' = follow theme
   bodyFont: 'lato',
   accent: 'tpl',              // 'tpl' or '#hex'
@@ -136,7 +140,7 @@ New in v4:
 - `EVER_events()` — event-type registry (id → {label, tagline}).
 - `EVER_siteDefaults(templateId?)` — now takes an OPTIONAL template id:
   merges the layout defaults with the template's `content` overrides.
-  Called with no arg it uses the first template (emerald).
+  Called with no arg it uses the first template (ivory).
 - `EVER_loadSiteState(flow)` — core state loader + v3→v4 migration used by
   the editor; returns the ready state object.
 - `EVER_renderSite(data, opts)` — dispatches to the layout found via
@@ -181,16 +185,22 @@ classes as `wsm-<layoutId>-*`.
 ## Theme (template) definition
 
 ```js
-{ id: 'emerald', name: 'Emerald & Gold',
+{ id: 'ivory', name: 'Ivory & Sable',
   event: 'wedding',            // event-type id (chip on create page)
   layout: 'poetic',            // layout id
   category: 'Classic',         // style chip inside the event group
   scene: 'petals',             // WebGL hero scene — js/invites/scene-petals.js
   motion: 'petals',            // ornament motif — js/site-motion.js
-  dark: '#17301f', gold: '#c9a45c', bg: '#f7f3e8', ink: '#3c3628',
-  soft: '#efe7d2', nameFont: 'vibes', ornament: 'floral',
+  dark: '#2c2a26', gold: '#a08a5f', bg: '#faf8f3', ink: '#2e2b26',
+  soft: '#ece6da', nameFont: 'derivia', ornament: 'floral',
   content: { basics: {...overrides}, sections: {...overrides} } }
 ```
+
+The opening line is written on ONE line by convention: the build scripts read
+the catalogue by matching `{ id: …, name: …, event: …, layout: …` out of the
+source (see `scripts/catalogue.mjs`), because templates.js is a browser script
+they cannot import. Break that line and every design count on the site is
+computed from a short catalogue.
 
 - `content` overrides are deep-merged over the layout defaults by
   `EVER_siteDefaults(templateId)`. Arrays REPLACE, objects merge.
@@ -245,14 +255,20 @@ The editor builds its sidebar from `EVER_findLayout(state.layoutId)`:
 ## Event-type registry
 
 ```
-wedding      Wedding
-birthday     Birthday
-anniversary  Anniversary
-housewarming Housewarming
-baptism      Baptism & Christening
-baby         Baby Shower & Kids
-gala         Gala & Evening
+wedding      Wedding                 ivory, crescent, amalfi, marigold
+engagement   Engagement              firstlight
+birthday     Birthday                balloon, neon
+anniversary  Anniversary             jubilee
+housewarming Housewarming            newkeys
+baptism      Baptism & Christening   lamb
+baby         Baby Shower & Kids      sunshine
+graduation   Graduation              summa
+gala         Gala & Evening          gala
 ```
+
+Every occasion must keep at least one theme. The SEO landing pages pin their
+design grid to one `event` via `data-event`, so an occasion with no theme
+renders a landing page with an empty gallery.
 
 ## Quality bar (premium)
 
@@ -261,3 +277,15 @@ gala         Gala & Evening
 - Real sample copy per event type (no lorem ipsum, no wedding copy reused).
 - Consistent premium details: letter-spaced kickers, hairline dividers,
   generous whitespace, hover transitions, scroll reveal via bindSite.
+- **`gold` must clear 3:1 against `bg`.** Several layouts paint hero display
+  text in `--ws-gold` — `serene` at 50px, `mandala` at 40px — so a pale accent
+  on a near-white ground is not a styling preference, it is unreadable. A
+  lemon accent on `serene` measured 2.2:1 and had to be replaced with a
+  sea-blue at 5.4:1. Where the hero headline sits over a photograph instead,
+  it is painted white and this floor does not apply. Check the pair before
+  adding a theme:
+
+  ```js
+  // in the browser console on layouts-test.html
+  EVER_THEMES.map(t => t.id + ' ' + contrast(t.gold, t.bg))
+  ```
