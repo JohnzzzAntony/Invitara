@@ -34,7 +34,7 @@ product.** `src/app/` is two files that keep the App Router valid.
 ```
 public/                  ← THE PRODUCT. This folder is the deployable.
   index.html               Landing page
-  create.html              Design gallery — 27 designs across 10 layouts
+  create.html              Design gallery — 8 designs, one per occasion
   checkout.html            One-time $25 payment (front-end demo — see DEPLOY.md §5)
   editor.html              The builder: control sidebar + live preview
   design.html              Design detail: preview, sections, plans, price
@@ -90,9 +90,11 @@ exports, no build.
 |---|---|
 | `app.js` | Shared UI: toast, mobile menu, reveal animations, carousel, FAQ accordion, demo modal, "Continue editing", footer year |
 | `commerce.js` | **The commerce domain** — plans, feature permissions, theme pricing, the price calculator, projects, the purchase state machine, orders, publish validation and the invitation link. See §11 |
-| `templates.js` | The v4 engine — layout registry, 27 themes across 10 layouts and 7 occasion types, custom-design CRUD, `EVER_renderSite` / `EVER_renderSiteMini`, state v1→v4 migration, countdowns |
+| `templates.js` | The v4 engine — layout registry, 8 themes across 8 layouts covering 7 occasion types, custom-design CRUD, `EVER_renderSite` / `EVER_renderSiteMini`, state v1→v4 migration, countdowns |
 | `mu.js` | Shared layout runtime every layout is built on: header, section titles, vanilla slider (no jQuery), RSVP form, footer, mini-preview scaler |
-| `layouts/*.js` | Ten layout modules. Each self-registers its section structure, field specs and `render()` / `mini()` per [LAYOUT-SPEC.md](LAYOUT-SPEC.md) |
+| `layouts/*.js` | Eight layout modules. Each self-registers its section structure, field specs and `render()` / `mini()` per [LAYOUT-SPEC.md](LAYOUT-SPEC.md) |
+| `site-scene.js` | Mounts a design's WebGL hero scene when its theme names one. Loads three.js on demand; a design without a scene costs nothing |
+| `site-motion.js` | Section motion below the hero — per-section ornament layers, staggered content reveal, ornament parallax. Pure DOM and CSS; see §14 |
 | `designer.js` | "Create your own design" modal — name, 5 colours, fonts, ornament, live preview |
 | `create.js` | Marketplace: cards, occasion chips, search, style/price/plan filters, "use this design" → plan choice |
 | `picker.js` | Homepage "Pick a design" — six cards painted from theme colours, no layout code (keeps the landing page light) |
@@ -235,7 +237,8 @@ an explanation. There is no login because there are no accounts.
 A **layout** is a genuinely different page structure — its own section list,
 editor field specs and defaults. All ten are ports of the Muhibbi wedding
 template's invitation home pages, re-themeable via five core colours plus a
-display font. 27 themes span 7 occasion types across those 10 layouts.
+display font. 8 themes span 7 occasion types across 8 layouts — one design per
+occasion, plus a second wedding, and no two designs sharing a page structure.
 
 Switching design *within* a layout re-themes instantly. Switching *across*
 layouts rebuilds both the page structure and the editor sidebar from the new
@@ -345,7 +348,7 @@ bun run dev        # then exercise the pages in a browser
 ```
 
 `public/layouts-test.html` renders every layout × theme combination on one page
-— the fastest way to eyeball a change across all 27 designs.
+— the fastest way to eyeball a change across all 8 designs.
 
 ## 13. Regenerating derived files
 
@@ -356,3 +359,59 @@ Four files in `public/` are generated. Re-run the generator; never hand-edit.
 | `public/css/mu.css` | `scripts/scope-css.mjs` | `vendor/muhibbi-template/assets` |
 | photo library in `public/js/templates.js` | `scripts/gen-photos.mjs` | `public/mu/images` |
 | `public/_headers`, `netlify.toml`, `vercel.json` | `scripts/gen-deploy-headers.mjs` | `config/security-headers.mjs` |
+
+## 14. Motion
+
+Two systems, deliberately separate, and both driven from the theme.
+
+**Hero — `js/site-scene.js` + `js/invites/scene-*.js`.** A theme naming
+`scene: 'petals'` gets a WebGL layer mounted into its hero, over the photograph
+and under `.ws-hero-inner`. three.js is fetched on demand, so a design without a
+scene never downloads it. The loop runs only while the hero is on screen
+(`IntersectionObserver`) and stops on tab hide; `prefers-reduced-motion` renders
+one still frame and never starts a loop; no WebGL, or a scene that throws, leaves
+the hero as a plain photograph with nothing logged at the visitor.
+
+Scenes implement one contract:
+
+```js
+INVITE_SCENES[name](THREE, renderer, ctx) -> { frame(t, mouse), resize(w, h), dispose() }
+// ctx = { width, height, reduced, palette }
+```
+
+`palette` carries the design's own five colours, so one scene serves several
+designs and looks different in each. `t` is absolute seconds — derive your own
+delta and clamp it, or a throttled tab teleports every particle on resume.
+
+**Everything below the hero — `js/site-motion.js`.** A theme naming
+`motion: 'petals'` gets, per section: a layer of drifting CSS ornaments, a
+staggered reveal on the content the existing `.ws-anim/.ws-in` observer already
+brings in, and a light parallax on the ornament layer.
+
+Ornaments are DOM and CSS rather than a second WebGL canvas for three reasons: a
+full-page canvas would sit behind the sections' opaque backgrounds and be
+invisible for the whole page; one GPU context per page is a budget worth keeping;
+and transform/opacity keyframes on a promoted layer are compositor work that
+keeps running where WebGL is unavailable.
+
+Two rules that matter if you touch it:
+
+- **Ornament count scales, it does not switch off.** Count comes from section
+  area, is clamped per motif, then scaled by a `density()` multiplier derived
+  from `hardwareConcurrency`. An earlier version treated a low core count as an
+  on/off gate, which removed the feature outright on a 2-core machine and on
+  phones that merely report 4 cores. Core count belongs to the WebGL pixel
+  ratio, not to compositor work.
+- **A layer is only mounted where it is provably safe.** `canHostLayer()` accepts
+  a section that is already a containing block, or one that is static but
+  contains nothing positioned. A static section holding absolute children is
+  skipped, because making it their containing block would move them.
+
+The six motifs — `petals`, `sparkle`, `confetti`, `bubbles`, `leaves`,
+`feathers` — share one keyframe set in `css/mu-extra.css` and differ only in
+silhouette, tint source and speed. Ornaments take their colour from the theme
+variables, so a motif looks different on every design that uses it.
+
+Both modules load on every page that renders a live site, `create.html` and
+`design.html` included — a customer should meet a design's motion while deciding
+whether to buy it, not after paying.

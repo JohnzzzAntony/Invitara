@@ -224,8 +224,6 @@
     editorial: { basePrice: 29, editorLevel: 'pro',      plans: ['basic', 'pro', 'advanced'] },
     calm:      { basePrice: 32, editorLevel: 'pro',      plans: ['basic', 'pro', 'advanced'] },
     terra:     { basePrice: 32, editorLevel: 'pro',      plans: ['basic', 'pro', 'advanced'] },
-    serene:    { basePrice: 45, editorLevel: 'advanced', plans: ['pro', 'advanced'] },
-    mandala:   { basePrice: 49, editorLevel: 'advanced', plans: ['pro', 'advanced'] },
     crescent:  { basePrice: 39, editorLevel: 'advanced', plans: ['basic', 'pro', 'advanced'] },
     heritage:  { basePrice: 42, editorLevel: 'advanced', plans: ['pro', 'advanced'] }
   };
@@ -235,10 +233,21 @@
   var STYLE_OF = {
     Signature: 'Elegant', Classic: 'Traditional', Elegant: 'Elegant',
     Minimal: 'Minimal', Floral: 'Floral', Garden: 'Floral',
-    Modern: 'Modern', Festive: 'Modern', Luxe: 'Luxury', Custom: 'Modern'
+    Modern: 'Modern', Festive: 'Modern', Luxe: 'Luxury', Custom: 'Modern',
+    Playful: 'Playful', Soft: 'Soft', Coastal: 'Floral'
   };
 
-  var STYLES = ['Elegant', 'Minimal', 'Luxury', 'Floral', 'Modern', 'Traditional'];
+  /* Derived, not hardcoded: the marketplace style filter should only ever
+     offer styles a design actually has. A hardcoded list outlived the
+     catalogue it described and left "Luxury" as a chip that matched nothing. */
+  var STYLES = (function () {
+    var seen = {}, out = [];
+    (window.EVER_THEMES || []).forEach(function (t) {
+      var s = STYLE_OF[t.category] || 'Modern';
+      if (!seen[s]) { seen[s] = true; out.push(s); }
+    });
+    return out.sort();
+  })();
 
   /* Section id -> the customer-facing feature name shown on a design card. */
   var FEATURE_LABEL = {

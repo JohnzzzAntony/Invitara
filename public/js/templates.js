@@ -1,7 +1,7 @@
 /* ==========================================================================
    Invitara — core engine v4: multi-layout template catalog
-   10 layouts (poetic, herald, atrium, editorial, calm, terra, serene,
-   mandala, crescent, heritage) x 27 premium themes across 7 event types.
+   8 layouts (poetic, herald, atrium, editorial, calm, terra, crescent,
+   heritage) x 8 premium themes — one per event type, plus a second wedding.
    Each layout is a port of one Muhibbi invitation home page; they live in
    js/layouts/*.js, share js/mu.js and register themselves through
    EVER_registerLayout (see docs/LAYOUT-SPEC.md).
@@ -373,151 +373,354 @@
   }
 
   /* ------------------------------------------------------------------ *
-   *  Theme catalog — 27 designs across 10 layouts / 7 event types       *
-   *  Every layout is a port of one Muhibbi invitation home page; a theme *
-   *  re-colours it (5 core colours + a display font) and supplies a few  *
-   *  content overrides so the design reads as its occasion.             *
+   *  Theme catalog — 8 designs, one per occasion, each on its own layout *
+   *                                                                     *
+   *  Every layout is a port of one Muhibbi invitation home page. A theme *
+   *  re-colours it (5 core colours + a display font), names its hero     *
+   *  scene and ornament motif, and — this is the part that matters —     *
+   *  overrides EVERY section its layout renders.                         *
+   *                                                                     *
+   *  That last rule exists because of a real defect: the layout defaults *
+   *  are all weddings, and a theme that overrode only `hero` shipped a   *
+   *  birthday party whose RSVP form said "Welcome to our big day" and    *
+   *  whose story section explained how the couple met. The shared        *
+   *  MU.rsvpDefaults() and MU.contactDefaults() are wedding copy too, so *
+   *  a non-wedding theme MUST override `rsvp` and `contact` as well.     *
+   *  If you add a theme, override every section id in its layout's spec. *
+   *                                                                     *
+   *  `scene`  — WebGL hero background, js/invites/scene-<id>.js          *
+   *  `motion` — drifting ornament motif, js/site-motion.js              *
    * ------------------------------------------------------------------ */
   var THEMES = [
-    /* ---- poetic — Poetic Portrait --------------------------------- */
-    { id: 'bronze', name: 'Bronze & Ivory', event: 'wedding', layout: 'poetic', category: 'Signature',
-      dark: '#2f2422', gold: '#73543b', bg: '#f6f3ee', ink: '#041117', soft: '#e6dcd0',
-      nameFont: 'derivia', ornament: 'floral',
-      content: { basics: { nameA: 'Max', nameB: 'Amanda', brand: 'M & A' } } },
-    { id: 'emerald', scene: 'crystal', name: 'Emerald & Gold', event: 'wedding', layout: 'poetic', category: 'Classic',
+    /* ---- wedding · poetic — the classic, and the reference layout --- */
+    { id: 'emerald', name: 'Emerald & Gold', event: 'wedding', layout: 'poetic',
+      category: 'Classic', scene: 'petals', motion: 'petals',
       dark: '#17301f', gold: '#a8843f', bg: '#f7f4ea', ink: '#22301f', soft: '#e3e5d5',
       nameFont: 'derivia', ornament: 'floral',
-      content: { basics: { nameA: 'Ananya', nameB: 'Rohan', brand: 'A & R' } } },
-    { id: 'pearl', name: 'Pearl Anniversary', event: 'anniversary', layout: 'poetic', category: 'Elegant',
-      dark: '#2b3038', gold: '#8b93a3', bg: '#f4f5f7', ink: '#1e242c', soft: '#e2e5ea',
-      nameFont: 'pfd', ornament: 'lines',
-      content: { basics: { nameA: 'Marion', nameB: 'Edward', brand: '30 Years' },
-        sections: { hero: { headline: 'Thirty years on', kicker: 'A pearl anniversary' } } } },
+      content: {
+        basics: { nameA: 'Ananya', nameB: 'Rohan', brand: 'A & R',
+          venue: 'Rosewood Barn', city: 'Kent', dress: 'Garden formal' },
+        sections: {
+          hero: { headline: 'Let the party begin' },
+          couple: { nameA: 'Ananya Iyer', nameB: 'Rohan Mehra' },
+          cta: { title: 'We can’t wait to see you there',
+            text: 'Please be with us — your presence is the only gift the day really needs.' },
+          rsvp: { title: 'Welcome to our big day' },
+          contact: { thanks: 'We can’t wait to see all of our beloved friends and family on our special day.' }
+        } } },
 
-    /* ---- herald — Herald ------------------------------------------ */
-    { id: 'herald-ivory', name: 'Ivory Herald', event: 'wedding', layout: 'herald', category: 'Minimal',
-      dark: '#2f2422', gold: '#73543b', bg: '#faf8f4', ink: '#1d1a17', soft: '#eee7dd',
-      nameFont: 'derivia', ornament: 'lines',
-      content: { basics: { nameA: 'Isla', nameB: 'Theo', brand: 'I & T' } } },
-    { id: 'blush', scene: 'petals', name: 'Blush Rose', event: 'wedding', layout: 'herald', category: 'Floral',
-      dark: '#5c3a40', gold: '#b98a8e', bg: '#faf3ef', ink: '#54423f', soft: '#f2e2dc',
-      nameFont: 'paris', ornament: 'floral',
-      content: { basics: { nameA: 'Priya', nameB: 'Dev', brand: 'P & D' } } },
-    { id: 'gala', name: 'Midnight Gala', event: 'gala', layout: 'herald', category: 'Elegant', scene: 'gilded',
-      dark: '#0d0c11', gold: '#c9a45c', bg: '#17161c', ink: '#ece9e2', soft: '#232129',
-      nameFont: 'cinzel', ornament: 'lines',
-      content: { basics: { nameA: 'The Ashford', nameB: 'Society', brand: 'ASHFORD' },
-        sections: { hero: { headline: 'An evening of note', kicker: 'Black tie' } } } },
-
-    /* ---- atrium — Atrium ------------------------------------------ */
-    { id: 'sage', name: 'Sage Atrium', event: 'wedding', layout: 'atrium', category: 'Garden',
-      dark: '#2c3a30', gold: '#7d8f6d', bg: '#f4f6f1', ink: '#28312a', soft: '#e0e6d8',
-      nameFont: 'corm', ornament: 'floral',
-      content: { basics: { nameA: 'Elena', nameB: 'Marco', brand: 'E & M' } } },
-    { id: 'terracotta', name: 'Terracotta', event: 'wedding', layout: 'atrium', category: 'Modern',
-      dark: '#41291f', gold: '#b3563f', bg: '#faf2ec', ink: '#33241d', soft: '#efdcd1',
-      nameFont: 'jost', ornament: 'geo',
-      content: { basics: { nameA: 'Nadia', nameB: 'Yusuf', brand: 'N & Y' } } },
-    { id: 'newkeys', scene: 'hearth', cover: true, name: 'New Keys', event: 'housewarming', layout: 'atrium', category: 'Modern',
-      dark: '#233240', gold: '#5d8aa8', bg: '#f4f7f9', ink: '#22303a', soft: '#dfe8ee',
-      nameFont: 'jost', ornament: 'geo',
-      content: { basics: { nameA: 'The Mehtas', nameB: '', brand: 'No. 42' },
-        sections: { hero: { headline: 'Our new address', kicker: 'Open house' } } } },
-
-    /* ---- editorial — Editorial ------------------------------------ */
-    { id: 'ink', name: 'Editorial Ink', event: 'wedding', layout: 'editorial', category: 'Minimal',
-      dark: '#14140f', gold: '#6a6558', bg: '#f7f6f2', ink: '#14140f', soft: '#e7e5dd',
-      nameFont: 'pfd', ornament: 'lines',
-      content: { basics: { nameA: 'Cleo', nameB: 'Ivan', brand: 'C & I' } } },
-    { id: 'champagne', name: 'Champagne Ivory', event: 'wedding', layout: 'editorial', category: 'Classic',
-      dark: '#3d3428', gold: '#bfa06a', bg: '#fbf7ee', ink: '#3a3226', soft: '#f0e7d5',
-      nameFont: 'derivia', ornament: 'floral',
-      content: { basics: { nameA: 'Sofia', nameB: 'Luca', brand: 'S & L' } } },
-    { id: 'lamb', scene: 'halo', cover: true, name: 'Little Lamb', event: 'baptism', layout: 'editorial', category: 'Soft',
-      dark: '#3b4450', gold: '#9fb4c7', bg: '#f7f9fb', ink: '#333c47', soft: '#e5edf3',
-      nameFont: 'corm', ornament: 'lines',
-      content: { basics: { nameA: 'Baby', nameB: 'Noor', brand: 'NOOR' },
-        sections: { hero: { headline: 'A blessed beginning', kicker: 'Christening' } } } },
-
-    /* ---- calm — Calm ---------------------------------------------- */
-    { id: 'hanji', name: 'Hanji Calm', event: 'wedding', layout: 'calm', category: 'Minimal',
-      dark: '#33302b', gold: '#9c8264', bg: '#f8f6f1', ink: '#2c2a26', soft: '#eae4d9',
-      nameFont: 'corm', ornament: 'lines',
-      content: { basics: { nameA: 'Jina', nameB: 'Minho', brand: 'J & M' } } },
-    { id: 'lavender', scene: 'aurora', name: 'Lavender Mist', event: 'wedding', layout: 'calm', category: 'Floral',
-      dark: '#3d3450', gold: '#8f7fb0', bg: '#f8f6fc', ink: '#352e44', soft: '#e8e3f2',
-      nameFont: 'paris', ornament: 'floral',
-      content: { basics: { nameA: 'Amara', nameB: 'Kian', brand: 'A & K' } } },
-    { id: 'sunshine', scene: 'clouds', cover: true, name: 'Sunshine Sprinkle', event: 'baby', layout: 'calm', category: 'Playful',
-      dark: '#4a3a1c', gold: '#e0a63c', bg: '#fdf8ea', ink: '#463a22', soft: '#f8ebcd',
-      nameFont: 'baloo', ornament: 'geo',
-      content: { basics: { nameA: 'Baby', nameB: 'Rae', brand: 'HELLO' },
-        sections: { hero: { headline: 'A little sunshine', kicker: 'Baby shower' } } } },
-
-    /* ---- terra — Terra -------------------------------------------- */
-    { id: 'clay', name: 'Clay & Ochre', event: 'wedding', layout: 'terra', category: 'Modern',
-      dark: '#3a251c', gold: '#a4622f', bg: '#faf3ec', ink: '#33241c', soft: '#eeddcd',
-      nameFont: 'derivia', ornament: 'geo',
-      content: { basics: { nameA: 'Zola', nameB: 'Kwame', brand: 'Z & K' } } },
-    { id: 'marigold', name: 'Marigold Saffron', event: 'wedding', layout: 'terra', category: 'Festive',
-      dark: '#5a2d10', gold: '#e08a1e', bg: '#fdf5e6', ink: '#4a2c14', soft: '#f8e3bf',
-      nameFont: 'derivia', ornament: 'floral',
-      content: { basics: { nameA: 'Kavya', nameB: 'Aditya', brand: 'K & A' } } },
-    { id: 'balloon', scene: 'confetti', cover: true, name: 'Balloon Pop', event: 'birthday', layout: 'terra', category: 'Playful',
-      dark: '#3b1f4a', gold: '#e0567f', bg: '#fdf4f8', ink: '#3a2440', soft: '#f8dce6',
-      nameFont: 'baloo', ornament: 'geo',
-      content: { basics: { nameA: 'Maya', nameB: '', brand: 'MAYA' },
-        sections: { hero: { headline: 'Maya turns eight', kicker: 'Party time' } } } },
-
-    /* ---- serene — Serene ------------------------------------------ */
-    { id: 'seafoam', scene: 'aurora', name: 'Serene Sea', event: 'wedding', layout: 'serene', category: 'Coastal',
-      dark: '#1e3a3d', gold: '#5b9298', bg: '#f2f8f8', ink: '#20363a', soft: '#dcebec',
-      nameFont: 'corm', ornament: 'lines',
-      content: { basics: { nameA: 'Leila', nameB: 'Idris', brand: 'L & I' } } },
-    { id: 'tropical', name: 'Tropical Fiesta', event: 'birthday', layout: 'serene', category: 'Festive',
-      dark: '#123a2c', gold: '#f07f3c', bg: '#f4fbf6', ink: '#1a3a2e', soft: '#dcf0e2',
-      nameFont: 'baloo', ornament: 'geo',
-      content: { basics: { nameA: 'Rio', nameB: '', brand: 'RIO 30' },
-        sections: { hero: { headline: 'Rio turns thirty', kicker: 'Pool party' } } } },
-    { id: 'cottage', scene: 'hearth', cover: true, name: 'Cottage Welcome', event: 'housewarming', layout: 'serene', category: 'Garden',
-      dark: '#3a3a26', gold: '#8a9a5b', bg: '#f7f8ef', ink: '#33341f', soft: '#e6ead4',
-      nameFont: 'corm', ornament: 'floral',
-      content: { basics: { nameA: 'The Bhattis', nameB: '', brand: 'THE NEST' },
-        sections: { hero: { headline: 'Come see the cottage', kicker: 'Housewarming' } } } },
-
-    /* ---- mandala — Mandala ---------------------------------------- */
-    { id: 'mandala', name: 'Mandala Red', event: 'wedding', layout: 'mandala', category: 'Festive',
-      dark: '#4a121c', gold: '#c9973c', bg: '#fdf3e9', ink: '#42221c', soft: '#f4dcc4',
-      nameFont: 'derivia', ornament: 'floral',
-      content: { basics: { nameA: 'Ishita', nameB: 'Vikram', brand: 'I & V' } } },
-    { id: 'sixteen', scene: 'confetti', cover: true, name: 'Golden Sixteen', event: 'birthday', layout: 'mandala', category: 'Elegant',
-      dark: '#241f2e', gold: '#d0ad55', bg: '#f9f6f0', ink: '#2b2535', soft: '#ece3cf',
-      nameFont: 'cinzel', ornament: 'lines',
-      content: { basics: { nameA: 'Zara', nameB: '', brand: 'SWEET 16' },
-        sections: { hero: { headline: 'Zara turns sixteen', kicker: 'Golden hour' } } } },
-
-    /* ---- crescent — Crescent -------------------------------------- */
-    { id: 'crescent', name: 'Crescent Green', event: 'wedding', layout: 'crescent', category: 'Classic',
+    /* ---- wedding · crescent — nikah and walima ---------------------- */
+    { id: 'crescent', name: 'Crescent Green', event: 'wedding', layout: 'crescent',
+      category: 'Classic', scene: 'crystal', motion: 'sparkle',
       dark: '#123329', gold: '#b08d4d', bg: '#f5f8f4', ink: '#1a2f26', soft: '#dfe9de',
       nameFont: 'derivia', ornament: 'geo',
-      content: { basics: { nameA: 'Aisha', nameB: 'Bilal', brand: 'A & B' } } },
-    { id: 'teddy', scene: 'clouds', cover: true, name: 'Teddy Hug', event: 'baby', layout: 'crescent', category: 'Playful',
-      dark: '#4a3728', gold: '#c08a5e', bg: '#fbf5ee', ink: '#40312a', soft: '#f2e2d2',
-      nameFont: 'baloo', ornament: 'geo',
-      content: { basics: { nameA: 'Baby', nameB: 'Ellis', brand: 'ELLIS' },
-        sections: { hero: { headline: 'A little one is on the way', kicker: 'Baby shower' } } } },
+      content: {
+        basics: { nameA: 'Aisha', nameB: 'Bilal', brand: 'A & B',
+          venue: 'Al Naseem Ballroom', city: 'Dubai', dress: 'Modest formal' },
+        sections: {
+          hero: { note: 'With the blessings of our families, we invite you to share our joy.',
+            address: 'Al Naseem Ballroom, Jumeirah, Dubai' },
+          couple: { nameA: 'Bilal Rahman', nameB: 'Aisha Kareem' },
+          event: { items: [
+            { icon: 'icon-1.svg', title: 'Venue', text: 'Al Naseem Ballroom, Jumeirah — entrance on the north side.' },
+            { icon: 'icon-2.svg', title: 'Nikah', text: 'Four in the afternoon, followed by refreshments.' },
+            { icon: 'icon-3.svg', title: 'Walima', text: 'Dinner from eight; family and friends most welcome.' }
+          ] },
+          story: { title: 'How our families came together', items: [
+            { photoA: 'mu-story-24', photoB: 'mu-story-25', title: 'The first meeting',
+              text: 'Two families, one long table, and an afternoon that quietly decided everything.' },
+            { photoA: 'mu-story-26', photoB: 'mu-story-27', title: 'Our promise',
+              text: 'Words spoken softly, witnessed by the people who raised us both.' }
+          ] },
+          rsvp: { title: 'Will you join us?',
+            note: 'It would mean a great deal to have you there. Kindly reply by',
+            yes: 'Yes, with pleasure', no: 'Sadly, I can’t attend',
+            meals: ['No preference', 'Vegetarian', 'No nuts', 'Other — I’ll note it below'],
+            success: 'Thank you — your reply has reached us, and we look forward to welcoming you.' },
+          contact: { thanks: 'We would be honoured to have you with us as we begin this new chapter.',
+            address: 'Al Naseem Ballroom, Jumeirah, Dubai' }
+        } } },
 
-    /* ---- heritage — Heritage -------------------------------------- */
-    { id: 'jubilee', scene: 'gilded', name: 'Golden Jubilee', event: 'anniversary', layout: 'heritage', category: 'Classic',
+    /* ---- anniversary · heritage — a golden jubilee ------------------ */
+    { id: 'jubilee', name: 'Golden Jubilee', event: 'anniversary', layout: 'heritage',
+      category: 'Elegant', scene: 'gilded', motion: 'sparkle',
       dark: '#3a2c14', gold: '#c1a04f', bg: '#faf6ea', ink: '#352a17', soft: '#efe4c8',
       nameFont: 'cinzel', ornament: 'floral',
-      content: { basics: { nameA: 'Rose', nameB: 'Albert', brand: '50 Years' },
-        sections: { hero: { headline: 'Fifty golden years', kicker: 'Golden jubilee' } } } },
-    { id: 'velvet', scene: 'nocturne', name: 'Velvet Rope', event: 'gala', layout: 'heritage', category: 'Elegant',
-      dark: '#3b0f18', gold: '#c9905c', bg: '#f9f4f4', ink: '#33191d', soft: '#eddcd9',
+      content: {
+        basics: { nameA: 'Rose', nameB: 'Albert', brand: '50 Years',
+          time: '06:00 PM onwards', venue: 'The Assembly Rooms', city: 'Richardson',
+          dress: 'Evening dress' },
+        sections: {
+          hero: { headline: 'Fifty golden years', items: [
+            { photo: 'mu-hero-19', headline: '', meta: 'Fifty years — and one more evening to mark them' },
+            { photo: 'mu-hero-20', headline: '', meta: 'Drinks from six, dinner at eight' }
+          ] },
+          quote: { photoL: 'mu-quote-1', photoR: 'mu-quote-2',
+            title: 'Fifty years on, still the best company in the room.',
+            text: 'Half a century of ordinary mornings, which turns out to be the extraordinary part. We would love to spend one more evening of it with you.' },
+          story: { title: 'Fifty years, briefly told', items: [
+            { photo: 'mu-story-30', year: '1976', title: 'How we met',
+              text: 'A dance hall, a borrowed jacket, and a song neither of us can name any more.' },
+            { photo: 'mu-story-31', year: '1979', title: 'Our first home',
+              text: 'Two rooms, one kettle, and a view of somebody else’s garden.' },
+            { photo: 'mu-story-32', year: 'Today', title: 'Still here',
+              text: 'Children, grandchildren, and the same unresolved argument about the thermostat.' }
+          ] },
+          gallery: { title: 'Fifty years in photographs' },
+          event: { items: [
+            { icon: 'icon-4.svg', title: 'Venue', text: 'The Assembly Rooms, Richardson — lift to the first floor.' },
+            { icon: 'icon-5.svg', title: 'Drinks', text: 'From six in the long gallery.' },
+            { icon: 'icon-6.svg', title: 'Dinner', text: 'Served at eight, with a few short speeches after.' }
+          ] },
+          countdown: { title: 'Counting down', label: 'Until the evening',
+            quote: 'Fifty years, and the party is still worth the trouble.' },
+          rsvp: { title: 'Will you be joining us?',
+            note: 'There is a seat with your name on it. Kindly reply by',
+            yes: 'Yes, I’ll be there', no: 'Sorry, I can’t make it',
+            meals: ['Roast', 'Fish', 'Vegetarian', 'Something light'],
+            success: 'Thank you — we have you down, and we are glad you can come.' },
+          contact: { thanks: 'Fifty years of friends and family, and we would love to see as many of you as possible.' }
+        } } },
+
+    /* ---- gala · herald — black tie, in aid of something ------------- */
+    { id: 'gala', name: 'Midnight Gala', event: 'gala', layout: 'herald',
+      category: 'Elegant', scene: 'nocturne', motion: 'sparkle',
+      dark: '#0d0c11', gold: '#c9a45c', bg: '#17161c', ink: '#ece9e2', soft: '#232129',
       nameFont: 'cinzel', ornament: 'lines',
-      content: { basics: { nameA: 'The Winter', nameB: 'Ball', brand: 'WINTER BALL' },
-        sections: { hero: { headline: 'The Winter Ball', kicker: 'Invitation only' } } } }
+      content: {
+        basics: { nameA: 'The Ashford', nameB: 'Society', brand: 'ASHFORD',
+          time: '07:00 PM', venue: 'The Ashford Rooms', city: 'Dubai', dress: 'Black tie' },
+        sections: {
+          hero: { items: [
+            { photo: 'mu-hero-4', kicker: 'The Ashford Society invites you to', line1: 'An Evening',
+              line2: 'of Note', meta: 'Black tie · Doors at seven' },
+            { photo: 'mu-hero-5', kicker: 'In aid of the Harbour Fund', line1: 'An Evening',
+              line2: 'of Note', meta: 'Dinner, auction and music until late' }
+          ] },
+          quote: { title: 'One evening a year, in aid of something that lasts the other fifty-one.',
+            text: 'Every seat taken is a term of school fees covered. Come for the dinner and the music; stay because the auction gets competitive.',
+            btn: 'Reserve a seat' },
+          couple: { nameA: 'Dr Amina Farouk', photoA: 'mu-couple-2',
+            textA: 'Co-chair. Twelve years with the Harbour Fund, and still the first to arrive and the last to leave.',
+            nameB: 'Julian Ashford', photoB: 'mu-couple-3',
+            textB: 'Co-chair. Founded the evening in 2014 on the theory that people give more after a good dinner. He was right.' },
+          story: { title: 'What the evening has paid for so far', btn: 'Reserve a seat', items: [
+            { photoA: 'mu-story-1', photoB: 'mu-story-2', year: '2019', title: 'The first classroom',
+              text: 'Forty guests, one long table, and enough raised to fit out a single room in the harbour district.' },
+            { photoA: 'mu-story-3', photoB: 'mu-story-4', year: '2025', title: 'Nine schools on',
+              text: 'The same evening, rather more guests, and nine hundred children now in classrooms because of it.' }
+          ] },
+          event: { items: [
+            { icon: 'icon-1.svg', title: 'Venue', text: 'The Ashford Rooms — valet parking from the east entrance.', photo: 'mu-event-1' },
+            { icon: 'icon-2.svg', title: 'Reception', text: 'Champagne and the silent auction from seven.', photo: 'mu-event-2' },
+            { icon: 'icon-3.svg', title: 'Dinner', text: 'Served at eight thirty, live auction and music to follow.', photo: 'mu-event-3' }
+          ] },
+          countdown: { title: 'Counting down', label: 'Until the evening',
+            quote: 'Black tie. Open heart. Closed bidding.' },
+          rsvp: { title: 'Reserve your seat',
+            note: 'Tables seat ten. Let us know who you would like to sit with. Please reply by',
+            showPhone: true, showMsg: true, guestsMax: 10,
+            yes: 'Yes, reserve my seat', no: 'Unable to attend — I’d like to donate',
+            meals: ['Meat', 'Fish', 'Vegetarian', 'Vegan'],
+            submit: 'Reserve seat',
+            success: 'Thank you — your seat is reserved. Table details will follow by email closer to the evening.' },
+          contact: { thanks: 'The Ashford Society is grateful to every guest, donor and volunteer who makes this evening possible.',
+            email: 'gala@example.com', address: 'The Ashford Rooms, Dubai',
+            credit: 'In aid of the Harbour Fund' }
+        } } },
+
+    /* ---- birthday · terra — a child's party ------------------------- */
+    { id: 'balloon', name: 'Balloon Pop', event: 'birthday', layout: 'terra',
+      category: 'Playful', scene: 'confetti', motion: 'confetti',
+      dark: '#3b1f4a', gold: '#e0567f', bg: '#fdf4f8', ink: '#3a2440', soft: '#f8dce6',
+      nameFont: 'baloo', ornament: 'geo',
+      content: {
+        basics: { nameA: 'Maya', nameB: '', brand: 'MAYA IS 8',
+          time: '03:00 PM to 06:00 PM', venue: 'The Garden Room',
+          city: 'Dubai', dress: 'Come as your favourite animal' },
+        sections: {
+          hero: { items: [
+            { photo: 'mu-hero-12', kicker: 'Maya is turning eight', line1: 'Maya',
+              line2: 'is Eight!', meta: 'Saturday · The Garden Room · 3 pm' },
+            { photo: 'mu-hero-13', kicker: 'There will be cake', line1: 'Maya',
+              line2: 'is Eight!', meta: 'Games, cake, and a slightly chaotic piñata' }
+          ] },
+          couple: { photoA: 'mu-couple-8', photoB: 'mu-couple-9',
+            nameA: 'Maya',
+            textA: 'Eight years old, currently obsessed with sharks, and has been counting down to this party since roughly March.',
+            nameB: 'Hosted by Mum & Dad',
+            textB: 'We will be the ones handing out cake and quietly counting children. Do stay for a cup of tea.' },
+          gallery: { items: [
+            { src: 'mu-gallery-15' }, { src: 'mu-gallery-16' }, { src: 'mu-gallery-17' },
+            { src: 'mu-gallery-18' }, { src: 'mu-gallery-19' }, { src: 'mu-gallery-20' },
+            { src: 'mu-gallery-21' }, { src: 'mu-gallery-22' }, { src: 'mu-gallery-23' },
+            { src: 'mu-gallery-24' }
+          ] },
+          story: { title: 'Eight years, very quickly', items: [
+            { photoBig: 'mu-story-17', photoSmall: 'mu-story-16', title: 'The first birthday',
+              text: 'One candle, no idea what was happening, and cake mostly in the hair.' },
+            { photoBig: 'mu-story-19', photoSmall: 'mu-story-18', title: 'And now eight',
+              text: 'Reads about sharks at breakfast. Can name more of them than either of us can.' }
+          ] },
+          countdown: { title: 'Counting down to the party' },
+          event: { title: 'Everything you need to know', items: [
+            { icon: 'icon-1.svg', title: 'Where', text: 'The Garden Room — the gate on the park side is easiest.' },
+            { icon: 'icon-2.svg', title: 'When', text: 'Three until six. Do come a little early if you can.' },
+            { icon: 'icon-3.svg', title: 'What to expect', text: 'Games in the garden, cake at four, and a piñata we make no promises about.' }
+          ] },
+          rsvp: { title: 'Can you come?',
+            note: 'Let us know how many of you to expect, and anything Maya’s cake should avoid. Please reply by',
+            showPhone: true, showMsg: true, guestsMax: 4,
+            yes: 'Yes, we’ll be there!', no: 'Sorry, we can’t make it',
+            meals: ['Eats anything', 'No nuts', 'Vegetarian', 'Dairy-free'],
+            submit: 'Send reply',
+            success: 'Brilliant — Maya will be thrilled. See you on Saturday!' },
+          contact: { thanks: 'Thank you for helping make a small person’s day a very big one.',
+            address: 'The Garden Room, Dubai', credit: 'No presents needed — just turn up' }
+        } } },
+
+    /* ---- baby shower · calm ---------------------------------------- */
+    { id: 'sunshine', name: 'Sunshine Sprinkle', event: 'baby', layout: 'calm',
+      category: 'Soft', scene: 'bloom', motion: 'bubbles',
+      dark: '#4a3a1c', gold: '#e0a63c', bg: '#fdf8ea', ink: '#463a22', soft: '#f8ebcd',
+      nameFont: 'baloo', ornament: 'geo',
+      content: {
+        basics: { nameA: 'Baby', nameB: 'Rae', brand: 'HELLO SUNSHINE',
+          time: '11:00 AM', venue: 'The Orangery', city: 'Dubai', dress: 'Anything sunny' },
+        sections: {
+          hero: { headline: 'A little sunshine is on the way',
+            meta: 'Come and help us welcome her',
+            items: [{ src: 'mu-hero-9' }, { src: 'mu-hero-10' }, { src: 'mu-hero-11' }] },
+          countdown: { title: 'Counting down to the shower' },
+          story: { title: 'How we got here', items: [
+            { heading: '', photoBig: 'mu-story-10', photoA: 'mu-story-11', photoB: 'mu-story-12',
+              title: 'The news', text: 'Told the family over a Sunday lunch that went on considerably longer than planned.' },
+            { heading: '', photoBig: 'mu-story-13', photoA: 'mu-story-14', photoB: 'mu-story-15',
+              title: 'Getting ready', text: 'One small room painted yellow, and rather more tiny socks than anyone needs.' }
+          ] },
+          gallery: { items: [
+            { src: 'mu-gallery-7' }, { src: 'mu-gallery-8' }, { src: 'mu-gallery-9' },
+            { src: 'mu-gallery-31', caption: 'Almost ready' },
+            { src: 'mu-gallery-12' },
+            { src: 'mu-gallery-11', caption: 'The yellow room' },
+            { src: 'mu-gallery-13' }, { src: 'mu-gallery-14' }
+          ] },
+          event: { title: 'So glad you can come', items: [
+            { icon: 'icon-1.svg', title: 'Where', text: 'The Orangery — through the garden, second door.' },
+            { icon: 'icon-2.svg', title: 'When', text: 'Eleven in the morning, for about three hours.' },
+            { icon: 'icon-3.svg', title: 'Brunch', text: 'Pastries, fruit and a cake decorated rather optimistically.' }
+          ] },
+          rsvp: { title: 'Can you come and celebrate?',
+            note: 'Let us know if you can make it, and anything you can’t eat. Kindly reply by',
+            showPhone: false, showMsg: true, guestsMax: 2,
+            yes: 'Yes, count me in', no: 'Sorry, can’t make it',
+            meals: ['Eats anything', 'Vegetarian', 'Gluten-free', 'No dairy'],
+            submit: 'Send reply',
+            success: 'Lovely — we’ll see you there. Thank you for celebrating with us!' },
+          photos: { items: [
+            { src: 'mu-portfolio-1' }, { src: 'mu-portfolio-2' }, { src: 'mu-portfolio-3' },
+            { src: 'mu-portfolio-4' }, { src: 'mu-portfolio-5' }, { src: 'mu-portfolio-6' },
+            { src: 'mu-portfolio-7' }
+          ] },
+          contact: { thanks: 'Thank you for all the kindness already — we can’t wait for her to meet you.',
+            address: 'The Orangery, Dubai', credit: 'No gifts expected' }
+        } } },
+
+    /* ---- housewarming · atrium ------------------------------------- */
+    { id: 'newkeys', name: 'New Keys', event: 'housewarming', layout: 'atrium',
+      category: 'Modern', scene: 'aurora', motion: 'leaves',
+      dark: '#233240', gold: '#5d8aa8', bg: '#f4f7f9', ink: '#22303a', soft: '#dfe8ee',
+      nameFont: 'jost', ornament: 'geo',
+      content: {
+        basics: { nameA: 'The Mehtas', nameB: '', brand: 'No. 42',
+          time: '04:00 PM onwards', venue: 'No. 42 Willow Court',
+          city: 'Dubai', dress: 'Come comfortable' },
+        sections: {
+          hero: { headline: 'Our new address',
+            meta: 'No. 42 Willow Court · Open house from four',
+            photoMid: 'mu-hero-6', photoRight: 'mu-hero-7' },
+          couple: { quote: 'It took eleven months, three skips and one very patient plumber.',
+            nameA: 'Nikhil Mehta', photoA: 'mu-couple-4',
+            textA: 'Did the floors himself, which is why we are having the party in November rather than August.',
+            photoMid: 'mu-couple-5',
+            text: 'We have unpacked most of it, found homes for nearly all of it, and would now very much like to fill the place with people instead of boxes.',
+            btn: 'Let us know you’re coming',
+            nameB: 'Priya Mehta', photoB: 'mu-couple-6',
+            textB: 'Chose every paint colour twice and has strong feelings about the kitchen tiles. Rightly.' },
+          story: { title: 'How the house came together', items: [
+            { title: 'The day we got the keys', year: 'Jan', photoB: 'mu-story-6', photoA: 'mu-story-5',
+              text: 'Bare boards, one working socket, and a wallpaper pattern we still occasionally dream about.' },
+            { title: 'The kitchen, finally', year: 'Sept', photoB: 'mu-story-29', photoA: 'mu-story-28',
+              text: 'Eight months of cooking on a camping stove, ended in a single triumphant afternoon.' }
+          ] },
+          event: { title: 'Come and see the place', items: [
+            { photo: 'mu-event-1', icon: 'icon-1.svg', title: 'Parking',
+              text: 'Willow Court is one-way — visitor bays are at the far end, past the postbox.' },
+            { photo: 'mu-event-2', icon: 'icon-2.svg', title: 'Doors',
+              text: 'Open from four. Come whenever suits; there is no schedule to keep to.' },
+            { photo: 'mu-event-3', icon: 'icon-3.svg', title: 'Supper',
+              text: 'Something slow-cooked from about seven, for anyone still standing.' }
+          ] },
+          countdown: { title: 'Counting down', label: 'Until the doors open',
+            quote: 'New keys, old friends. Bring nothing but yourselves.' },
+          rsvp: { title: 'Will you come by?',
+            note: 'Rough numbers help us work out how much to cook. Let us know by',
+            showPhone: false, showMsg: true, guestsMax: 6,
+            yes: 'Yes, we’ll come by', no: 'Can’t this time',
+            meals: ['Eats anything', 'Vegetarian', 'No pork', 'Gluten-free'],
+            submit: 'Let us know',
+            success: 'Wonderful — the door will be open. See you at No. 42.' },
+          photos: { items: [
+            { src: 'mu-portfolio-8' }, { src: 'mu-portfolio-9' }, { src: 'mu-portfolio-10' },
+            { src: 'mu-portfolio-11' }, { src: 'mu-portfolio-12' }, { src: 'mu-portfolio-13' }
+          ] },
+          contact: { thanks: 'Thank you to everyone who carried a box, lent a drill or fed us during the works.',
+            address: 'No. 42 Willow Court, Dubai', credit: 'Please, no housewarming gifts' }
+        } } },
+
+    /* ---- baptism · editorial --------------------------------------- */
+    { id: 'lamb', name: 'Little Lamb', event: 'baptism', layout: 'editorial',
+      category: 'Soft', scene: 'doves', motion: 'feathers',
+      dark: '#3b4450', gold: '#9fb4c7', bg: '#f7f9fb', ink: '#333c47', soft: '#e5edf3',
+      nameFont: 'corm', ornament: 'lines',
+      content: {
+        basics: { nameA: 'Noor', nameB: '', brand: 'NOOR',
+          time: '10:30 AM', venue: 'St Mary’s', city: 'Dubai', dress: 'Sunday best' },
+        sections: {
+          hero: { kicker: 'The christening of', nameA: 'Noor', nameB: 'Elise',
+            left: 'Sunday, at half past ten',
+            right: 'St Mary’s, followed by lunch' },
+          quote: { title: 'A small person, a great deal of love, and one morning to say so out loud.',
+            text: 'We would be glad of your company at Noor’s christening, and gladder still of it at lunch afterwards, where the behaviour is less formal all round.' },
+          couple: { nameA: 'Hannah Poulos', photoA: 'mu-couple-4',
+            textA: 'Godmother. Has already promised to teach her the piano, and will be held to it.',
+            photoMid: 'mu-couple-7',
+            nameB: 'Sami Haddad', photoB: 'mu-couple-6',
+            textB: 'Godfather. Volunteered for the job before anyone thought to ask him.' },
+          story: { title: 'Her first year, briefly', items: [
+            { photo: 'mu-story-7', year: 'March', title: 'The day she arrived',
+              text: 'Early, loudly, and entirely on her own schedule.' },
+            { photo: 'mu-story-8', year: 'August', title: 'First laugh',
+              text: 'At the dog, not at either of us, which we are choosing not to take personally.' },
+            { photo: 'mu-story-9', year: 'Now', title: 'Nearly walking',
+              text: 'Three steps, then a sit-down. The three steps count.' }
+          ] },
+          countdown: { title: 'Counting down', label: 'Until the christening',
+            quote: 'Held, named, and very much loved.' },
+          rsvp: { title: 'Will you join us?',
+            note: 'The church seats plenty; lunch needs numbers. Kindly reply by',
+            showPhone: false, showMsg: true, guestsMax: 4,
+            yes: 'Yes, for church and lunch', no: 'Sorry, I can’t come',
+            meals: ['Eats anything', 'Vegetarian', 'No fish', 'Child’s portion'],
+            submit: 'Send reply',
+            success: 'Thank you — we have you down for lunch, and we are so glad you can come.' },
+          photos: { items: [
+            { src: 'mu-portfolio-8' }, { src: 'mu-portfolio-9' }, { src: 'mu-portfolio-10' },
+            { src: 'mu-portfolio-11' }, { src: 'mu-portfolio-12' }, { src: 'mu-portfolio-13' }
+          ] },
+          contact: { thanks: 'Thank you to her godparents, her grandparents, and everyone who has held her since March.',
+            address: 'St Mary’s, Dubai', credit: 'Made with ♥' }
+        } } }
   ];
 
   /* ------------------------------------------------------------------ *
@@ -906,15 +1109,24 @@
        miniatures, which is exactly where a WebGL context must not appear.
        js/site-scene.js loads three.js on demand, so a design without a scene
        costs nothing. */
-    var sceneTpl = findTemplate((root.__wsData && root.__wsData.templateId) || '');
-    if (typeof window.EVER_mountScene === 'function') {
-      if (sceneTpl && sceneTpl.scene) window.EVER_mountScene(root, sceneTpl);
+    if (typeof window.EVER_mountScene === 'function' || typeof window.EVER_mountMotion === 'function') {
+      var motionTpl = findTemplate((root.__wsData && root.__wsData.templateId) || '');
+      if (motionTpl && motionTpl.scene && typeof window.EVER_mountScene === 'function') {
+        window.EVER_mountScene(root, motionTpl);
+      }
+      /* Section motion below the hero — ornaments, staggered reveal and the
+         ornament parallax. js/site-motion.js is pure DOM and CSS, so unlike
+         the hero scene it costs nothing to load and needs no WebGL. */
+      if (motionTpl && typeof window.EVER_mountMotion === 'function') {
+        window.EVER_mountMotion(root, motionTpl);
+      }
     }
 
     /* Designs that opt into a tap-to-open cover (`cover` on the theme) mount
        it here, the same way and at the same moment as the scene above. */
     if (typeof window.EVER_mountCover === 'function') {
-      if (sceneTpl && sceneTpl.cover) window.EVER_mountCover(root, sceneTpl);
+      var coverTpl = findTemplate((root.__wsData && root.__wsData.templateId) || '');
+      if (coverTpl && coverTpl.cover) window.EVER_mountCover(root, coverTpl);
     }
   }
 

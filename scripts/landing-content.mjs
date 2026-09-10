@@ -347,7 +347,7 @@ export const PAGES = [
     event: null,
     title: 'Digital Invitations — A Whole Website, Not Just a Picture',
     description:
-      'A digital invitation that is a real web page: story, schedule, gallery, map, gift list and RSVP. 27 designs, from AED 58, paid once.',
+      'A digital invitation that is a real web page: story, schedule, gallery, map, gift list and RSVP. 8 designs, from AED 58, paid once.',
     keywords:
       'digital invitation, online invitation, electronic invitation, e-invite, invitation website, paperless invitation',
     kicker: 'Digital invitations',

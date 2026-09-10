@@ -493,4 +493,148 @@
     opacity: 0;
     transform: none;
   }
+/* ==========================================================================
+   Section motion — js/site-motion.js
+   --------------------------------------------------------------------------
+   Two systems, both transform/opacity only so they stay on the compositor:
+
+   1. `.ws-orn` — a per-section layer of drifting ornaments. The layer is
+      injected as the section's first child, so it paints under the section's
+      own content without changing document flow. site-motion.js only mounts
+      it into sections that can host an absolute child without moving what is
+      already there.
+   2. `.ws-mo-item` — a stagger on the content the existing `.ws-anim/.ws-in`
+      scroll-reveal already brings in. bindSite adds `.ws-in`; this just
+      delays each child by its index so a row assembles rather than appearing.
+
+   Every ornament takes its colour from the theme variables (`--ws-gold`,
+   `--ws-soft`), so one motif looks different on every design that uses it.
+   ========================================================================== */
+
+.ws-orn {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  /* Parallax writes translate3d here; promoting the layer keeps the drift
+     off the main thread and stops it repainting the section behind it. */
+  will-change: transform;
+}
+/* The section's own content must stay above the layer. Muhibbi wraps every
+   section in one of these, so lifting them is enough — no per-layout rules. */
+.ws-has-orn > .container,
+.ws-has-orn > .container-fluid,
+.ws-has-orn > .row { position: relative; z-index: 1; }
+
+.ws-orn-bit {
+  position: absolute;
+  left: var(--x, 50%);
+  top: -12%;
+  width: 14px;
+  height: 14px;
+  opacity: 0;
+  background: var(--ws-gold, #c9a45c);
+  transform: scale(var(--s, 1));
+  animation: ws-orn-fall var(--dur, 18s) linear var(--delay, 0s) infinite;
+}
+
+@keyframes ws-orn-fall {
+  0%   { opacity: 0; transform: translate3d(0, -10%, 0) rotate(0) scale(var(--s, 1)); }
+  8%   { opacity: var(--o, .4); }
+  92%  { opacity: var(--o, .4); }
+  100% { opacity: 0;
+         transform: translate3d(var(--drift, 0), 128vh, 0) rotate(var(--spin, 180deg)) scale(var(--s, 1)); }
+}
+
+/* ---- Motifs ------------------------------------------------------------
+   One keyframe set, six silhouettes. Each motif changes only shape, tint
+   and how heavy the fall reads. */
+
+/* Petals — the classic teardrop, tinted warm. */
+.ws-mo-petals .ws-orn-bit {
+  width: 13px; height: 15px;
+  border-radius: 76% 24% 70% 30% / 60% 60% 40% 40%;
+  background: var(--ws-soft, #f2e2dc);
+  box-shadow: inset -2px -1px 0 rgba(0, 0, 0, .06);
+}
+
+/* Sparkle — a four-point star, small and bright, for the formal designs. */
+.ws-mo-sparkle .ws-orn-bit {
+  width: 11px; height: 11px;
+  background: var(--ws-gold, #c9a45c);
+  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+}
+
+/* Confetti — hard-edged rectangles that flip as they fall. */
+.ws-mo-confetti .ws-orn-bit {
+  width: 8px; height: 13px;
+  border-radius: 1px;
+  background: var(--ws-gold, #e0567f);
+}
+.ws-mo-confetti .ws-orn-bit:nth-child(3n)   { background: var(--ws-soft, #f8dce6); }
+.ws-mo-confetti .ws-orn-bit:nth-child(4n+1) { background: var(--ws-dark, #3b1f4a); }
+
+/* Bubbles — rise instead of falling, and never spin. */
+.ws-mo-bubbles .ws-orn-bit {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1.5px solid var(--ws-gold, #e0a63c);
+  top: auto;
+  bottom: -12%;
+  animation-name: ws-orn-rise;
+}
+@keyframes ws-orn-rise {
+  0%   { opacity: 0; transform: translate3d(0, 10%, 0) scale(var(--s, 1)); }
+  10%  { opacity: var(--o, .4); }
+  90%  { opacity: var(--o, .4); }
+  100% { opacity: 0; transform: translate3d(var(--drift, 0), -128vh, 0) scale(calc(var(--s, 1) * 1.25)); }
+}
+
+/* Leaves — broader, slower, tipped to one side. */
+.ws-mo-leaves .ws-orn-bit {
+  width: 18px; height: 11px;
+  border-radius: 0 100% 0 100%;
+  background: var(--ws-gold, #5d8aa8);
+}
+
+/* Feathers — the softest: pale, tapered and barely there. */
+.ws-mo-feathers .ws-orn-bit {
+  width: 9px; height: 20px;
+  border-radius: 50% 50% 50% 50% / 34% 34% 66% 66%;
+  background: linear-gradient(180deg, var(--ws-soft, #e5edf3), transparent);
+}
+
+/* ---- Staggered content reveal ------------------------------------------ */
+.ws-mo-item {
+  transition: opacity .62s ease, transform .62s cubic-bezier(.16, 1, .3, 1);
+  transition-delay: calc(var(--i, 0) * 90ms);
+}
+.ws-anim .ws-mo-item { opacity: 0; transform: translateY(16px); }
+.ws-anim.ws-in .ws-mo-item { opacity: 1; transform: none; }
+
+/* ---- Motion is opt-out ---------------------------------------------------
+   site-motion.js already returns early when the visitor asks for reduced
+   motion, so nothing is injected. This is the belt to that braces: it also
+   covers a preference changed after the page rendered. */
+@media (prefers-reduced-motion: reduce) {
+  .ws-orn { display: none; }
+  .ws-orn-bit { animation: none; }
+  .ws-mo-item,
+  .ws-anim .ws-mo-item,
+  .ws-anim.ws-in .ws-mo-item { opacity: 1; transform: none; transition: none; }
+}
+
+/* Phones get fewer, smaller ornaments — the layer is already area-scaled in
+   JS, but a 14px shape at 360px wide is proportionally twice the object it
+   is on a laptop. */
+   Scaled by width/height rather than transform: the keyframes set transform
+   on every step, so a transform here would simply be overridden. */
+@media (max-width: 620px) {
+  .ws-orn-bit { width: 10px; height: 12px; }
+  .ws-mo-bubbles .ws-orn-bit { width: 12px; height: 12px; }
+  .ws-mo-leaves .ws-orn-bit { width: 13px; height: 8px; }
+  .ws-mo-feathers .ws-orn-bit { width: 7px; height: 15px; }
+  .ws-orn-bit:nth-child(n + 7) { display: none; }
 }

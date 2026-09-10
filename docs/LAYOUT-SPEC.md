@@ -9,7 +9,7 @@ markup/behaviour helpers from `public/js/mu.js` and styling from
 
 ## Goal
 
-Every template is built from ONE of 10 **layouts** (genuinely different page
+Every template is built from ONE of 8 **layouts** (genuinely different page
 structures, each a Muhibbi home-page port) + a **theme** (palette / fonts /
 ornament) + **content defaults** specific to its event type (wedding,
 birthday, anniversary, housewarming, baptism, baby & kids, gala…). The editor
@@ -28,8 +28,6 @@ public/js/layouts/atrium.js    Announcement Home 2
 public/js/layouts/editorial.js Announcement Home 3
 public/js/layouts/calm.js      Korean Wedding Home
 public/js/layouts/terra.js     African Wedding Home
-public/js/layouts/serene.js    Indo & Malay Wedding Home
-public/js/layouts/mandala.js   Indian Wedding Home
 public/js/layouts/crescent.js  Muslim Wedding Home
 public/js/layouts/heritage.js  Senior Wedding Home
 public/css/mu.css              GENERATED (scripts/scope-css.mjs) — the whole
@@ -187,15 +185,39 @@ classes as `wsm-<layoutId>-*`.
   event: 'wedding',            // event-type id (chip on create page)
   layout: 'poetic',            // layout id
   category: 'Classic',         // style chip inside the event group
+  scene: 'petals',             // WebGL hero scene — js/invites/scene-petals.js
+  motion: 'petals',            // ornament motif — js/site-motion.js
   dark: '#17301f', gold: '#c9a45c', bg: '#f7f3e8', ink: '#3c3628',
   soft: '#efe7d2', nameFont: 'vibes', ornament: 'floral',
   content: { basics: {...overrides}, sections: {...overrides} } }
 ```
 
 - `content` overrides are deep-merged over the layout defaults by
-  `EVER_siteDefaults(templateId)` — keep them SMALL (titles, names, sample
-  copy, which photos/icons to show).
+  `EVER_siteDefaults(templateId)`. Arrays REPLACE, objects merge.
+- `scene` and `motion` are both optional and independent. A theme with neither
+  renders as a still page and costs nothing extra. See ARCHITECTURE.md §14.
 - Custom templates (designer modal) carry `layout` too and merge the same way.
+
+### A theme MUST override every section its layout renders
+
+This used to say "keep overrides SMALL", and that advice produced the single
+worst defect in the catalogue. **Every layout's `defaults()` is a wedding.** A
+theme that overrode only `basics` and `hero` therefore shipped, for example, a
+child's birthday party whose `story` section explained how the couple met, whose
+`event` tiles announced a ceremony, and whose RSVP form said *"Welcome to our
+big day"* with the options *Joyfully accept / Regretfully decline*.
+
+Two of those sections are not even in the layout files: `MU.rsvpDefaults()` and
+`MU.contactDefaults()` in `js/mu.js` are shared, and they are wedding copy too.
+So a non-wedding theme must override **`rsvp` and `contact` as well as** every
+section id in its layout's spec.
+
+The rule, concretely: write out `content.sections` for every id in
+`EVER_layoutOrder(layout)`, plus `rsvp` and `contact`. It is more text than the
+old guidance implied, and it is the difference between a design and a recolour.
+
+`public/layouts-test.html` renders every layout and theme on one page; reading a
+non-wedding design top to bottom there is the fastest way to catch a leak.
 
 ## Editor (dynamic)
 
