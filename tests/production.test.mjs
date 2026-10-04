@@ -8,7 +8,7 @@ import path from 'node:path';
 test('production boot serves built assets with security headers and secure cookies', async()=>{
   const directory=mkdtempSync(path.join(tmpdir(),'invitara-production-'));
   const endpoint='http://localhost:3199',appOrigin='https://invitara.example';
-  const child=spawn(process.execPath,['server/index.mjs'],{env:{...process.env,NODE_ENV:'production',PORT:'3199',APP_ORIGIN:appOrigin,DATA_DIR:directory,STRIPE_SECRET_KEY:'sk_test_fixture',STRIPE_WEBHOOK_SECRET:'whsec_fixture',BUSINESS_NAME:'Test operator',SUPPORT_EMAIL:'test@example.test',TRUST_PROXY_HOPS:'0'},stdio:'pipe'});
+  const child=spawn(process.execPath,['server/index.mjs'],{env:{...process.env,NODE_ENV:'production',PORT:'3199',APP_ORIGIN:'invitara.example',DATA_DIR:directory,STRIPE_SECRET_KEY:'sk_test_fixture',STRIPE_WEBHOOK_SECRET:'whsec_fixture',BUSINESS_NAME:'Test operator',SUPPORT_EMAIL:'test@example.test',TRUST_PROXY_HOPS:'0'},stdio:'pipe'});
   try{
     await new Promise((resolve,reject)=>{
       const timeout=setTimeout(()=>reject(new Error('Production startup timed out')),30000);
@@ -17,6 +17,8 @@ test('production boot serves built assets with security headers and secure cooki
       child.on('exit',code=>{clearTimeout(timeout);reject(new Error('Production process exited '+code));});
     });
     const health=await fetch(endpoint+'/api/health');
+    const allowed=await fetch(endpoint+'/api/auth/login',{method:'POST',headers:{Origin:appOrigin,'Content-Type':'application/json'},body:'{}'});
+    assert.equal(allowed.status,400,'Normalized HTTPS origin passes CSRF middleware and reaches field validation');
     assert.equal(health.status,200);
     assert.match(health.headers.get('strict-transport-security'),/max-age=/);
     assert.match(health.headers.get('set-cookie'),/Secure/);

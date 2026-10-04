@@ -1,4 +1,5 @@
 import express from 'express';
+import { resolveOrigin } from './origin.mjs';
 import Stripe from 'stripe';
 import QRCode from 'qrcode';
 import { DatabaseSync } from 'node:sqlite';
@@ -15,8 +16,7 @@ import { initAuth, accountFor, mountAuth } from './auth.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicRoot = path.join(root, 'public');
 const production = process.env.NODE_ENV === 'production';
-const origin = process.env.APP_ORIGIN || 'http://localhost:3000';
-if(new URL(origin).origin!==origin||!/^https?:/.test(origin))throw new Error('APP_ORIGIN must be an exact HTTP(S) origin with no path or trailing slash.');
+const origin = resolveOrigin(process.env.APP_ORIGIN, production);
 if (production && (!origin.startsWith('https://') || !process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET)) throw new Error('Production requires HTTPS APP_ORIGIN and Stripe secrets.');
 if(production&&(!process.env.BUSINESS_NAME||!process.env.SUPPORT_EMAIL))throw new Error('Production requires BUSINESS_NAME and SUPPORT_EMAIL.');
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
