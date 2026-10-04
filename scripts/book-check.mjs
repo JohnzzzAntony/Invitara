@@ -1,0 +1,33 @@
+import {chromium} from '@playwright/test';
+import assert from 'node:assert/strict';
+const browser=await chromium.launch({channel:'msedge',headless:true});
+try{
+ const page=await browser.newPage({viewport:{width:390,height:844}});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto((process.env.TEST_ORIGIN||'http://localhost:3000')+'/demo.html?id=edition-vow');
+ const book=page.locator('.ed-book-bound');
+ await book.waitFor();
+ await page.locator('.ed-invite-link').click();
+ await page.waitForTimeout(250);
+ assert.equal(await page.locator('.ed-sheet-turning').count(),1,'A physical sheet must be turning');
+ assert.notEqual(await page.locator('.ed-sheet-turning').evaluate(el=>getComputedStyle(el).transform),'none');
+ await page.waitForFunction(()=>document.querySelector('.edition').dataset.bookPage==='1');
+ assert.equal(await page.locator('.ed-book-sheet:not([hidden])').count(),1);
+ await page.getByRole('button',{name:'Next chapter'}).click();
+ await page.waitForFunction(()=>document.querySelector('.edition').dataset.bookPage==='2');
+ await page.getByRole('button',{name:'Previous chapter'}).click();
+ await page.waitForFunction(()=>document.querySelector('.edition').dataset.bookPage==='1');
+ await page.getByRole('button',{name:'Return to cover'}).click();
+ await page.waitForFunction(()=>document.querySelector('.edition').dataset.bookPage==='0');
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await page.locator('.ed-book-sheet:not([hidden])').evaluate(el=>{el.scrollTop=el.scrollHeight;});
+ await page.locator('.ed-book-stage').dispatchEvent('wheel',{deltaY:100,bubbles:true,cancelable:true});
+ await page.waitForFunction(()=>document.querySelector('.edition').dataset.bookPage==='1');
+ await page.locator('.ed-book-sheet:not([hidden]) h2').click();
+ await page.waitForFunction(()=>document.querySelector('.edition').dataset.bookPage==='2');
+ assert.equal(await page.locator('.ed-sheet-turning').count(),0);
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+ await page.screenshot({path:'artifacts/editions/book-open-mobile.png'});
+ assert.deepEqual(errors,[]);
+ console.log('Passed: hinged page animation, next/previous/cover, scroll, tap, reduced motion, mobile overflow.');
+}finally{await browser.close();}
