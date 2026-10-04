@@ -18,6 +18,7 @@
     "check:js": "node scripts/check.mjs",
     "test:platform": "node scripts/platform-check.mjs",
     "build:motion": "node scripts/build-motion.mjs",
+    "test:openings": "node scripts/openings-check.mjs",
     "test:book": "node scripts/book-check.mjs",
     "test:editions": "node scripts/editions-check.mjs",
     "lint": "eslint . --max-warnings=0"

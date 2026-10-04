@@ -46,6 +46,49 @@
   }
   if(key==='postmark'&&trigger){var date=hero.querySelector('.ed-date');date.classList.add('ed-sealed-date');trigger.setAttribute('aria-expanded','false');on(trigger,'click',function(e){if(trigger.getAttribute('aria-expanded')==='true')return;e.preventDefault();e.stopImmediatePropagation();date.classList.remove('ed-sealed-date');trigger.setAttribute('aria-expanded','true');trigger.querySelector('span').textContent='The details are yours';date.setAttribute('role','status');root.dispatchEvent(new CustomEvent('edition-reveal',{detail:{node:date}}));},true);}
   if(key==='mosaic'&&trigger){root.classList.add('ed-courtyard-closed');trigger.setAttribute('aria-expanded','false');on(trigger,'click',function(e){if(trigger.getAttribute('aria-expanded')==='true')return;e.preventDefault();e.stopImmediatePropagation();root.classList.remove('ed-courtyard-closed');root.classList.add('ed-courtyard-open');trigger.setAttribute('aria-expanded','true');trigger.querySelector('span').textContent='Come on in';root.dispatchEvent(new CustomEvent('edition-reveal',{detail:{node:hero.querySelector('.ed-courtyard-copy')}}));},true);}
+  var opening,openingAnimations=[],openingStarted=false,startMotion=function(){};
+  var entrances={
+   orbit:['The next chapter begins','Open the ring box','YES, TO US','ringbox'],
+   postmark:['A little note, just for you','Unseal the invitation','WITH LOVE','envelope'],
+   encore:['Your name is on the list','Tear your ticket','ADMIT ONE','ticket'],
+   archive:['A lifetime of little moments','Open our album','OUR STORY','album'],
+   universe:['Someone wonderful is on the way','Welcome our little wonder','HELLO, LITTLE ONE','nursery'],
+   petal:['An afternoon in full bloom','Unwrap the flowers','THE PETAL SOCIETY','botanical'],
+   next:['You are part of what comes next','Unroll the announcement','THE NEXT CHAPTER','scroll'],
+   disco:['The evening belongs to you','Draw the curtains','AFTER DARK','curtain'],
+   form:['An invitation to think forward','Open your invitation','FORM / FUTURE','folder'],
+   majlis:['An evening of light and gratitude','Open the lantern screen','UNDER ONE MOON','lantern'],
+   mosaic:['Our doors are open to you','Enter the courtyard','EID MUBARAK','doors'],
+   solstice:['A little warmth, wrapped for you','Unwrap the gathering','IN GOOD COMPANY','parcel'],
+   elsewhere:['Somewhere worth being together','Open the travel wallet','YOU ARE INVITED','wallet']
+  };
+  if(hero&&entrances[key]){
+   var entrance=entrances[key];opening=document.createElement('section');opening.className='ed-opening ed-opening-'+entrance[3];opening.setAttribute('aria-label','Open your invitation');
+   var eyebrow=document.createElement('p');eyebrow.className='ed-opening-eyebrow';eyebrow.textContent=entrance[0];
+   var object=document.createElement('div');object.className='ed-opening-object';object.setAttribute('aria-hidden','true');object.innerHTML='<div class="ed-opening-inside"><span>YOU ARE INVITED</span></div><div class="ed-opening-leaf ed-opening-left"><span></span></div><div class="ed-opening-leaf ed-opening-right"><span></span></div><div class="ed-opening-seal">✦</div>';object.querySelector('.ed-opening-left span').textContent=entrance[2];
+   var names=document.createElement('h2');names.className='ed-opening-names';names.textContent=Array.from(hero.querySelectorAll('.ed-name')).map(function(node){return node.textContent;}).join(' & ')||'A celebration awaits';
+   var openButton=document.createElement('button');openButton.type='button';openButton.className='ed-opening-button';openButton.textContent=entrance[1];openButton.setAttribute('aria-expanded','false');
+   var caption=document.createElement('p');caption.className='ed-opening-caption';caption.textContent='A personal invitation · Tap to open';
+   opening.append(eyebrow,object,names,openButton,caption);root.prepend(opening);root.classList.add('ed-awaiting-open');
+   var concealed=Array.from(root.children).filter(function(node){return node!==opening;});concealed.forEach(function(node){node.inert=true;});
+   function finishOpening(){if(!opening||disposed)return;openingAnimations.forEach(function(a){a.cancel();});openingAnimations=[];root.classList.remove('ed-awaiting-open');root.dataset.opened='true';concealed.forEach(function(node){node.inert=false;});opening.remove();opening=null;
+    // The outer letter/doors already reveal these details; avoid a second gate.
+    if(key==='postmark'){hero.querySelector('.ed-date')?.classList.remove('ed-sealed-date');trigger?.setAttribute('aria-expanded','true');}
+    if(key==='mosaic'){root.classList.remove('ed-courtyard-closed');root.classList.add('ed-courtyard-open');trigger?.setAttribute('aria-expanded','true');}
+    hero.tabIndex=-1;hero.focus({preventScroll:true});startMotion();
+   }
+   function openInvitation(){if(openingStarted)return;openingStarted=true;openButton.setAttribute('aria-expanded','true');openButton.textContent='Opening your invitation…';
+    if(reduced.matches||root.dataset.motion==='none'){finishOpening();return;}
+    opening.classList.add('is-opening');
+    var leaves=opening.querySelectorAll('.ed-opening-leaf'),seal=opening.querySelector('.ed-opening-seal');
+    var transitions={ringbox:['rotateX(110deg)','translateY(20%)'],envelope:['rotateX(180deg)','translateY(110%)'],ticket:['translate(-110%, -12%) rotate(-12deg)','translate(115%, 18%) rotate(15deg)'],album:['rotateY(-150deg)','rotateY(15deg)'],nursery:['translateX(-105%)','translateX(105%)'],botanical:['translate(-80%, 70%) rotate(-50deg)','translate(80%, 70%) rotate(50deg)'],scroll:['translateY(-105%) scaleY(.08)','translateY(105%) scaleY(.08)'],curtain:['translateX(-100%) scaleX(.2)','translateX(100%) scaleX(.2)'],folder:['rotateY(-120deg)','rotateY(120deg)'],lantern:['translateY(-110%)','translateY(110%)'],doors:['rotateY(-105deg)','rotateY(105deg)'],parcel:['translateX(-115%) rotate(-8deg)','translateX(115%) rotate(8deg)'],wallet:['rotateX(130deg)','translateY(110%)']};
+    leaves.forEach(function(leaf,i){openingAnimations.push(leaf.animate([{transform:'none'},{transform:transitions[entrance[3]][i]}],{duration:1200,delay:120+i*90,easing:'cubic-bezier(.22,.7,.18,1)',fill:'forwards'}));});
+    openingAnimations.push(seal.animate([{transform:'scale(1)',opacity:1},{transform:'scale(1.3) translateY(15px)',opacity:0}],{duration:400,fill:'forwards'}));
+    var exit=opening.animate([{opacity:1},{opacity:0}],{duration:400,delay:1300,fill:'forwards'});openingAnimations.push(exit);exit.onfinish=finishOpening;
+   }
+   on(openButton,'click',openInvitation);on(object,'click',openInvitation);on(reduced,'change',function(){if(reduced.matches&&openingStarted)finishOpening();});
+   clean.push(function(){openingAnimations.forEach(function(a){a.onfinish=null;a.cancel();});});
+  }
   var photos=Array.from(root.querySelectorAll('.nx-gallery-photo'));
   if(photos.length){var dialog=document.createElement('dialog');dialog.className='nx-lightbox';dialog.setAttribute('aria-label','Photo gallery');dialog.innerHTML='<button aria-label="Close gallery">×</button><img alt=""><p role="status"></p><div><button aria-label="Previous photograph">←</button><button aria-label="Next photograph">→</button></div>';document.body.appendChild(dialog);var current=0,focus;
    function show(i){current=(i+photos.length)%photos.length;dialog.querySelector('img').src=photos[current].src;dialog.querySelector('img').alt=photos[current].alt;dialog.querySelector('p').textContent=(current+1)+' / '+photos.length+' — '+photos[current].alt;}
@@ -53,7 +96,7 @@
   }
   if(!reduced.matches&&root.dataset.motion!=='none'){
    var pause=document.createElement('button');pause.className='ed-scene-action';pause.type='button';pause.textContent='Pause motion';pause.setAttribute('aria-pressed','false');hero?.appendChild(pause);on(pause,'click',function(){var paused=pause.getAttribute('aria-pressed')!=='true';pause.setAttribute('aria-pressed',String(paused));pause.textContent=paused?'Resume motion':'Pause motion';root.dataset.paused=String(paused);root.dispatchEvent(new CustomEvent('edition-motion'));});
-   import('/vendor/editions/editions-motion.js').then(function(module){if(!disposed&&root.isConnected){var stop=module.bindEditionMotion(root);clean.push(stop);}}).catch(function(){pause.remove();});
+   startMotion=function(){import('/vendor/editions/editions-motion.js').then(function(module){if(!disposed&&root.isConnected){var stop=module.bindEditionMotion(root);clean.push(stop);}}).catch(function(){pause.remove();});};if(!opening)startMotion();
   }
  };
 })();
