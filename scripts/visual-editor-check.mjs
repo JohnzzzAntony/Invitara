@@ -1,0 +1,96 @@
+import {chromium} from '@playwright/test';
+import assert from 'node:assert/strict';
+import {mkdirSync} from 'node:fs';
+
+const origin=process.env.TEST_ORIGIN||'http://localhost:3000';
+const browser=await chromium.launch({channel:'msedge',headless:true});
+const page=await browser.newPage({viewport:{width:1440,height:1000}});
+const errors=[];
+page.on('pageerror',error=>errors.push(error.message));
+mkdirSync('artifacts',{recursive:true});
+try {
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await page.goto(origin);
+ await page.locator('.collection-card').first().waitFor();
+ await page.screenshot({path:'artifacts/premium-home-desktop.png',fullPage:true});
+ for(const width of [320,375,390,414,768,1024,1280,1440,1920]) {
+  await page.setViewportSize({width,height:1000});
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'Homepage overflow at '+width+' '+JSON.stringify(await page.locator('body *').evaluateAll(nodes=>nodes.filter(n=>n.getBoundingClientRect().right>innerWidth+1).slice(0,8).map(n=>[n.className,n.getBoundingClientRect().right]))));
+ }
+ await page.setViewportSize({width:390,height:844});
+ await page.screenshot({path:'artifacts/premium-home-mobile.png',fullPage:true});
+ await page.goto(origin+'/create.html');
+ await page.locator('#template-search').fill('a little universe');
+ assert.equal(await page.locator('.collection-card').count(),1);
+ await page.locator('#template-search').fill('no such template');
+ await page.locator('#collection-empty').waitFor({state:'visible'});
+ await page.goto(origin+'/demo.html?id=vellum');
+ await page.locator('#demo-select').click();
+ await page.waitForURL('**/editor.html');
+ await page.setViewportSize({width:1440,height:1000});
+ const name=()=>page.locator('#canvas [data-field="basics.nameA"]');
+ await name().click();
+ await name().fill('Sarah');
+ await page.locator('#save-btn').click();
+ assert.equal(await page.evaluate(()=>window.EVER_EDITOR.getState().basics.nameA),'Sarah');
+ await page.locator('#undo-btn').click();
+ assert.equal(await name().textContent(),'Amelia');
+ await page.locator('#redo-btn').click();
+ assert.equal(await name().textContent(),'Sarah');
+ await name().click();
+ await page.locator('#visual-font-size').fill('44');
+ await page.locator('#save-btn').click();
+ await page.reload();
+ assert.equal(await name().textContent(),'Sarah');
+ assert.equal(await name().evaluate(n=>n.style.fontSize),'44px');
+ await name().click();
+ await page.screenshot({path:'artifacts/premium-editor-desktop.png'});
+ await page.locator('#full-preview-btn').click();
+ assert.equal(await page.locator('.visual-inspector').isVisible(),false);
+ assert.equal(await page.locator('#canvas [contenteditable]').count(),0);
+ await page.locator('[data-open]').click();
+ await page.locator('#full-preview-btn').click();
+ await page.setViewportSize({width:390,height:844});
+ await name().click();
+ assert.equal(await page.locator('#visual-inspector').isVisible(),true);
+ await page.screenshot({path:'artifacts/premium-editor-mobile.png'});
+ for(const width of [320,375,390,414,768,1024,1280,1440,1920]) {
+  await page.setViewportSize({width,height:1000});
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'Editor overflow at '+width);
+ }
+ await page.setViewportSize({width:1440,height:1000});
+ await page.locator('#tab-design').click();
+ await page.getByRole('button',{name:'Aa Black & Gold'}).click();
+ assert.equal(await page.evaluate(()=>window.EVER_EDITOR.getState().sections.hero.bg),'#171b19');
+ await page.locator('#undo-btn').click();
+ assert.notEqual(await page.evaluate(()=>window.EVER_EDITOR.getState().sections.hero.bg),'#171b19');
+ const image=page.locator('#canvas img[data-editable=true]').first();
+ await image.click();
+ await page.locator('#visual-image-fit').selectOption('contain');
+ assert.equal(await image.evaluate(n=>n.style.objectFit),'contain');
+ const letter=page.locator('#ws-sec-letter');
+ await letter.click({position:{x:6,y:6}});
+ await page.getByRole('button',{name:'Duplicate',exact:true}).click();
+ await page.locator('#ws-sec-letterCopy1').waitFor();
+ await page.locator('#canvas [data-field="sections.letterCopy1.title"]').click();
+ await page.locator('#visual-text-content').fill('A second chapter');
+ await page.locator('#save-btn').click();
+ await page.reload();
+ assert.equal(await page.locator('#canvas [data-field="sections.letterCopy1.title"]').textContent(),'A second chapter');
+ await page.locator('#ws-sec-letterCopy1').click({position:{x:6,y:6}});
+ page.once('dialog',dialog=>dialog.accept());
+ await page.getByRole('button',{name:'Delete section',exact:true}).click();
+ assert.equal(await page.locator('#ws-sec-letterCopy1').count(),0);
+ await page.locator('#undo-btn').click();
+ assert.equal(await page.locator('#ws-sec-letterCopy1').count(),1);
+ await page.goto(origin+'/dashboard.html');
+ await page.locator('.dashboard-card').waitFor();
+ await page.locator('#dashboard-search').fill('no such invitation');
+ await page.locator('#dashboard-no-results').waitFor({state:'visible'});
+ await page.locator('#dashboard-search').fill('');
+ await page.goto(origin+'/pricing.html');
+ assert.ok(await page.locator('.pricing-card').count()>=7);
+ for(const width of [320,768,1440]){await page.setViewportSize({width,height:1000});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'Pricing overflow');}
+ assert.deepEqual(errors,[]);
+ console.log('Passed: 9 responsive widths, search, inline edit, persistence, undo/redo, presets, image controls, full preview, mobile inspector, section duplication/deletion/restoration, dashboard search, and pricing.');
+} finally {await browser.close();}

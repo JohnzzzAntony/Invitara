@@ -1,35 +1,41 @@
 {
-  "name": "ever-rsvp",
+  "name": "invitara",
   "version": "1.0.0",
   "private": true,
-  "description": "Ever RSVP — a pure HTML/CSS/JS event website builder. Next.js is only a static file server for local dev; the product itself has zero runtime dependencies.",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
-    "dev": "next dev -p 3000",
-    "build": "next build",
-    "start": "next start -p 3000",
-    "lint": "eslint .",
-    "check:js": "node scripts/check-public-js.mjs",
-    "check": "bun run lint && bun run check:js",
-    "domain": "node scripts/set-domain.mjs",
-    "gen:headers": "node scripts/gen-deploy-headers.mjs",
-    "gen:landing": "node scripts/gen-landing.mjs",
-    "gen:css": "node scripts/scope-css.mjs",
-    "gen:photos": "node scripts/gen-photos.mjs"
+    "dev": "node --watch --env-file-if-exists=.env server/index.mjs",
+    "start": "node --env-file-if-exists=.env server/index.mjs",
+    "build": "npm run build:motion && node scripts/check.mjs",
+    "check": "node scripts/check.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "test:browser": "node scripts/browser-check.mjs",
+    "test:visual-editor": "node scripts/visual-editor-check.mjs",
+    "test:paid-browser": "node scripts/paid-browser-check.mjs",
+    "check:js": "node scripts/check.mjs",
+    "test:platform": "node scripts/platform-check.mjs",
+    "build:motion": "node scripts/build-motion.mjs",
+    "test:editions": "node scripts/editions-check.mjs",
+    "lint": "eslint . --max-warnings=0"
   },
   "dependencies": {
-    "next": "^16.1.1",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "express": "5.1.0",
+    "luxon": "3.7.2",
+    "qrcode": "^1.5.4",
+    "stripe": "18.5.0"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "^16.1.1",
-    "typescript": "^5"
-  },
-  "trustedDependencies": [
-    "unrs-resolver"
-  ]
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.55.1",
+    "animejs": "4.5.0",
+    "esbuild": "0.28.2",
+    "eslint": "10.12.0",
+    "globals": "16.5.0",
+    "gsap": "3.13.0",
+    "motion": "14.0.0",
+    "three": "0.186.1"
+  }
 }

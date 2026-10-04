@@ -1,0 +1,6 @@
+(function(){
+ 'use strict';var E=window,C=E.EVER_C,esc=E.EVER_esc;
+ function use(id){var p=C.createProject(id);if(!p)return;C.updateProject(p.id,{plan:'studio',state:E.EVER_siteDefaults(id)});C.openProject(p.id);localStorage.setItem('ever-rsvp-flow',JSON.stringify({design:id}));location.href='editor.html';}
+ function card(t){var art=document.createElement('article');art.className='collection-card';var engine=E.INVITARA_CATALOG.experiences[t.experience];art.innerHTML='<div class="collection-art '+t.id+'"><span class="collection-tag">'+esc(engine.name)+'</span><div data-preview></div><a class="card-experience" href="design.html?id='+t.id+'" aria-label="Experience '+esc(t.name)+'">↗</a></div><div class="collection-card-top"><h3>'+esc(t.name)+'</h3><span>AED '+C.startingPrice(t.id)+'</span></div><p class="template-meta">'+esc(E.INVITARA_CATALOG.label(t.occasion))+' · '+esc(t.style)+'</p><div class="card-bottom"><a href="design.html?id='+t.id+'">Preview</a><button type="button">Use Template <span>→</span></button></div>';art.querySelector('[data-preview]').replaceWith(E.EVER_renderSiteMini(t));art.querySelector('.card-bottom button').addEventListener('click',function(){use(t.id);});return art;}
+ E.INVITARA_CARDS={card:card,use:use};E.STUDIO_choose=use;
+})();

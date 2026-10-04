@@ -1,0 +1,90 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { spawn } from 'node:child_process';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { DatabaseSync } from 'node:sqlite';
+import { createHash } from 'node:crypto';
+import Stripe from 'stripe';
+
+test('server enforces ownership, payments, expiry, immutable dates and signed webhooks', async () => {
+  const dir = mkdtempSync(path.join(tmpdir(),'invitara-test-'));
+  const origin = 'http://localhost:3197';
+  const proc = spawn(process.execPath,['server/index.mjs'],{env:{...process.env,PORT:'3197',APP_ORIGIN:origin,DATA_DIR:dir,NODE_ENV:'test',STRIPE_SECRET_KEY:'sk_test_fixture',STRIPE_WEBHOOK_SECRET:'whsec_fixture'},stdio:'pipe'});
+  let db;
+  try {
+    await new Promise((resolve,reject) => { const timeout=setTimeout(()=>reject(new Error('Server startup timed out')),10000);proc.stdout.on('data',d=>{if(d.toString().includes('listening')){clearTimeout(timeout);resolve();}});proc.on('error',reject);proc.on('exit',c=>reject(new Error('Server exited '+c))); });
+    const response = await fetch(origin+'/api/projects');
+    const cookie = response.headers.get('set-cookie').split(';')[0];
+    const token = cookie.split('=')[1];
+    const owner = createHash('sha256').update(token).digest('hex');
+    db = new DatabaseSync(path.join(dir,'invitara.sqlite'));
+    const state = {templateId:'vellum',layoutId:'vellum',basics:{nameA:'Alex',nameB:'Sam',brand:'Alex and Sam celebrate',date:'2027-06-10',time:'14:00',venue:'Test venue'},sections:{rsvp:{on:true}},order:['hero','rsvp']};
+    const base = {id:'active',themeId:'vellum',layoutId:'vellum',state,eventDate:'2027-06-10',timezone:'UTC',paid:true,expiresAt:Date.now()+86400000,amount:7140};
+    for(const p of [base,{...base,id:'expired',expiresAt:Date.now()-1},{...base,id:'unpaid',paid:false}]) db.prepare('INSERT INTO projects VALUES (?,?,?)').run(p.id,owner,JSON.stringify(p));
+    const call = (url,method='GET',body,auth=true) => fetch(origin+'/api'+url,{method,headers:{Origin:origin,'Content-Type':'application/json',...(auth?{Cookie:cookie}:{})},body:body?JSON.stringify(body):undefined});
+    assert.equal((await call('/projects/active','GET',null,false)).status,404);
+    assert.equal((await call('/projects/active','PUT',[])).status,400);
+    assert.equal((await call('/auth/login','POST',[])).status,400);
+    assert.equal((await call('/auth/login','POST',null)).status,400);
+    assert.equal(response.headers.get('x-content-type-options'),'nosniff');
+    assert.match(response.headers.get('content-security-policy'),/frame-ancestors 'none'/);
+    assert.equal((await call('/projects/expired','PUT',{state})).status,403);
+    assert.equal((await call('/projects/expired/publish','POST',{})).status,403);
+    assert.equal((await call('/projects/unpaid','PUT',{state})).status,403);
+    assert.equal((await call('/projects/active','PUT',{state:{...state,basics:{...state.basics,date:'2028-01-01'}}})).status,400);
+    assert.equal((await call('/projects/active','PUT',{state})).status,200);
+    const styled={...state,elementStyles:{'basics.nameA':{fontSize:'44px',color:'#203b37',fontFamily:'Cormorant Garamond'}}};
+    const styleResponse=await call('/projects/active','PUT',{state:styled});
+    assert.equal(styleResponse.status,200);
+    assert.deepEqual((await styleResponse.json()).state.elementStyles,styled.elementStyles);
+    assert.equal((await call('/projects/active','PUT',{state:{...state,elementStyles:{'basics.nameA':{position:'fixed'}}}})).status,400);
+    assert.equal((await call('/projects/active','PUT',{state:{...state,elementStyles:{'basics.nameA':{fontSize:'9999px'}}}})).status,400);
+    assert.equal((await call('/projects/active','PUT',{state:{...state,elementStyles:{'unknown.field':{color:'#ffffff'}}}})).status,400);
+    const theme={background:'#faf6ed',headingSize:'72px',imageTreatment:'warm',overlay:'.45',motion:'gentle'};
+    const themed=await call('/projects/active','PUT',{state:{...state,theme}});assert.equal(themed.status,200);assert.deepEqual((await themed.json()).state.theme,theme);
+    assert.equal((await call('/projects/active','PUT',{state:{...state,theme:{background:'url(https://evil.test)'}}})).status,400);
+    assert.equal((await call('/projects/active','PUT',{state:{...state,elementLinks:{'sections.hero.button':'javascript:alert(1)'}}})).status,400);
+    assert.equal((await call('/projects/active','PUT',{state:{...state,elementStyles:{'basics.nameA':{filter:'url(https://evil.test)'}}}})).status,400);
+    const copied={...state,sectionTypes:{letterCopy1:'letter'},sections:{...state.sections,letterCopy1:{on:true,title:'A second chapter'}},order:['hero','letterCopy1','rsvp'],elementStyles:{'sections.letterCopy1.title':{fontSize:'32px'}}};
+    const copyResponse=await call('/projects/active','PUT',{state:copied});
+    assert.equal(copyResponse.status,200);
+    const copyState=(await copyResponse.json()).state;
+    assert.equal(copyState.sections.letterCopy1.title,'A second chapter');
+    assert.equal(copyState.sectionTypes.letterCopy1,'letter');
+    assert.equal(copyState.elementStyles['sections.letterCopy1.title'].fontSize,'32px');
+    assert.equal((await call('/projects/active','PUT',{state:{...state,sectionTypes:{rsvpCopy1:'rsvp'}}})).status,400);
+    assert.equal((await call('/projects/active/publish','POST',{})).status,200);
+    assert.equal((await call('/projects/active/qr','GET',null,false)).status,404);
+    const qr=await call('/projects/active/qr');assert.equal(qr.status,200);assert.match(await qr.text(),/<svg/);
+    const guest=await call('/invites/active','GET',null,false),guestCookie=guest.headers.get('set-cookie').split(';')[0];
+    await fetch(origin+'/api/invites/active',{headers:{Cookie:guestCookie}});
+    await call('/invites/active');
+    assert.equal((await(await call('/projects/active')).json()).views,1,'Repeated guest loads count once; owner previews are excluded.');
+    assert.equal((await call('/invites/active','GET',null,false)).status,200);
+    assert.equal((await call('/invites/unpaid','GET',null,false)).status,404);
+    assert.equal((await fetch(origin+'/api/projects/active',{method:'PUT',headers:{'Content-Type':'application/json',Cookie:cookie},body:JSON.stringify({state})})).status,403);
+    assert.equal((await fetch(origin+'/.env')).status,404);
+    assert.equal((await fetch(origin+'/data/invitara.sqlite')).status,404);
+    assert.equal((await fetch(origin+'/api/webhook',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})).status,400);
+    db.prepare('INSERT INTO sessions VALUES (?,?)').run('cs_test_fixture','unpaid');
+    const stripe = new Stripe('sk_test_fixture');
+    async function webhook(amount) {
+      const payload=JSON.stringify({id:'evt_fixture',type:'checkout.session.completed',data:{object:{id:'cs_test_fixture',metadata:{projectId:'unpaid'},payment_status:'paid',amount_total:amount,currency:'aed'}}});
+      const signature=stripe.webhooks.generateTestHeaderString({payload,secret:'whsec_fixture'});
+      return fetch(origin+'/api/webhook',{method:'POST',headers:{'Content-Type':'application/json','stripe-signature':signature},body:payload});
+    }
+    await webhook(1);
+    assert.equal((await (await call('/projects/unpaid')).json()).paid,false);
+    assert.equal((await webhook(7140)).status,200);
+    assert.equal((await (await call('/projects/unpaid')).json()).paid,true);
+    assert.equal((await webhook(7140)).status,200);
+  } finally {
+    if(db) db.close();
+    proc.kill();
+    await new Promise(resolve=>proc.once('exit',resolve));
+    // Only the exact test-created temporary directory is removed.
+    rmSync(dir,{recursive:true,force:true});
+  }
+});

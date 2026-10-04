@@ -1,19 +1,9 @@
-/* ==========================================================================
-   Invitara — checkout (step 4)
-   Itemised order summary from EVER_C.quote(), card validation, and a
-   simulated payment that records a real order and advances the project's
-   state through PAYMENT_PENDING -> PAID.
-
-   Card data is never persisted — not to localStorage, not to a cookie, not
-   anywhere. Only the resulting order record survives, and it holds amounts
-   only. See docs/DEPLOY.md §5 for wiring a real payment provider.
-   ========================================================================== */
-(function () {
+/* Invitara: event-date checkout via hosted Stripe. Payment confirmation is server-owned. */
+(async function () {
   'use strict';
 
   var C = window.EVER_C;
   var form = document.getElementById('pay-form');
-  var successView = document.getElementById('pay-success');
   var payBtn = document.getElementById('pay-btn');
 
   if (!C) return;
@@ -40,6 +30,7 @@
     return;
   }
   C.setActive(project.id);
+  try {var session=await window.EVER_API.request('/me');if(!session.account){location.replace('account.html?return=checkout.html');return;}document.getElementById('pay-email').value=session.account.email;}catch(err){var message=document.getElementById('checkout-error');message.textContent='The invitation server is unavailable. Your draft is saved.';message.hidden=false;payBtn.disabled=true;return;}
 
   var tpl = window.EVER_findTemplate(project.themeId);
   var meta = C.themeCommerce(project.themeId);
@@ -94,125 +85,30 @@
   var btnLabel = payBtn && payBtn.querySelector('.pay-btn-label');
   if (btnLabel) btnLabel.textContent = 'Pay ' + C.money(quote.total) + ' & create invitation';
 
-  /* ---------- Input formatting ---------- */
-  var cardInput = document.getElementById('pay-card');
-  var expInput = document.getElementById('pay-exp');
-  var cvcInput = document.getElementById('pay-cvc');
 
-  if (cardInput) {
-    cardInput.addEventListener('input', function () {
-      var digits = cardInput.value.replace(/\D/g, '').slice(0, 16);
-      cardInput.value = digits.replace(/(\d{4})(?=\d)/g, '$1 ');
-    });
+  var date = document.getElementById('event-date');
+  var zone = document.getElementById('event-zone');
+  var guessed = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  var zones = Intl.supportedValuesOf ? Intl.supportedValuesOf('timeZone') : ['UTC','Asia/Dubai','Europe/London','America/New_York'];
+  zones = Array.from(new Set([guessed,'UTC'].concat(zones))).sort();
+  zones.forEach(function(z) { var o = new Option(z.replace(/_/g,' '),z); zone.add(o); });
+  zone.value = guessed;
+  date.value = project.state && project.state.basics && project.state.basics.date || '';
+  function summary() {
+    document.getElementById('access-summary').textContent = date.value ? 'All purchased template content is editable through ' + date.value + ' in ' + zone.value + '. Access closes at the following midnight.' : 'Choose your event date to see when editor access ends.';
   }
-  if (expInput) {
-    expInput.addEventListener('input', function () {
-      var d = expInput.value.replace(/\D/g, '').slice(0, 4);
-      expInput.value = d.length > 2 ? d.slice(0, 2) + ' / ' + d.slice(2) : d;
-    });
-  }
-  if (cvcInput) {
-    cvcInput.addEventListener('input', function () {
-      cvcInput.value = cvcInput.value.replace(/\D/g, '').slice(0, 4);
-    });
-  }
-
-  /* ---------- Validation ---------- */
-  /* Luhn checksum (industry-standard card digit validation) */
-  function luhnOk(num) {
-    if (!/^\d{13,16}$/.test(num)) return false;
-    var sum = 0, alt = false;
-    for (var i = num.length - 1; i >= 0; i--) {
-      var d = parseInt(num.charAt(i), 10);
-      if (alt) { d *= 2; if (d > 9) d -= 9; }
-      sum += d;
-      alt = !alt;
-    }
-    return sum % 10 === 0;
-  }
-
-  function setError(id, msg) {
-    var input = document.getElementById(id);
-    var err = input.closest('.pfield').querySelector('.perror');
-    if (err) {
-      err.textContent = msg;
-      err.hidden = !msg;
-    }
-    if (input) input.closest('.pfield').classList.toggle('invalid', !!msg);
-    return !msg;
-  }
-
-  function validate() {
-    var email = document.getElementById('pay-email').value.trim();
-    var name = document.getElementById('pay-name').value.trim();
-    var card = cardInput.value.replace(/\s/g, '');
-    var exp = expInput.value.replace(/\D/g, '');
-    var cvc = cvcInput.value;
-
-    var ok = true;
-    ok = setError('pay-email', /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? '' : 'Enter a valid e-mail address.') && ok;
-    ok = setError('pay-name', name ? '' : 'Enter the name on the card.') && ok;
-    ok = setError('pay-card', luhnOk(card) ? '' : 'Enter a valid card number (Luhn check).') && ok;
-
-    var expOk = false;
-    if (exp.length === 4) {
-      var mm = parseInt(exp.slice(0, 2), 10);
-      var yy = parseInt(exp.slice(2), 10) + 2000;
-      var now = new Date();
-      expOk = mm >= 1 && mm <= 12 &&
-        (yy > now.getFullYear() || (yy === now.getFullYear() && mm >= now.getMonth() + 1));
-    }
-    ok = setError('pay-exp', expOk ? '' : 'Use a future MM / YY date.') && ok;
-    ok = setError('pay-cvc', /^\d{3,4}$/.test(cvc) ? '' : '3–4 digits.') && ok;
-
-    return ok;
-  }
-
-  ['pay-email', 'pay-name', 'pay-card', 'pay-exp', 'pay-cvc'].forEach(function (id) {
-    var el = document.getElementById(id);
-    if (el) el.addEventListener('input', function () { setError(id, ''); });
-  });
-
-  /* ---------- Submit (simulated) ---------- */
-  if (form) {
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      if (!validate()) return;
-
-      payBtn.classList.add('loading');
-      payBtn.disabled = true;
-      if (btnLabel) btnLabel.textContent = 'Processing…';
-
-      /* Make sure the editor's latest work is on the project before it is
-         locked in as paid. */
+  date.addEventListener('input',summary); zone.addEventListener('change',summary); summary();
+  form.addEventListener('submit',async function(e) {
+    e.preventDefault();
+    var error = document.getElementById('checkout-error'); error.hidden = true;
+    document.getElementById('pay-email').required = true;
+    if (!form.reportValidity()) return;
+    payBtn.disabled = true; if(btnLabel) btnLabel.textContent = 'Opening secure checkout…';
+    try {
       C.syncActiveState();
-      if (project.status === 'CUSTOMIZING') C.setStatus(project.id, 'READY_FOR_PAYMENT');
-
-      setTimeout(function () {
-        var order = C.createOrder(project.id, quote);
-        if (!order) {
-          payBtn.classList.remove('loading');
-          payBtn.disabled = false;
-          if (btnLabel) btnLabel.textContent = 'Try payment again';
-          if (window.everToast) {
-            window.everToast('That payment could not be completed. Please try again.');
-          }
-          return;
-        }
-
-        var msg = document.getElementById('pay-success-msg');
-        if (msg) {
-          msg.innerHTML = 'Your order <b>' + esc(order.number) + '</b> is confirmed — ' +
-            esc(C.money(order.total)) + ' paid.';
-        }
-        form.hidden = true;
-        successView.hidden = false;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        setTimeout(function () {
-          window.location.href = 'editor.html';
-        }, 1600);
-      }, 1500);
-    });
-  }
+      var current = C.findProject(project.id);
+      var result = await window.EVER_API.request('/checkout','POST', {draftId:project.id, themeId:project.themeId, plan:project.plan, addons:project.addons, state:current.state, email:document.getElementById('pay-email').value.trim(), eventDate:date.value, timezone:zone.value, consent:document.getElementById('access-consent').checked});
+      location.assign(result.url);
+    } catch(err) { error.textContent = err.message; error.hidden = false; payBtn.disabled = false; if(btnLabel) btnLabel.textContent = 'Continue to secure payment'; }
+  });
 })();

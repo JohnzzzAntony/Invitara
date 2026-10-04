@@ -43,3 +43,9 @@ Claude outputs/
 # Third-party scrape artifacts (competitor screenshots/copy) — local only.
 # Regenerate with the commands in DESIGN.md.
 .firecrawl/
+
+# Invitation application runtime
+data/
+artifacts/
+test-results/
+playwright-report/

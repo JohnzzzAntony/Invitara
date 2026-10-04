@@ -40,101 +40,8 @@
    * ------------------------------------------------------------------ */
   /* `grants` are permission ids checked by can(). Each plan grants its own
      list plus everything from the plans below it. */
-  var PLANS = [
-    {
-      id: 'basic',
-      name: 'Basic',
-      price: 29,
-      editorLevel: 'Basic',
-      tagline: 'For simple, beautiful invitations.',
-      grants: [
-        'editor.text.basic',
-        'editor.color.basic',
-        'editor.media.basic',
-        'editor.rsvp.basic',
-        'editor.animation.basic',
-        'editor.share.basic'
-      ],
-      includes: [
-        'Basic invitation layout',
-        'Event details, names, date & time',
-        'Location',
-        'Basic typography & colours',
-        'Mobile-responsive invitation',
-        'Shareable invitation link',
-        'Basic RSVP',
-        'Standard support'
-      ]
-    },
-    {
-      id: 'pro',
-      name: 'Pro',
-      price: 59,
-      editorLevel: 'Advanced',
-      tagline: 'For customers who want real customisation.',
-      popular: true,
-      grants: [
-        'editor.text.advanced',
-        'editor.color.advanced',
-        'editor.media.advanced',
-        'editor.typography.advanced',
-        'editor.gallery',
-        'editor.countdown',
-        'editor.map',
-        'editor.rsvp.advanced',
-        'editor.sections.toggle',
-        'editor.background',
-        'editor.animation.advanced',
-        'editor.share.advanced'
-      ],
-      includes: [
-        'Advanced typography',
-        'Full colour customisation',
-        'Image gallery',
-        'Countdown',
-        'Map & location',
-        'RSVP customisation',
-        'Multiple content sections',
-        'Background customisation',
-        'Animation options',
-        'Custom buttons',
-        'Enhanced sharing'
-      ]
-    },
-    {
-      id: 'advanced',
-      name: 'Advanced',
-      price: 99,
-      editorLevel: 'Full',
-      tagline: 'For a fully personalised invitation.',
-      grants: [
-        'editor.layout',
-        'editor.sections.full',
-        'editor.sections.reorder',
-        'editor.typography.full',
-        'editor.animation.full',
-        'editor.gallery.advanced',
-        'editor.schedule.multi',
-        'editor.rsvp.full',
-        'editor.media.full',
-        'editor.premium'
-      ],
-      includes: [
-        'Full layout customisation',
-        'Advanced section controls & reordering',
-        'Premium animations',
-        'Advanced gallery layouts',
-        'Multiple event schedules',
-        'Custom fonts where supported',
-        'Advanced RSVP & guest information',
-        'Custom background & media',
-        'Premium design elements',
-        'Priority support'
-      ]
-    }
-  ];
-
-  var PLAN_ORDER = ['basic', 'pro', 'advanced'];
+  var PLANS = [{id:'studio',name:'Studio',price:0,editorLevel:'Full',tagline:'Every detail, entirely yours.',grants:[],includes:['All template content editable','Premium GSAP animations','Photo uploads & video support','Scratch-to-reveal date','Secure publishing & live guest replies','Editor access through your event date']}];
+  var PLAN_ORDER = ['studio'];
 
   function findPlan(id) {
     for (var i = 0; i < PLANS.length; i++) if (PLANS[i].id === id) return PLANS[i];
@@ -158,7 +65,7 @@
 
   /** Does `planId` include permission `perm`? */
   function can(planId, perm) {
-    return grantsFor(planId).indexOf(perm) !== -1;
+    return planId === 'studio' && /^editor\./.test(perm);
   }
 
   /** The cheapest plan that grants `perm`, or null if no plan does. */
@@ -189,11 +96,7 @@
   /* ------------------------------------------------------------------ *
    *  Optional paid add-ons (§11 dynamic pricing)                        *
    * ------------------------------------------------------------------ */
-  var ADDONS = [
-    { id: 'anim',  name: 'Advanced animation', price: 10, note: 'Scroll reveals and section motion.', needs: 'pro' },
-    { id: 'font',  name: 'Premium typography', price: 5,  note: 'The full display-font library.',      needs: 'pro' },
-    { id: 'rush',  name: 'Priority support',   price: 15, note: 'Same-day replies until your event.',  needs: 'basic' }
-  ];
+  var ADDONS = [];
 
   function findAddon(id) {
     for (var i = 0; i < ADDONS.length; i++) if (ADDONS[i].id === id) return ADDONS[i];
@@ -216,19 +119,7 @@
    * layout actually exposes. Features are DERIVED from the layout's own
    * section list, so a theme can never advertise a section its layout does
    * not render.                                                          */
-  var TIERS = {
-    /* layout id -> { basePrice, editorLevel, plans } */
-    poetic:    { basePrice: 39, editorLevel: 'advanced', plans: ['basic', 'pro', 'advanced'] },
-    herald:    { basePrice: 35, editorLevel: 'pro',      plans: ['basic', 'pro', 'advanced'] },
-    atrium:    { basePrice: 35, editorLevel: 'pro',      plans: ['basic', 'pro', 'advanced'] },
-    editorial: { basePrice: 29, editorLevel: 'pro',      plans: ['basic', 'pro', 'advanced'] },
-    calm:      { basePrice: 32, editorLevel: 'pro',      plans: ['basic', 'pro', 'advanced'] },
-    terra:     { basePrice: 32, editorLevel: 'pro',      plans: ['basic', 'pro', 'advanced'] },
-    crescent:  { basePrice: 39, editorLevel: 'advanced', plans: ['basic', 'pro', 'advanced'] },
-    heritage:  { basePrice: 42, editorLevel: 'advanced', plans: ['pro', 'advanced'] },
-    mandala:   { basePrice: 42, editorLevel: 'advanced', plans: ['pro', 'advanced'] },
-    serene:    { basePrice: 35, editorLevel: 'pro',      plans: ['basic', 'pro', 'advanced'] }
-  };
+  var TIERS = {"vellum":{"basePrice":89,"editorLevel":"full","plans":["studio"]},"nocturne":{"basePrice":99,"editorLevel":"full","plans":["studio"]},"confetti":{"basePrice":69,"editorLevel":"full","plans":["studio"]},"bloom":{"basePrice":79,"editorLevel":"full","plans":["studio"]},"atlas":{"basePrice":99,"editorLevel":"full","plans":["studio"]}};
 
   /* Visual style, used by the marketplace style filter. Derived from the
      theme's own `category` so there is one source of truth. */
@@ -269,6 +160,7 @@
     if (!tpl) return null;
 
     var tier = TIERS[tpl.layout] || { basePrice: 29, editorLevel: 'basic', plans: PLAN_ORDER.slice() };
+    if (tpl.layout === 'platform') tier = { basePrice: tpl.price || 79, editorLevel: 'full', plans: ['studio'] };
     /* Custom user designs are always the entry tier. */
     if (tpl.custom) tier = { basePrice: 29, editorLevel: 'basic', plans: PLAN_ORDER.slice() };
 
@@ -513,46 +405,6 @@
     return Array.isArray(list) ? list : [];
   }
 
-  function nextOrderNumber() {
-    return 'INV-' + (1001 + allOrders().length);
-  }
-
-  /**
-   * Record a paid order for a project and advance it to PAID.
-   * Card data is never part of this record — only the itemised amounts.
-   */
-  function createOrder(projectId, q) {
-    var p = findProject(projectId);
-    if (!p) return null;
-    var order = {
-      id: newId('ord'),
-      number: nextOrderNumber(),
-      projectId: projectId,
-      themeId: p.themeId,
-      themeName: p.themeName,
-      plan: p.plan,
-      addons: p.addons.slice(),
-      currency: q.currency,
-      themePrice: q.themePrice,
-      planPrice: q.planPrice,
-      customization: q.customization,
-      subtotal: q.subtotal,
-      discount: q.discount,
-      vat: q.vat,
-      total: q.total,
-      status: 'Paid',
-      paidAt: new Date().toISOString()
-    };
-    var list = allOrders();
-    list.unshift(order);
-    writeJson(ORDERS_KEY, list);
-
-    setStatus(projectId, 'PAYMENT_PENDING');
-    setStatus(projectId, 'PAID');
-    updateProject(projectId, { orderId: order.id, customizationPrice: q.customization });
-    return order;
-  }
-
   function findOrder(id) {
     var list = allOrders();
     for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
@@ -603,7 +455,7 @@
     var checks = [
       { label: 'Your event name or title',  ok: anyDone(['title', 'name', 'brand']), section: '' },
       { label: 'Host or couple names',      ok: anyDone(['nameA', 'nameB', 'host', 'family', 'child']), section: '' },
-      { label: 'Your event date',           ok: done('date'), section: '' },
+      { label: 'Your event date',           ok: /^\d{4}-\d{2}-\d{2}$/.test(b.date || ''), section: '' },
       { label: 'Your event time',           ok: done('time'), section: '' },
       { label: 'Your venue or address',     ok: anyDone(['venue', 'address', 'city']), section: '' }
     ];
@@ -643,32 +495,10 @@
     return { ok: true, project: findProject(projectId) || updated, slug: slug };
   }
 
-  /**
-   * The public link for a published invitation.
-   *
-   * There is no server, so the invitation travels in the URL: the state is
-   * JSON -> URI-encoded -> base64 in the hash, which invite.html decodes.
-   * That makes a shared link genuinely open on a guest's device rather than
-   * depending on the host's own localStorage.
-   */
+  /** Public invitations are loaded by ID from the server. */
   function inviteUrl(project) {
     if (!project) return '';
-    var origin = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
-    var payload = { s: project.state, t: project.themeId, n: project.slug };
-    var hash = '';
-    try {
-      hash = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-    } catch (e) { hash = ''; }
-    return origin + 'invite.html?e=' + encodeURIComponent(project.slug) + '#' + hash;
-  }
-
-  /** Decode the payload written by inviteUrl(). Returns null when absent. */
-  function decodeInvite(hash) {
-    var raw = String(hash || '').replace(/^#/, '');
-    if (!raw) return null;
-    try {
-      return JSON.parse(decodeURIComponent(escape(atob(raw))));
-    } catch (e) { return null; }
+    return window.location.origin + '/invite.html?e=' + encodeURIComponent(project.id);
   }
 
   /* ------------------------------------------------------------------ *
@@ -715,13 +545,11 @@
 
     allOrders: allOrders,
     findOrder: findOrder,
-    createOrder: createOrder,
 
     validate: validate,
     isValid: isValid,
     publish: publish,
     inviteUrl: inviteUrl,
-    decodeInvite: decodeInvite,
 
     slugify: slugify
   };

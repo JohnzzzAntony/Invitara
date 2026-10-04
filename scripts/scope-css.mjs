@@ -184,11 +184,6 @@ const parts = [
   ['bootstrap grid + base', 'css/bootstrap.min.css', false],
   ['themify icons', 'css/themify-icons.css', false],
   ['flaticon (muhibbi)', 'css/flaticon_muhibbi.css', false],
-  ['owl carousel', 'css/owl.carousel.css', false],
-  ['owl theme', 'css/owl.theme.css', false],
-  ['owl transitions', 'css/owl.transitions.css', false],
-  ['slick', 'css/slick.css', false],
-  ['slick theme', 'css/slick-theme.css', false],
   ['animate.css', 'css/animate.css', false],
   ['muhibbi theme', 'sass/style.css', true]
 ];

@@ -1,32 +1,11 @@
-import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
-import nextTypescript from "eslint-config-next/typescript";
+import js from '@eslint/js';
+import globals from 'globals';
 
-/**
- * Lints the (tiny) TypeScript server shell: next.config.ts and src/app/*.
- *
- * public/** is deliberately ignored: it is plain browser JavaScript
- * (IIFE modules, no imports/exports) that is syntax-checked with
- * `node --check` and verified in a real browser — ESLint's Node-oriented
- * rules do not apply to it.
- */
-const eslintConfig = [
-  ...nextCoreWebVitals,
-  ...nextTypescript,
-  {
-    ignores: [
-      "node_modules/**",
-      ".next/**",
-      "out/**",
-      "build/**",
-      "next-env.d.ts",
-      "scripts/**",
-      "public/**",
-      /* Vendor source archive for the Muhibbi template (its CSS is compiled
-         into public/css/mu.css by scripts/scope-css.mjs; none of its
-         jQuery is shipped). Not our code — not ours to lint. */
-      "vendor/**",
-    ],
-  },
+export default [
+  { ignores: ['node_modules/**', '.next/**', 'artifacts/**', 'data/**', 'vendor/**', 'public/vendor/**', '.claude/**', '.firecrawl/**', 'Claude outputs/**'] },
+  { files: ['**/*.js', '**/*.mjs'], ...js.configs.recommended,
+    languageOptions: { ecmaVersion: 'latest', globals: globals.node },
+    rules: { 'no-unused-vars': ['error', { args: 'after-used', caughtErrors: 'none' }] } },
+  { files: ['public/js/**/*.js'], languageOptions: { sourceType: 'script', globals: globals.browser } },
+  { files: ['src/**/*.js'], languageOptions: { globals: globals.browser } },
 ];
-
-export default eslintConfig;

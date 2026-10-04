@@ -174,7 +174,6 @@
   /* ---------------- Dashboard counters ---------------- */
   function animateCount(el) {
     var target = parseInt(el.getAttribute('data-count'), 10) || 0;
-    var suffix = el.getAttribute('data-suffix') || '';
     var t0 = null;
     var dur = 1100;
 

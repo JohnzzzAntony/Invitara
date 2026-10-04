@@ -6,7 +6,7 @@
    layout is editable with zero editor changes.
    Right side: live preview rendered by templates.js (EVER_renderSite).
    ========================================================================== */
-(function () {
+(async function () {
   'use strict';
 
   if (!window.EVER_findLayout || !window.EVER_loadSiteState) return;
@@ -21,12 +21,10 @@
     catch (e) { return null; }
   }
   function writeJson(key, val) {
-    try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) { /* ignore */ }
+    try { localStorage.setItem(key, JSON.stringify(val)); return true; } catch (e) { return false; }
   }
   function esc(s) { return window.EVER_esc(s); }
-  function slugify(s) {
-    return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-  }
+
 
   /* dotted-path access: 'social.wa' -> sections.contact.social.wa */
   function getVal(obj, path) {
@@ -52,13 +50,43 @@
   var ui = { open: {} };
   var pvTimer = null;
   var saveTimer = null;
+  var history = [], historyIndex = -1;
+  function remember() {
+    var snapshot = JSON.stringify(state);
+    if (history[historyIndex] === snapshot) return;
+    history = history.slice(0, historyIndex + 1);
+    history.push(snapshot);
+    if (history.length > 80) history.shift();
+    historyIndex = history.length - 1;
+    updateHistory();
+  }
+  function updateHistory() {
+    document.getElementById('undo-btn').disabled = historyIndex <= 0;
+    document.getElementById('redo-btn').disabled = historyIndex >= history.length - 1;
+  }
+  function travel(direction) {
+    if (!accessAllowed()) return;
+    var next = historyIndex + direction;
+    if (next < 0 || next >= history.length) return;
+    state = JSON.parse(history[next]); historyIndex = next;
+    if (access) state.basics.date = access.eventDate;
+    buildSidebar(); buildDesign(); render(); autosave(); updateHistory();
+    var flow = readJson(FLOW_KEY) || {}; flow.design = state.templateId; writeJson(FLOW_KEY, flow);
+  }
 
-  function layout() { return window.EVER_findLayout(state.layoutId); }
+  function layout() {
+    var base = window.EVER_findLayout(state.layoutId), sections = base.sections.slice();
+    Object.keys(state.sectionTypes || {}).forEach(function (key) {
+      var source = base.sections.find(function (s) { return s.id === state.sectionTypes[key]; });
+      if (source) sections.push(Object.assign({}, source, {id:key,label:source.label + ' (copy)'}));
+    });
+    return Object.assign({}, base, {sections:sections});
+  }
 
   /* Core loader: EVER_siteDefaults + v1/v2/v3 -> v4 migration + the
      flow.design (checkout) override + template existence checks. */
   function loadState() {
-    state = window.EVER_loadSiteState(readJson(FLOW_KEY) || {});
+    state = access ? JSON.parse(JSON.stringify(access.state)) : window.EVER_loadSiteState(readJson(FLOW_KEY) || {});
   }
 
   /* ---- Autosave (§25) --------------------------------------------- *
@@ -73,9 +101,22 @@
     el.classList.toggle('on', !!text);
   }
 
+  var remoteSave = Promise.resolve();
+  var access = null;
+  var localSaveFailed = false;
+  function accessAllowed() { return !access || (access.paid && Date.now() < access.expiresAt); }
   function persist() {
-    writeJson(window.EVER_EVENT_KEY, state);
+    if (!accessAllowed()) { saveStatus('Editor access ended'); return; }
+    localSaveFailed = !writeJson(window.EVER_EVENT_KEY, state);
+    if (localSaveFailed && !access) { saveStatus('Could not save — device storage is full'); return; }
     if (window.EVER_C) window.EVER_C.syncActiveState();
+    if (access) {
+      var snapshot = JSON.parse(JSON.stringify(state));
+      saveStatus('Saving to your account…');
+      remoteSave = remoteSave.catch(function(){}).then(function() {
+        return window.EVER_API.request('/projects/' + access.id, 'PUT', {state:snapshot});
+      }).then(function(p) { window.EVER_API.cache(p); saveStatus('Saved to your account'); return true; }).catch(function(err) { saveStatus('Not synced: ' + err.message); return false; });
+    }
   }
 
   /* Two timers: one debounces the write, one clears the "Saved" label. They
@@ -84,12 +125,14 @@
   var statusTimer = null;
 
   function markSaved() {
-    saveStatus('Saved');
+    if (access || localSaveFailed) return;
+    saveStatus('Saved on this device');
     clearTimeout(statusTimer);
     statusTimer = setTimeout(function () { saveStatus(''); }, 2000);
   }
 
   function autosave() {
+    remember();
     clearTimeout(saveTimer);
     saveStatus('Saving…');
     saveTimer = setTimeout(function () {
@@ -139,6 +182,8 @@
   }
 
   function allow(perm) {
+    if (!access) return true;
+    if (access && access.paid) return accessAllowed();
     var id = planId();
     if (!id) return true;
     return window.EVER_C.can(id, perm);
@@ -250,11 +295,18 @@
     var frame = previewScroller();
     var keepTop = frame ? frame.scrollTop : 0;
 
+    var oldSite = canvas.querySelector('.ex');
+    if (oldSite && oldSite.__premiumDispose) oldSite.__premiumDispose();
+    if (oldSite && oldSite.__muDisposers) oldSite.__muDisposers.forEach(function (dispose) { dispose(); });
     canvas.innerHTML = '';
+    var wasOpen = oldSite && oldSite.__opened;
+    if (window.EVER_visualEditor) wasOpen = !window.EVER_visualEditor.isPreview();
     var site = window.EVER_renderSite(state, { interactive: true });
+    if(wasOpen) { var cover=site.querySelector('.ex-cover');if(cover)cover.remove();site.__opened=true; }
     site.__wsData = state;
     canvas.appendChild(site);
-    window.EVER_bindSite(site);
+    window.EVER_bindSite(site, {editing: !window.EVER_visualEditor || !window.EVER_visualEditor.isPreview()});
+    if (window.EVER_visualEditor) window.EVER_visualEditor.mount(site);
     window.EVER_tickCountdowns(site);
     clearInterval(pvTimer);
     pvTimer = setInterval(function () { window.EVER_tickCountdowns(canvas); }, 1000);
@@ -333,13 +385,14 @@
       ctl = '<select id="' + id + '">' + sopts + '</select>';
     } else if (type === 'photo') {
       var isUrl = value && String(value).indexOf('/') > -1;
-      var popts = '<option value="">None — hide this image</option>';
+      var popts = '<option value="">' + (f.k === 'premiumPhoto' ? 'Use template photograph' : 'None — hide this image') + '</option>';
       window.EVER_PHOTOS.forEach(function (p) {
         popts += '<option value="' + p.id + '"' + (value === p.id ? ' selected' : '') + '>' + esc(p.label) + '</option>';
       });
       ctl = '<div class="ed-photo-row">' +
-          '<select data-role="pick">' + popts + '</select>' +
-          '<input type="text" data-role="url" placeholder="…or paste image URL" value="' + (isUrl ? esc(value) : '') + '"/>' +
+          '<select id="' + id + '" data-role="pick">' + popts + '</select>' +
+          '<input type="text" aria-label="Image URL" data-role="url" placeholder="…or paste image URL" value="' + (isUrl ? esc(value) : '') + '"/>' +
+          '<label class="ed-upload">Upload your photo<input type="file" data-role="upload" accept="image/jpeg,image/png,image/webp" /></label>' +
         '</div>' +
         '<div class="ed-photo-preview">' +
           (value ? '<img src="' + esc(window.EVER_photoSrc(value)) + '" alt=""/>' : '') +
@@ -368,6 +421,22 @@
       ta.value = value == null ? '' : String(value);
       ta.addEventListener('input', function () { onInput(ta.value); });
     } else if (type === 'photo') {
+      var upload = wrap.querySelector('[data-role="upload"]');
+      upload.addEventListener('change', function () {
+        var file = upload.files[0];
+        if (!file) return;
+        if (!/^image\/(jpeg|png|webp)$/.test(file.type) || file.size > 8 * 1024 * 1024) { toast('Choose a JPG, PNG or WebP image under 8 MB.'); return; }
+        var objectUrl = URL.createObjectURL(file), img = new Image();
+        img.onload = function () {
+          var scale = Math.min(1, 1400 / Math.max(img.width,img.height));
+          var surface = document.createElement('canvas'); surface.width = Math.round(img.width*scale); surface.height = Math.round(img.height*scale);
+          surface.getContext('2d').drawImage(img,0,0,surface.width,surface.height);
+          var encoded = surface.toDataURL('image/jpeg',0.8); URL.revokeObjectURL(objectUrl);
+          onInput(encoded); wrap.querySelector('.ed-photo-preview').innerHTML = '<img alt="Your uploaded photo" src="' + encoded + '" />';
+        };
+        img.onerror = function () { URL.revokeObjectURL(objectUrl); toast('This photo could not be opened. Try another image.'); };
+        img.src = objectUrl;
+      });
       var pick = wrap.querySelector('[data-role="pick"]');
       var url = wrap.querySelector('[data-role="url"]');
       var shot = wrap.querySelector('.ed-photo-preview');
@@ -427,10 +496,13 @@
     var specs = layout().basics || [];
 
     function bind(f) {
-      return fieldHtml(f, getVal(state.basics, f.k), function (v) {
+      var field = fieldHtml(f, getVal(state.basics, f.k), function (v) {
+        if (access && f.k === 'date') return;
         setVal(state.basics, f.k, v);
         refresh();
       });
+      if (access && f.k === 'date') { field.querySelector('input').disabled = true; field.querySelector('input').title = 'Event date fixed at purchase'; }
+      return field;
     }
 
     var i = 0;
@@ -476,6 +548,15 @@
       if (ui.open[sid]) det.open = true;
 
       var sum = document.createElement('summary');
+      sum.draggable = true;
+      sum.addEventListener('dragstart', function (e) { if (!accessAllowed()) { e.preventDefault(); return; } e.dataTransfer.setData('text/plain', sid); e.dataTransfer.effectAllowed = 'move'; });
+      sum.addEventListener('dragover', function (e) { if (accessAllowed()) e.preventDefault(); });
+      sum.addEventListener('drop', function (e) {
+        e.preventDefault(); if (!accessAllowed()) return;
+        var source = e.dataTransfer.getData('text/plain'), from = state.order.indexOf(source), to = state.order.indexOf(sid);
+        if (from < 0 || to < 0 || from === to) return;
+        state.order.splice(from, 1); state.order.splice(to, 0, source); buildGroups(); refresh();
+      });
       sum.innerHTML = '<span>' + esc(meta.label) + '</span>' +
         '<span class="sec-tools">' +
           '<button type="button" data-tool="goto" aria-label="Scroll the preview to ' + esc(meta.label) + '">&#9678;</button>' +
@@ -529,6 +610,16 @@
       det.appendChild(body);
       host.appendChild(det);
     });
+
+    var removed = specs.filter(function (spec) { return !state.order.includes(spec.id); });
+    if (removed.length) {
+      var restore = document.createElement('div'); restore.className = 'ed-body';
+      var label = document.createElement('label'); label.className = 'ed-label'; label.htmlFor = 'restore-section'; label.textContent = 'Add or restore a section';
+      var picker = document.createElement('select'); picker.id = 'restore-section'; picker.innerHTML = '<option value="">Choose section…</option>';
+      removed.forEach(function (spec) { var option = document.createElement('option'); option.value = spec.id; option.textContent = spec.label; picker.appendChild(option); });
+      picker.addEventListener('change', function () { if (!picker.value || !accessAllowed()) return; state.order.push(picker.value); state.sections[picker.value].on = true; buildGroups(); refresh(); });
+      restore.append(label, picker); host.appendChild(restore);
+    }
 
     applyLocks();
   }
@@ -626,6 +717,7 @@
     'address', 'dress', 'phone', 'email'];
 
   function applyTemplate(t) {
+    if(access)return; // Purchased designs are immutable; drafts may explore the collection.
     var cur = window.EVER_findTemplate(state.templateId);
     if (cur && cur.layout === t.layout && window.EVER_findLayout(t.layout).id === state.layoutId) {
       state.templateId = t.id;
@@ -653,6 +745,7 @@
       next.layoutId = window.EVER_findLayout(t.layout).id;
       state = next;
     }
+    var draft=project();if(draft&&window.EVER_C)window.EVER_C.updateProject(draft.id,{themeId:t.id,themeName:t.name,event:t.event});
     buildSidebar();
     buildDesign();
     refresh();
@@ -662,7 +755,7 @@
     /* template chips */
     var chips = document.getElementById('tpl-chips');
     chips.innerHTML = '';
-    window.EVER_allTemplates().forEach(function (t) {
+    window.EVER_allTemplates().filter(function(t){return !t.archived||t.id===state.templateId;}).forEach(function (t) {
       var chip = document.createElement('button');
       chip.type = 'button';
       chip.className = 'tpl-chip' + (state.templateId === t.id ? ' on' : '');
@@ -682,17 +775,6 @@
       }
       chips.appendChild(chip);
     });
-
-    /* "create your own" chip */
-    var newChip = document.createElement('button');
-    newChip.type = 'button';
-    newChip.className = 'tpl-chip tpl-chip-new';
-    newChip.setAttribute('data-open-designer', '');
-    newChip.innerHTML = '<span class="tpl-swatch new">+</span> New design';
-    newChip.__dsnOnSave = function (t) {
-      applyTemplate(t);
-    };
-    chips.appendChild(newChip);
 
     /* name font */
     var fonts = document.getElementById('font-cards');
@@ -807,6 +889,7 @@
    *  Chrome: tabs / device / save / publish                             *
    * ------------------------------------------------------------------ */
   function bindChrome() {
+    document.getElementById('replay-opening').addEventListener('click',function(){var current=document.querySelector('#canvas .ex');if(current)current.__opened=false;render();previewScroller().scrollTop=0;});
     document.querySelectorAll('.ed-tab').forEach(function (tab) {
       tab.addEventListener('click', function () {
         document.querySelectorAll('.ed-tab').forEach(function (t) {
@@ -836,9 +919,10 @@
       });
     });
 
-    document.getElementById('save-btn').addEventListener('click', function () {
+    document.getElementById('save-btn').addEventListener('click', async function () {
       saveNow();
-      toast('Saved — your website lives on this device.');
+      if (access) { toast(await remoteSave ? 'Saved to your account.' : 'Not synced. Please try saving again.'); }
+      else toast(localSaveFailed ? 'Could not save. Free some device storage, then try again.' : 'Draft saved on this device. Complete checkout to publish.');
     });
 
     document.getElementById('publish-btn').addEventListener('click', openPublish);
@@ -879,6 +963,7 @@
   function closePublish() {
     overlay().hidden = true;
     document.body.classList.remove('modal-open');
+    document.getElementById('publish-btn').focus();
   }
 
   /**
@@ -925,8 +1010,10 @@
     goBtn.disabled = !(allOk && paid);
     goBtn.textContent = allOk && paid ? 'Publish now' : 'Fix the items above';
 
+    var reviews=document.getElementById('publish-device-checks');if(!reviews){reviews=document.createElement('div');reviews.id='publish-device-checks';reviews.className='publish-device-checks';['mobile','desktop'].forEach(function(device){var b=document.createElement('button');b.type='button';b.className='btn btn-ghost';b.textContent='Check '+device+' preview';b.addEventListener('click',function(){closePublish();document.querySelector('[data-dev="'+device+'"]').click();if(!window.EVER_visualEditor.isPreview())document.getElementById('full-preview-btn').click();});reviews.appendChild(b);});list.after(reviews);}
     overlay().hidden = false;
     document.body.classList.add('modal-open');
+    document.getElementById('pub-x').focus();
   }
 
   /* A failed item is phrased as the action that clears it. */
@@ -938,6 +1025,7 @@
   /* Send the customer to the control that fixes a failed check: a named
      section if the check belongs to one, otherwise the Basics group. */
   function focusFix(c) {
+    if (matchMedia('(max-width:767px)').matches) document.getElementById('mobile-edit').click();
     var target = null;
     if (c.section) {
       target = document.querySelector('#sec-groups [data-sec="' + c.section + '"]');
@@ -952,7 +1040,7 @@
   }
 
   /** Stage 2 — publish for real and show the shareable link. */
-  function doPublish() {
+  async function doPublish() {
     var C = window.EVER_C;
     var p = project();
     saveNow();
@@ -962,7 +1050,12 @@
       return;
     }
 
-    var result = C.publish(p.id);
+    var result;
+    if (access) {
+      if (!await remoteSave) { toast('Save failed. Please retry before publishing.'); return; }
+      try { var live = await window.EVER_API.request('/projects/' + access.id + '/publish','POST',{}); result = {ok:true,project:window.EVER_API.cache(live)}; }
+      catch(err) { toast(err.message); return; }
+    } else { result = {ok:false,reason:'Complete secure checkout before publishing.'}; }
     if (!result.ok) {
       toast(result.reason);
       return;
@@ -981,24 +1074,12 @@
       'mailto:?subject=' + encodeURIComponent(text) +
       '&body=' + encodeURIComponent(text + '\n\n' + url);
     document.getElementById('pub-open').href = url;
+    var qr=document.getElementById('pub-qr');qr.src='/api/projects/'+encodeURIComponent(result.project.id)+'/qr';
+    document.getElementById('pub-native-share').onclick=async function(){try{if(navigator.share)await navigator.share({title:'You’re invited',url:url});else{await navigator.clipboard.writeText(url);toast('Invitation link copied.');}}catch(err){if(err.name!=='AbortError')toast('Use Copy link to share your invitation.');}};
 
     document.getElementById('pub-check-stage').hidden = true;
     document.getElementById('pub-live-stage').hidden = false;
     updateBadge();
-  }
-
-  /* Publish slug is layout-aware: every layout names its event differently
-     (wedding partners, birthday name, housewarming family, baptism child,
-     gala host …). The ONLY layout-specific fallback chain in this file. */
-  function publishSlug() {
-    var b = state.basics || {};
-    var pair = [b.nameA, b.nameB].filter(Boolean).join('-');
-    var candidates = [b.title, b.name, pair, b.family, b.child, b.host];
-    for (var i = 0; i < candidates.length; i++) {
-      var s = slugify(candidates[i]);
-      if (s) return s;
-    }
-    return 'your-event';
   }
 
   function toast(msg) {
@@ -1057,12 +1138,104 @@
     window.EVER_C.openProject(window.EVER_C.activeId());
   }
 
+  var remoteId = new URLSearchParams(location.search).get('p');
+  var active = window.EVER_C.activeProject();
+  if (!remoteId && active && active.server) remoteId = active.id;
+  if (remoteId) {
+    var banner = document.createElement('div'); banner.className = 'access-banner'; banner.setAttribute('role','status');
+    document.querySelector('.ed-sidebar').prepend(banner);
+    try {
+      access = await window.EVER_API.request('/projects/' + encodeURIComponent(remoteId));
+      window.EVER_API.cache(access); window.EVER_C.openProject(access.id);
+      banner.textContent = access.expired ? 'Your event has ended. Editor access is closed. Your published invitation remains viewable.' : access.paid ? 'Editor access through ' + access.eventDate + ' (' + access.timezone + '). Your event date is fixed.' : 'Waiting for secure payment confirmation. Refresh in a moment.';
+      if (!accessAllowed()) {
+        document.querySelector('.ed-canvas-wrap').prepend(banner);
+        document.getElementById('full-preview-btn').disabled = true;
+        document.getElementById('save-btn').disabled = true; document.getElementById('publish-btn').disabled = true;
+        if (!access.paid) {
+          var attempts = 0;
+          var confirmTimer = setInterval(async function () {
+            if (++attempts > 40) { clearInterval(confirmTimer); banner.textContent = 'Payment confirmation is taking longer than expected. Refresh to check again. Do not pay a second time.'; return; }
+            try { var confirmed = await window.EVER_API.request('/projects/' + encodeURIComponent(remoteId)); if (confirmed.paid) { clearInterval(confirmTimer); location.reload(); } } catch (_) { /* Retry transient connection errors. */ }
+          },3000);
+        }
+        var readonly = window.EVER_renderSite(access.state, {interactive:true}); readonly.__wsData = access.state; document.getElementById('canvas').appendChild(readonly); window.EVER_bindSite(readonly); return;
+      }
+    } catch(err) { banner.classList.add('error'); banner.textContent = err.message; document.querySelector('.ed-canvas-wrap').prepend(banner); document.getElementById('full-preview-btn').disabled = true; document.getElementById('save-btn').disabled = true; document.getElementById('publish-btn').disabled = true; return; }
+  }
   loadState();
+  window.EVER_EDITOR = {
+    getState: function () { return state; },
+    canEdit: function (path) { return accessAllowed() && !(access && path === 'basics.date'); },
+    change: function (path, value, inline) {
+      if (!this.canEdit(path)) return;
+      if (!/^(basics\.[a-zA-Z]+|sections\.[a-zA-Z0-9]+\.(?:[a-zA-Z]+|items\.\d+\.[a-zA-Z]+))$/.test(path)) return;
+      setVal(state, path, value);
+      if (inline) autosave(); else refresh();
+    },
+    style: function (path, property, value) {
+      if (!this.canEdit(path)) return;
+      state.elementStyles = state.elementStyles || {};
+      state.elementStyles[path] = state.elementStyles[path] || {};
+      state.elementStyles[path][property] = value;
+      refresh();
+    },
+    sync: function () { buildSidebar(); },
+    theme: function (key, value) { if (!accessAllowed()) return; state.theme = state.theme || {}; state.theme[key] = value; if(key==='background'||key==='text')Object.keys(state.sections).forEach(function(id){delete state.sections[id][key==='background'?'bg':'textColor'];});refresh(); },
+    link: function (path, value) { if (!this.canEdit(path)) return; state.elementLinks = state.elementLinks || {}; state.elementLinks[path] = value; refresh(); },
+    section: function (id, action) {
+      if (!accessAllowed() || !state.sections[id]) return;
+      var index = state.order.indexOf(id), next = index + (action === 'up' ? -1 : 1);
+      if (action === 'hide') state.sections[id].on = false;
+      else if (action === 'delete') { if (['hero','rsvp','contact'].includes(id)) return; state.order.splice(index, 1); }
+      else if (action === 'duplicate') {
+        var type = (state.sectionTypes || {})[id] || id;
+        if (['hero','rsvp','contact','date'].includes(type)) return;
+        state.sectionTypes = state.sectionTypes || {};
+        if (Object.keys(state.sectionTypes).length >= 20) { toast('Use at most 20 additional sections.'); return; }
+        var n = 1; while (state.sections[type + 'Copy' + n]) n++;
+        var key = type + 'Copy' + n;
+        state.sectionTypes[key] = type; state.sections[key] = JSON.parse(JSON.stringify(state.sections[id]));
+        state.order.splice(index + 1, 0, key);
+        Object.keys(state.elementStyles || {}).filter(function (path) { return path === 'sections.'+id || path.startsWith('sections.'+id+'.'); }).forEach(function (path) { state.elementStyles[path.replace('sections.'+id,'sections.'+key)] = Object.assign({}, state.elementStyles[path]); });
+      }
+      else if (next >= 0 && next < state.order.length) { state.order.splice(index, 1); state.order.splice(next, 0, id); }
+      buildSidebar(); refresh();
+    },
+    undo: function () { travel(-1); }, redo: function () { travel(1); },
+    preview: function () { render(); },
+    preset: function (preset) {
+      if (!accessAllowed()) return;
+      state.nameFont = preset.font; state.accent = preset.accent;
+      state.btnShape = preset.shape; state.spacing = preset.spacing;
+      state.elementStyles = {};
+      state.theme = Object.assign({},state.theme,{background:preset.bg,text:preset.ink,primary:preset.ink,muted:preset.ink,button:preset.ink,secondary:preset.bg,accent:preset.accent});
+      Object.keys(state.sections).forEach(function (key) { state.sections[key].bg = preset.bg; state.sections[key].textColor = preset.ink; });
+      buildDesign(); buildSidebar(); refresh();
+    }
+  };
+  if (window.EVER_visualEditor) window.EVER_visualEditor.init();
+  remember();
+  if(access){document.getElementById('editor-help').textContent='Every detail is yours to change. Saved automatically to your account.';}
   buildSidebar();
   buildDesign();
   bindChrome();
+  if (window.INVITARA_editor) window.INVITARA_editor();
+  overlay().addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { e.stopPropagation(); closePublish(); }
+    if (e.key !== 'Tab') return;
+    var focusable = Array.from(overlay().querySelectorAll('button:not(:disabled),a[href],input')).filter(function (el) { return el.getClientRects().length; });
+    var first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
   updateBadge();
   render();
+  var phoneButton=document.querySelector('[data-dev=mobile]');if(phoneButton)phoneButton.click();
+  if (access) {
+    var expiryHandled = false;
+    setInterval(function() { if (!accessAllowed() && !expiryHandled) { expiryHandled = true; document.querySelectorAll('.ed-sidebar input,.ed-sidebar select,.ed-sidebar textarea,.ed-sidebar button,.visual-inspector input,.visual-inspector select,.visual-inspector textarea,.visual-inspector button,#undo-btn,#redo-btn,#save-btn,#publish-btn').forEach(function(el) { el.disabled = true; }); document.querySelectorAll('#canvas [contenteditable]').forEach(function(el) { el.removeAttribute('contenteditable'); }); banner.textContent = 'Your event has ended. Editor access is now closed.'; document.querySelector('.ed-canvas-wrap').prepend(banner); } },1000);
+  }
 
   /* Deep links from the dashboard: #publish opens the checklist straight
      away, #preview drops into the mobile preview. */

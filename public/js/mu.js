@@ -198,7 +198,7 @@
   }
 
   /* The RSVP section shared by every layout (image panel + titled form). */
-  function rsvpSection(s, B) {
+  function rsvpSection(s) {
     var deadline = s.deadline ? E.EVER_fmtLongDate(s.deadline) : '';
     return sec('rsvp', 'wpo-contact-section section-padding',
       '<div class="container-fluid"><div class="contact-wrap"><div class="row align-items-center">' +
@@ -401,8 +401,10 @@
       if ('ResizeObserver' in window) {
         var ro = new ResizeObserver(function () { layout(); });
         ro.observe(sl);
+        root.__muDisposers.push(function(){ro.disconnect();});
       } else {
         window.addEventListener('resize', layout);
+        root.__muDisposers.push(function(){window.removeEventListener('resize',layout);});
       }
       layout();
     });
@@ -438,6 +440,7 @@
 
   function bind(root) {
     if (!root) return;
+    root.__muDisposers = root.__muDisposers || [];
     bindSliders(root);
     bindMenu(root);
     bindLightbox(root);
@@ -494,6 +497,7 @@
     if (ro) {
       fitJobs.set(box, apply);
       ro.observe(box);
+      box.__dispose = function(){ro.unobserve(box);fitJobs.delete(box);};
     }
   }
 

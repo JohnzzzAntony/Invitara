@@ -1,0 +1,54 @@
+/* Catalogue data: occasions, visual families and experience types stay independent. */
+(function () {
+  'use strict';
+  var E = window;
+  var occasions = [['wedding','Wedding'],['engagement','Engagement'],['save-date','Save the Date'],['birthday','Birthday'],['anniversary','Anniversary'],['baby','Baby Shower'],['bridal','Bridal Shower'],['graduation','Graduation'],['party','Party'],['corporate','Corporate Event'],['ramadan','Ramadan'],['eid','Eid'],['holiday','Holiday'],['other','Other']];
+  var experiences = {
+    classic:{name:'Classic',description:'An elegant invitation that unfolds naturally as you scroll.',features:['Elegant vertical layout','Responsive typography','Embedded RSVP']},
+    story:{name:'Story',description:'A story told in beautiful chapters, photographs and quiet moments.',features:['Progressive scroll reveals','Chapter navigation','Immersive photographs']},
+    book:{name:'Book',description:'A keepsake invitation with a beautiful cover and softly turning pages.',features:['Tap or swipe to turn pages','Desktop two-page spread','Natural scroll alternative']},
+    magazine:{name:'Magazine',description:'Your celebration, art-directed like a luxury editorial publication.',features:['Editorial cover','Asymmetric layouts','Photography-led storytelling']},
+    cinematic:{name:'Cinematic',description:'A full-screen invitation with film, photography and a sense of occasion.',features:['Background video support','Slow photographic transitions','Full-screen chapters']},
+    reveal:{name:'Reveal',description:'A little anticipation. A beautiful surprise. Reveal your celebration one detail at a time.',features:['Tap to reveal chapters','Scroll to discover','Accessible reveal controls']},
+    timeline:{name:'Timeline',description:'Follow the moments that brought you here, and the celebration still to come.',features:['Animated story timeline','Photographs and milestones','Event running order']},
+    gallery:{name:'Gallery',description:'Let your photographs tell the story, in a gallery made for your favourite moments.',features:['Editorial photo collage','Full-screen lightbox','Swipe through photographs']}
+  };
+  var palettes = {
+    ivory:{bg:'#faf6ed',ink:'#394139',accent:'#a48a57',soft:'#eee5d3',font:'corm',decor:'botanical'},
+    gold:{bg:'#f6eedc',ink:'#4b3d28',accent:'#9d7940',soft:'#e9d9b8',font:'cinzel',decor:'ornate'},
+    rose:{bg:'#f9eeea',ink:'#74464a',accent:'#b27579',soft:'#ecd8d1',font:'pfd',decor:'botanical'},
+    black:{bg:'#171e1b',ink:'#f0e7d4',accent:'#c5ab70',soft:'#30372e',font:'cinzel',decor:'ornate'},
+    sage:{bg:'#eff2e7',ink:'#354c3c',accent:'#778967',soft:'#dce4d2',font:'corm',decor:'botanical'},
+    blue:{bg:'#eaf0f4',ink:'#2d4a5b',accent:'#668a9f',soft:'#d4e2e9',font:'jost',decor:'minimal'},
+    cream:{bg:'#fcfaf5',ink:'#34372f',accent:'#9d8d72',soft:'#ece9e0',font:'pfd',decor:'minimal'},
+    bold:{bg:'#e4e8f4',ink:'#2639a0',accent:'#9a3474',soft:'#ccd6e7',font:'jost',decor:'modern'}
+  };
+  var rows = [
+    ['wedding','Luxury Book','Luxury','book','gold'],['wedding','Editorial Wedding','Editorial','magazine','cream'],['wedding','Cinematic Love','Elegant','cinematic','black'],['wedding','Blooming Romance','Floral','story','rose'],['wedding','Minimal Ivory','Minimal','classic','ivory'],['wedding','Black & Gold','Luxury','book','black'],['wedding','Romantic Gallery','Romantic','gallery','rose'],['wedding','Arabian Luxury','Arabian Luxury','book','gold'],['wedding','Modern Architecture','Modern','magazine','cream'],['wedding','The Classic','Classic','classic','sage'],['wedding','Our Years Together','Traditional','timeline','ivory'],
+    ['engagement','Photo Story','Romantic','story','rose'],['engagement','A Beautiful Yes','Elegant','reveal','ivory'],['engagement','Minimal Editorial','Minimal','magazine','cream'],['engagement','Luxury Magazine','Luxury','magazine','gold'],['engagement','Under the Stars','Elegant','cinematic','black'],['engagement','Every Little Moment','Classic','timeline','sage'],
+    ['birthday','Party Magazine','Editorial','magazine','bold'],['birthday','Bold Celebration','Bold','reveal','bold'],['birthday','The Countdown','Modern','classic','blue'],['birthday','Another Beautiful Year','Romantic','story','rose'],['birthday','Memory Book','Classic','book','ivory'],['birthday','Life in Pictures','Modern','gallery','blue'],
+    ['baby','A Little Wonder','Romantic','story','rose'],['baby','Floral Welcome','Floral','classic','sage'],['baby','Our Next Chapter','Classic','book','ivory'],['baby','The Sweetest Secret','Minimal','reveal','blue'],['baby','Little Edition','Editorial','magazine','cream'],
+    ['anniversary','A Love Story','Romantic','story','rose'],['anniversary','Through the Years','Classic','timeline','ivory'],['anniversary','Golden Pages','Luxury','book','gold'],['anniversary','Still Our Forever','Elegant','cinematic','black'],['anniversary','The Anniversary Issue','Editorial','magazine','cream'],
+    ['corporate','Modern Conference','Modern','classic','blue'],['corporate','The Executive Edition','Luxury','book','black'],['corporate','An Agenda for Tomorrow','Minimal','timeline','cream'],['corporate','The Business Issue','Editorial','magazine','cream'],['corporate','A Considered Gathering','Minimal','classic','sage'],
+    ['graduation','The Next Chapter','Classic','book','ivory'],['graduation','Years of Possibility','Elegant','timeline','gold'],['graduation','A Journey in Pictures','Modern','gallery','blue'],['graduation','Class of Tomorrow','Editorial','magazine','bold'],
+    ['save-date','Something Beautiful','Minimal','reveal','ivory'],['bridal','Petals & Promises','Floral','story','rose'],['party','After Dark','Bold','cinematic','black'],['ramadan','An Evening of Togetherness','Arabian Luxury','book','gold'],['eid','Eid with Loved Ones','Traditional','reveal','sage'],['holiday','Gather in Good Company','Classic','gallery','ivory'],['other','A Moment to Remember','Elegant','classic','cream']
+  ];
+  function slug(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+  var labels = Object.fromEntries(occasions);
+  rows.forEach(function(row,index){
+    var occasion=row[0],p=palettes[row[4]],engine=row[3],wedding=['wedding','engagement','anniversary','save-date','bridal'].includes(occasion);
+    var image=occasion==='corporate'?'assets/ev-gala.jpg':occasion==='baby'?'assets/ev-baby.jpg':occasion==='birthday'||occasion==='party'?'assets/ev-balloons.jpg':occasion==='graduation'?'assets/ev-star.jpg':'assets/ws-couple.jpg';
+    var nameA=wedding?'Sarah':occasion==='baby'?'A little one':occasion==='corporate'?'The Annual Gathering':occasion==='graduation'?'Alex':occasion==='ramadan'?'Iftar':occasion==='eid'?'Eid Mubarak':'Sophia';
+    E.EVER_THEMES.push({id:slug(occasion+'-'+row[1]),name:row[1],event:occasion,occasion:occasion,category:row[2],style:row[2],experience:engine,family:row[4]+'-'+engine,layout:'platform',dark:p.ink,gold:p.accent,bg:p.bg,ink:p.ink,soft:p.soft,nameFont:p.font,ornament:'none',decoration:p.decor,price:engine==='book'||engine==='cinematic'?99:engine==='magazine'?89:79,description:experiences[engine].description,
+      content:{basics:{title:labels[occasion]+' invitation',nameA:nameA,nameB:wedding?'Daniel':'',brand:wedding?'S & D':nameA,venue:occasion==='corporate'?'The Grand Ballroom':'The Glasshouse',city:'Dubai, UAE'},sections:{hero:{kicker:occasion==='wedding'?'Together with their families':"You’re warmly invited",title:wedding?'Celebrate our next chapter':labels[occasion],note:wedding?'A day to remember. A lifetime to share.':'A beautiful moment is better together.',photo:image},story:{photo:index%2?'assets/ws-rings.jpg':'assets/ws-cafe.jpg'},gallery:{items:[{photo:image,caption:'The moments that make us'},{photo:'assets/ws-decor.jpg',caption:'A little inspiration'},{photo:'assets/ws-rings.jpg',caption:'Every beautiful detail'}]}}}});
+  });
+  E.EVER_THEMES.filter(function(t){return t.layout==='platform';}).forEach(function(t){
+    var family=t.experience,s=t.content.sections;
+    t.content.order=family==='gallery'?['hero','gallery','story','details','schedule','countdown','rsvp','contact']:family==='timeline'?['hero','timeline','story','details','schedule','gallery','countdown','rsvp','contact']:family==='classic'?['hero','details','story','gallery','schedule','countdown','rsvp','contact']:['hero','story','details','timeline','gallery','schedule','countdown','rsvp','contact'];
+    if(t.occasion==='corporate'){s.story=Object.assign({},s.story,{kicker:'A shared ambition',title:'Ideas worth gathering for.',text:'An evening to connect, exchange ideas, and celebrate what we can create together. Join colleagues and friends for thoughtful conversations and new possibilities.'});s.timeline={kicker:'Our progress',title:'Built together, year by year',items:[{time:'The beginning',title:'An idea with purpose',text:'A shared vision brought us together.',photo:'assets/ev-gala.jpg'},{time:'Today',title:'The next opportunity',text:'New perspectives. Lasting connections.',photo:'assets/ws-decor.jpg'}]};}
+    else if(!['wedding','engagement','anniversary','save-date','bridal'].includes(t.occasion)){s.story=Object.assign({},s.story,{kicker:'A reason to celebrate',title:t.occasion==='baby'?'Our sweetest chapter yet.':'Good company. Beautiful memories.',text:t.occasion==='baby'?'A little wonder is on the way. We would love to gather our favourite people to welcome this beautiful new beginning.':'Some moments deserve to be shared. Join us for a celebration of friendship, good company, and all the wonderful memories still to come.'});s.timeline={kicker:'A few favourite moments',title:'The story so far',items:[{time:'Then',title:'A beautiful beginning',text:'The first of many moments to remember.',photo:t.content.sections.hero.photo},{time:'Now',title:'A reason to gather',text:'The next chapter is better together.',photo:'assets/ws-decor.jpg'}]};s.schedule={title:'A beautiful gathering',items:[{time:'17:00',title:'A warm welcome',text:'Arrive, settle in, and catch up with friends.'},{time:'18:00',title:'Food & celebration',text:'Good food, lovely company, and memories to share.'},{time:'20:00',title:'One more lovely moment',text:'Stay a little longer. Enjoy the evening together.'}]};}
+  });
+  var legacy={vellum:['classic','Classic'],nocturne:['cinematic','Luxury'],confetti:['reveal','Bold'],bloom:['story','Romantic'],atlas:['story','Modern']};
+  E.EVER_THEMES.forEach(function(t){if(legacy[t.id]){t.experience=legacy[t.id][0];t.style=legacy[t.id][1];t.occasion=t.event;t.family=t.id;}});
+  E.INVITARA_CATALOG={occasions:occasions,experiences:experiences,palettes:palettes,styles:['Minimal','Luxury','Editorial','Romantic','Floral','Modern','Classic','Traditional','Bold','Elegant','Arabian Luxury'],label:function(id){return labels[id]||id;}};
+})();

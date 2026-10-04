@@ -1,0 +1,1 @@
+fetch('/api/config').then(r=>r.json()).then(c=>document.querySelectorAll('[data-operator]').forEach(el=>{el.textContent=c.businessName+' · ';if(c.supportEmail){const a=document.createElement('a');a.href='mailto:'+c.supportEmail;a.textContent=c.supportEmail;el.appendChild(a);}else el.append('Support details will be available when the store launches.');})).catch(()=>{});

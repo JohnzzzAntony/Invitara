@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: invitara
+    runtime: docker
+    plan: starter
+    healthCheckPath: /api/health
+    disk:
+      name: invitation-data
+      mountPath: /app/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATA_DIR
+        value: /app/data
+      - key: TRUST_PROXY_HOPS
+        value: '1'
+      - key: APP_ORIGIN
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: BUSINESS_NAME
+        sync: false
+      - key: SUPPORT_EMAIL
+        sync: false
