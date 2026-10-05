@@ -1,8 +1,10 @@
 (async function(){
  'use strict';var E=window,root=document.getElementById('invite-root'),missing=document.getElementById('invite-missing'),id=new URLSearchParams(location.search).get('e');
+ document.getElementById('invite-retry').onclick=function(){location.reload();};
+ document.getElementById('invite-retry').hidden=!id;
  try{
   if(!id)throw new Error('Missing invitation');
-  var payload=await E.EVER_API.request('/invites/'+encodeURIComponent(id));
+ var payload=await E.EVER_API.request('/invites/'+encodeURIComponent(id));
   var site=E.EVER_renderSite(payload.s,{interactive:true});root.appendChild(site);E.EVER_bindSite(site,{rsvpDemo:false});
   document.title=(payload.s.basics.title||payload.s.basics.brand)+' — you’re invited';
   site.querySelectorAll('.ws-rsvp-form').forEach(function(form){
@@ -13,5 +15,5 @@
     catch(err){status.textContent=err.message;}finally{button.disabled=false;}
    });
   });
- }catch(err){root.hidden=true;missing.hidden=false;}
+ }catch(err){root.hidden=true;missing.hidden=false;}finally{document.getElementById('invite-loading').hidden=true;}
 })();

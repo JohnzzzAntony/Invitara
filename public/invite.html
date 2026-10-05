@@ -18,10 +18,10 @@
 <link rel="stylesheet" href="css/collection.css"/>
 <link rel="stylesheet" href="css/studio.css"/>
 
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Cinzel:wght@500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500;600;700&family=Great+Vibes&family=Jost:wght@300;400;500;600;700;800&family=Parisienne&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,500&display=swap"><link rel="stylesheet" href="css/premium.css"><link rel="stylesheet" href="css/platform.css"><link rel="stylesheet" href="css/platform-app.css"><link rel="stylesheet" href="css/editions.css"></head>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Cinzel:wght@500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Great+Vibes&family=Jost:wght@300;400;500;600;700;800&family=Parisienne&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,500&display=swap"><link rel="stylesheet" href="css/premium.css"><link rel="stylesheet" href="css/platform.css"><link rel="stylesheet" href="css/platform-app.css"><link rel="stylesheet" href="css/editions.css"><link rel="stylesheet" href="css/refinement.css"></head>
 <body class="invite-body" style="margin:0">
   <!-- The published invitation renders here, full-bleed. -->
-  <div id="invite-root"></div>
+  <div id="invite-loading" class="invitation-loading" role="status"><span>Opening your invitation…</span><div class="loading-card" aria-hidden="true"></div></div><div id="invite-root"></div>
 
   <div class="invite-missing" id="invite-missing" hidden>
     <div class="container">
@@ -31,7 +31,7 @@
         cut short when copied out of a message. Ask whoever invited you to send
         the full link again.
       </p>
-      <a class="btn btn-primary" href="index.html">About Invitara</a>
+      <div class="invite-recovery-actions"><button id="invite-retry" type="button">Try again</button><a href="index.html">About Invitara →</a></div>
     </div>
   </div>
 
