@@ -51,16 +51,25 @@ app.post('/api/webhook', express.raw({ type: 'application/json', limit: '1mb' })
   let event;
   try { event = stripe.webhooks.constructEvent(req.body, req.headers['stripe-signature'], process.env.STRIPE_WEBHOOK_SECRET); }
   catch { return res.status(400).json({ error: 'Invalid webhook signature.' }); }
-  if (['checkout.session.completed', 'checkout.session.async_payment_succeeded'].includes(event.type)) {
-    const session = event.data.object;
-    const p = get(session.metadata?.projectId);
-    const registered = db.prepare('SELECT project FROM sessions WHERE id=?').get(session.id);
-    if (p && registered?.project === p.id && session.payment_status === 'paid' && session.amount_total === p.amount && session.currency === 'aed') {
-      if (!p.paid) { p.paid = true; p.status = 'PAID'; p.orderId = session.id; p.paidAt = new Date().toISOString(); save(p); }
-    }
-  }
+  if (['checkout.session.completed', 'checkout.session.async_payment_succeeded'].includes(event.type)) fulfil(event.data.object);
   res.json({ received: true });
 });
+// Unlocks a project only for a Stripe-sourced session we registered, with the expected amount and currency.
+function fulfil(session) {
+  const p = get(session.metadata?.projectId);
+  const registered = db.prepare('SELECT project FROM sessions WHERE id=?').get(session.id);
+  if (p && !p.paid && registered?.project === p.id && session.payment_status === 'paid' && session.amount_total === p.amount && session.currency === 'aed') {
+    p.paid = true; p.status = 'PAID'; p.orderId = session.id; p.paidAt = new Date().toISOString(); save(p);
+  }
+}
+// Webhooks can be delayed or misconfigured; the editor polls this, so confirm directly with Stripe (never from the redirect).
+async function reconcile(p) {
+  if (p.paid || !stripe) return p;
+  const latest = db.prepare('SELECT id FROM sessions WHERE project=? ORDER BY rowid DESC LIMIT 1').get(p.id);
+  if (!latest) return p;
+  try { fulfil(await stripe.checkout.sessions.retrieve(latest.id)); return get(p.id); }
+  catch (e) { console.error('Payment check failed:', e.type || 'provider error'); return p; }
+}
 app.use('/api', (req, res, next) => {
   res.set('Cache-Control', 'no-store');
   if (!['GET', 'HEAD'].includes(req.method) && req.headers.origin !== origin) return res.status(403).json({ error: 'Invalid request origin.' });
@@ -151,7 +160,7 @@ app.post('/api/checkout', async (req, res) => {
     res.json({ url: session.url });
   } catch (e) { console.error('Checkout failed:', e.type || 'provider error'); res.status(502).json({ error: 'Checkout is unavailable. Please try again.' }); }
 });
-app.get('/api/projects/:id', (req, res) => { const p = owned(req, res); if (p) res.json(publicProject(p)); });
+app.get('/api/projects/:id', async (req, res) => { const p = owned(req, res); if (p) res.json(publicProject(await reconcile(p))); });
 app.put('/api/projects/:id', (req, res) => {
   const p = owned(req, res); if (!p) return;
   if (!editable(p)) return res.status(403).json({ error: p.paid ? 'Editor access ended after your event.' : 'Payment confirmation is required.' });

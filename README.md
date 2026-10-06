@@ -31,7 +31,7 @@ Use the included Dockerfile or `render.yaml`. This application needs **one Node 
 5. Register `https://YOUR-DOMAIN/api/webhook` for `checkout.session.completed` and `checkout.session.async_payment_succeeded`. Test with Stripe test credentials before replacing them with live keys.
 6. Run `npm run build` and `npm test`. After deployment, verify `/api/health`, sign up, save the recovery code, complete a Stripe test payment, edit and publish, open the guest link from another browser, submit a reply and export it from the dashboard.
 
-The catalog currently uses AED and 5% VAT. Review prices, tax treatment, business contact details, terms and media/font licensing before accepting live orders. Payment redirects are not proof of payment: only verified signed webhooks with the expected amount, currency and registered session unlock the editor. Live checkout and webhook delivery require your own credentials.
+The catalog currently uses AED and 5% VAT. Review prices, tax treatment, business contact details, terms and media/font licensing before accepting live orders. Payment redirects are not proof of payment: only a registered Checkout Session confirmed by Stripe (signed webhook, or a server-side session lookup when the editor checks status) with the expected amount and currency unlocks the editor. Stripe test mode (`sk_test_…`) accepts the card 4242 4242 4242 4242 with any future expiry and any CVC. Live checkout and webhook delivery require your own credentials.
 
 ## Access and accounts
 

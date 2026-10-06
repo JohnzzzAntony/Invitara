@@ -50,7 +50,7 @@ Subscribe to:
 - `checkout.session.completed`
 - `checkout.session.async_payment_succeeded`
 
-Copy that endpoint's signing secret into `STRIPE_WEBHOOK_SECRET`. Configure separate test/live endpoints or destinations as appropriate and use matching credentials. Payment redirects do not unlock access; signed, matching webhooks do. Production startup requires both Stripe secrets and operator details.
+Copy that endpoint's signing secret into `STRIPE_WEBHOOK_SECRET`. Configure separate test/live endpoints or destinations as appropriate and use matching credentials. Payment redirects do not unlock access; signed, matching webhooks or a server-side Checkout Session lookup by the editor's status check do. Production startup requires both Stripe secrets and operator details.
 
 ## Storage and operations
 
