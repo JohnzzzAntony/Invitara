@@ -26,6 +26,7 @@ test('production boot serves built assets with security headers and secure cooki
     assert.equal(health.headers.get('cache-control'),'no-store');
     assert.equal(health.headers.get('x-powered-by'),null);
     for(const url of ['/','/vendor/editions/editions-motion.js','/vendor/gsap.min.js'])assert.equal((await fetch(endpoint+url)).status,200);
+    for(const [from,to] of [['/wedding-invitations.html','/create.html?occasion=wedding'],['/baby-shower-invitations.html','/create.html?occasion=baby'],['/plan.html','/pricing.html']]){const r=await fetch(endpoint+from,{redirect:'manual'});assert.equal(r.status,301);assert.equal(r.headers.get('location'),to);}
     for(const url of ['/.env','/server/index.mjs','/data/invitara.sqlite','/node_modules/express/package.json'])assert.equal((await fetch(endpoint+url)).status,404);
     assert.equal((await fetch(endpoint+'/api/auth/login',{method:'POST',headers:{Origin:'https://untrusted.example','Content-Type':'application/json'},body:'{}'})).status,403);
   }finally{

@@ -94,11 +94,27 @@
      active project so the dashboard, checkout and publish all see the same
      content. The status line says "Saving…" then "Saved" so a customer can
      see their work is safe.                                              */
-  function saveStatus(text) {
+  var saveFailed = false;
+  function saveStatus(text, failed) {
     var el = document.getElementById('ed-save');
     if (!el) return;
-    el.textContent = text;
+    el.textContent = failed ? '' : text;
     el.classList.toggle('on', !!text);
+    el.classList.toggle('err', !!failed);
+    if (failed) {
+      var detail = document.createElement('span');
+      detail.className = 'ed-save-detail';
+      detail.textContent = text + ' ';
+      var retry = document.createElement('button');
+      retry.type = 'button';
+      retry.className = 'ed-retry';
+      retry.textContent = 'Retry save';
+      retry.addEventListener('click', saveNow);
+      el.append(detail, retry);
+      /* The status is compact on phones; announce the first failure once, not on every keystroke. */
+      if (!saveFailed) toast(text + ' Your previous version is safe.');
+    }
+    saveFailed = !!failed;
   }
 
   var remoteSave = Promise.resolve();
@@ -108,14 +124,18 @@
   function persist() {
     if (!accessAllowed()) { saveStatus('Editor access ended'); return; }
     localSaveFailed = !writeJson(window.EVER_EVENT_KEY, state);
-    if (localSaveFailed && !access) { saveStatus('Could not save — device storage is full'); return; }
-    if (window.EVER_C) window.EVER_C.syncActiveState();
+    if (localSaveFailed && !access) { saveStatus('Couldn’t save — device storage is full.', true); return; }
+    if (window.EVER_C && !window.EVER_C.syncActiveState() && !access) {
+      localSaveFailed = true;
+      saveStatus('Couldn’t save — free some device storage.', true);
+      return;
+    }
     if (access) {
       var snapshot = JSON.parse(JSON.stringify(state));
       saveStatus('Saving to your account…');
       remoteSave = remoteSave.catch(function(){}).then(function() {
         return window.EVER_API.request('/projects/' + access.id, 'PUT', {state:snapshot});
-      }).then(function(p) { window.EVER_API.cache(p); saveStatus('Saved to your account'); return true; }).catch(function(err) { saveStatus('Not synced: ' + err.message); return false; });
+      }).then(function(p) { window.EVER_API.cache(p); saveStatus('✓ Saved to your account'); return true; }).catch(function(err) { saveStatus('Couldn’t save. ' + err.message, true); return false; });
     }
   }
 
@@ -126,7 +146,7 @@
 
   function markSaved() {
     if (access || localSaveFailed) return;
-    saveStatus('Saved on this device');
+    saveStatus('✓ Saved on this device');
     clearTimeout(statusTimer);
     statusTimer = setTimeout(function () { saveStatus(''); }, 2000);
   }
@@ -921,8 +941,8 @@
 
     document.getElementById('save-btn').addEventListener('click', async function () {
       saveNow();
-      if (access) { toast(await remoteSave ? 'Saved to your account.' : 'Not synced. Please try saving again.'); }
-      else toast(localSaveFailed ? 'Could not save. Free some device storage, then try again.' : 'Draft saved on this device. Complete checkout to publish.');
+      if (access) { toast(await remoteSave ? 'Saved to your account.' : 'We couldn’t save your changes. Your previous version is safe — please try again.'); }
+      else toast(localSaveFailed ? 'We couldn’t save your changes. Free some device storage, then try again.' : 'Draft saved on this device. Complete checkout to publish.');
     });
 
     document.getElementById('publish-btn').addEventListener('click', openPublish);

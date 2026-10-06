@@ -1,5 +1,6 @@
 import express from 'express';
 import { resolveOrigin } from './origin.mjs';
+import { pageHtml } from './page-meta.mjs';
 import Stripe from 'stripe';
 import QRCode from 'qrcode';
 import { DatabaseSync } from 'node:sqlite';
@@ -133,14 +134,19 @@ app.post('/api/checkout', async (req, res) => {
   const p = existing || { id, themeId, themeName: theme.name, layoutId: theme.layout, plan, addons, state: s, eventDate, timezone, expiresAt, amount: Math.round(q.total * 100), paid: false, status: 'PAYMENT_PENDING', published: false, createdAt: new Date().toISOString(), policyVersion: '2026-09-22', quote:q };
   db.prepare('INSERT OR IGNORE INTO projects VALUES (?,?,?)').run(id, req.owner, JSON.stringify(p));
   try {
-    const previous=db.prepare('SELECT id FROM sessions WHERE project=?').get(id);
+    const previous=db.prepare('SELECT id FROM sessions WHERE project=? ORDER BY rowid DESC LIMIT 1').get(id);
+    let idempotencyKey=id;
     if(previous) {
       const prior=await stripe.checkout.sessions.retrieve(previous.id);
       if(prior.status==='open') return res.json({url:prior.url});
       if(prior.status==='complete') return res.json({url:origin+'/editor.html?p='+id});
-      return res.status(409).json({error:'This checkout session expired. Start a new invitation from the design collection.'});
+      if(prior.status!=='expired')return res.status(409).json({error:'Your payment is still being checked. Please try again shortly.'});
+      // Concurrent retries of one expired session must create the same replacement.
+      // Keep its old mapping so delayed signed webhooks remain verifiable.
+      idempotencyKey=id+':'+previous.id;
     }
-    const session = await stripe.checkout.sessions.create({ mode: 'payment', customer_email: email, metadata: { projectId: id }, line_items: [{ price_data: { currency: 'aed', unit_amount: p.amount, product_data: { name: theme.name + ' — ' + catalog.EVER_C.findPlan(plan).name, description: 'Editor access through ' + eventDate + ' (' + timezone + '). Includes VAT.' } }, quantity: 1 }], success_url: origin + '/editor.html?p=' + id, cancel_url: origin + '/checkout.html?cancelled=1' }, { idempotencyKey: id });
+    p.state=s;save(p);
+    const session = await stripe.checkout.sessions.create({ mode: 'payment', customer_email: email, metadata: { projectId: id }, line_items: [{ price_data: { currency: 'aed', unit_amount: p.amount, product_data: { name: theme.name + ' — ' + catalog.EVER_C.findPlan(plan).name, description: 'Editor access through ' + eventDate + ' (' + timezone + '). Includes VAT.' } }, quantity: 1 }], success_url: origin + '/editor.html?p=' + id, cancel_url: origin + '/checkout.html?cancelled=1' }, { idempotencyKey });
     db.prepare('INSERT OR IGNORE INTO sessions VALUES (?,?)').run(session.id, id);
     res.json({ url: session.url });
   } catch (e) { console.error('Checkout failed:', e.type || 'provider error'); res.status(502).json({ error: 'Checkout is unavailable. Please try again.' }); }
@@ -181,9 +187,18 @@ app.get('/api/health',(req,res)=>{db.prepare('SELECT 1').get();res.json({ok:true
 // Explicit public allowlist: never expose database, secrets, source or dependencies.
 for (const dir of ['assets', 'mu', 'css', 'js', 'vendor']) app.use('/' + dir, express.static(path.join(publicRoot, dir), { dotfiles: 'deny' }));
 app.get('/robots.txt',(req,res)=>res.type('text/plain').send('User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /editor.html\nDisallow: /dashboard.html\nDisallow: /account.html\nDisallow: /checkout.html\nDisallow: /invite.html\nSitemap: '+origin+'/sitemap.xml\n'));
-app.get('/sitemap.xml',(req,res)=>res.type('application/xml').send('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+['/','/create.html','/terms.html','/privacy.html'].map(p=>'<url><loc>'+origin+p+'</loc></url>').join('')+'</urlset>'));
-app.get('/', (req, res) => res.sendFile(path.join(publicRoot, 'index.html')));
+app.get('/sitemap.xml',(req,res)=>res.type('application/xml').send('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+['/','/create.html','/pricing.html','/terms.html','/privacy.html'].map(p=>'<url><loc>'+origin+p+'</loc></url>').join('')+'</urlset>'));
+app.get('/', (req, res) => res.type('html').send(pageHtml('index.html', origin)));
+app.get('/invite.html', (req, res) => {
+  const p = typeof req.query.e === 'string' ? get(req.query.e) : null;
+  res.set('Cache-Control', 'no-store');
+  res.type('html').send(pageHtml('invite.html', origin, p?.published && p.paid ? p : null));
+});
+// Former static landing pages; occasion pages keep their filter instead of dropping visitors on the full catalogue.
+const legacyPages = { 'wedding-invitations.html': 'create.html?occasion=wedding', 'birthday-invitations.html': 'create.html?occasion=birthday', 'anniversary-invitations.html': 'create.html?occasion=anniversary', 'baby-shower-invitations.html': 'create.html?occasion=baby', 'baptism-invitations.html': 'create.html', 'gala-invitations.html': 'create.html', 'housewarming-invitations.html': 'create.html', 'digital-invitations.html': 'create.html', 'online-rsvp.html': 'create.html', 'plan.html': 'pricing.html', 'layouts-test.html': 'create.html' };
 app.get('/:file', (req, res, next) => {
+  if (Object.hasOwn(legacyPages, req.params.file)) return res.redirect(301, '/' + legacyPages[req.params.file]);
+  if (['index.html','create.html','design.html','pricing.html','account.html','dashboard.html','editor.html','checkout.html','demo.html','terms.html','privacy.html'].includes(req.params.file)) return res.type('html').send(pageHtml(req.params.file, origin));
   if (/^[a-z0-9-]+\.html$/.test(req.params.file) || ['styles.css', 'robots.txt', 'sitemap.xml'].includes(req.params.file)) return res.sendFile(path.join(publicRoot, req.params.file));
   next();
 });

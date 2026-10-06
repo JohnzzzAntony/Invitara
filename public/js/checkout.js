@@ -20,9 +20,8 @@
     return;
   }
   if (!project.plan) {
-    /* Arrived without choosing a plan — that step owns the decision. */
-    window.location.replace('plan.html?p=' + encodeURIComponent(project.id));
-    return;
+    /* Older drafts predate plan selection; every invitation now uses the single plan. */
+    project = C.updateProject(project.id, { plan: C.PLAN_ORDER[0] }) || Object.assign(project, { plan: C.PLAN_ORDER[0] });
   }
   /* Already paid: nothing to buy twice (§57 duplicate-payment protection). */
   if (C.isPaid(project)) {

@@ -283,7 +283,7 @@
     return Array.isArray(list) ? list : [];
   }
 
-  function saveProjects(list) { writeJson(PROJECTS_KEY, list); }
+  function saveProjects(list) { return writeJson(PROJECTS_KEY, list); }
 
   function findProject(id) {
     var list = allProjects();
@@ -328,7 +328,7 @@
     };
     var list = allProjects();
     list.unshift(project);
-    saveProjects(list);
+    if (!saveProjects(list)) return null;
     setActive(project.id);
     return project;
   }
@@ -339,7 +339,7 @@
       if (list[i].id !== id) continue;
       for (var k in patch) if (Object.prototype.hasOwnProperty.call(patch, k)) list[i][k] = patch[k];
       list[i].updatedAt = new Date().toISOString();
-      saveProjects(list);
+      if (!saveProjects(list)) return null;
       return list[i];
     }
     return null;

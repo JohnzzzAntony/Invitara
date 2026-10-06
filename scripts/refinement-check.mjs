@@ -86,6 +86,8 @@ try {
   await page.locator('#account-submit').click();
   await page.locator('#recovery-result').waitFor({state: 'visible'});
   assert.ok((await page.locator('#recovery-code').textContent()).length > 10);
+  assert.equal(await page.locator('#account-continue').isDisabled(), true);
+  await page.locator('#recovery-saved').check();
   await page.locator('#account-continue').click();
   await page.goto(`${origin}/checkout.html`);
   await page.locator('#event-zone option').first().waitFor({state: 'attached'});
@@ -108,6 +110,20 @@ try {
   await page.locator('#dashboard-retry').click();
   await page.locator('#dashboard-retry').waitFor({state: 'hidden'});
   await page.locator('#dashboard-loading').waitFor({state: 'hidden'});
+
+  await page.goto(`${origin}/create.html?occasion=baby-shower&style=romantic`);
+  assert.equal(await page.locator('.collection-card').count(), 1);
+  assert.match(await page.locator('.collection-card h3').textContent(), /Little Universe/);
+  await page.goto(`${origin}/create.html?occasion=unknown&style=unknown&experience=unknown`);
+  assert.equal(await page.locator('.collection-card').count(), 12);
+  await page.route('**/js/editions-catalog.js', route => route.fulfill({contentType:'application/javascript', body:''}));
+  await page.goto(`${origin}/create.html`);
+  await page.getByRole('button', {name:'Retry', exact:true}).waitFor();
+  assert.equal(await page.locator('#collection-empty').isVisible(), false);
+  await page.unroute('**/js/editions-catalog.js');
+  await page.getByRole('button', {name:'Retry', exact:true}).click();
+  await page.locator('.collection-card').first().waitFor();
+  assert.equal(await page.locator('#collection-status').isVisible(), false);
 
   assert.deepEqual(errors, []);
   writeFileSync('artifacts/refinement/results.json', JSON.stringify({results, errors}, null, 2));

@@ -1,5 +1,7 @@
 # Template audit — September 2026
 
+Historical snapshot. Current architecture and release status: [Release readiness](RELEASE-READINESS.md). Statements below about no backend or hash-based public links describe the retired implementation.
+
 Code-level audit of the 27-design catalogue that preceded the 8-design one, and
 the record of what was changed and why. Companion to
 [ARCHITECTURE.md](ARCHITECTURE.md) and [LAYOUT-SPEC.md](LAYOUT-SPEC.md).

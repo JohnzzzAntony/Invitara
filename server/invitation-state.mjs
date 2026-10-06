@@ -1,3 +1,5 @@
+import { validatePhoto } from './photo.mjs';
+
 export function invitationState(catalog,input,themeId,eventDate){
  const result=catalog.EVER_siteDefaults(themeId),baseLayout=catalog.EVER_findLayout(result.layoutId),layout={...baseLayout,sections:[...baseLayout.sections]};
  if(!input||typeof input!=='object'||Array.isArray(input))throw new Error('Invalid invitation content.');
@@ -10,7 +12,7 @@ export function invitationState(catalog,input,themeId,eventDate){
    result.sectionTypes[key]=type;result.sections[key]=JSON.parse(JSON.stringify(result.sections[type]));layout.sections.push({...source,id:key});
   }
  }
- const scalar=(value,field)=>{if(field.type==='check'){if(typeof value!=='boolean')throw new Error('Invalid switch.');return value;}if(field.type==='number'){const n=Number(value);if(!Number.isFinite(n)||n<1||n>50)throw new Error('Guest limit must be between 1 and 50.');return n;}if(typeof value!=='string'||value.length>(field.type==='photo'?10000000:10000))throw new Error('Invalid or oversized field.');if(field.type==='color'&&value&&!/^#[a-f0-9]{6}$/i.test(value))throw new Error('Invalid colour.');return value;};
+ const scalar=(value,field)=>{if(field.type==='check'){if(typeof value!=='boolean')throw new Error('Invalid switch.');return value;}if(field.type==='number'){const n=Number(value);if(!Number.isFinite(n)||n<1||n>50)throw new Error('Guest limit must be between 1 and 50.');return n;}if(typeof value!=='string'||value.length>(field.type==='photo'?10000000:10000))throw new Error('Invalid or oversized field.');if(field.type==='photo')validatePhoto(value);if(field.type==='color'&&value&&!/^#[a-f0-9]{6}$/i.test(value))throw new Error('Invalid colour.');return value;};
  for(const key of ['nameFont','bodyFont','accent','btnShape','spacing'])if(input[key]!==undefined){if(typeof input[key]!=='string'||input[key].length>100)throw new Error('Invalid design option.');result[key]=input[key];}
  for(const field of layout.basics)if(input.basics?.[field.k]!==undefined)result.basics[field.k]=scalar(input.basics[field.k],field);
  if(input.sections!==undefined&&(!input.sections||typeof input.sections!=='object'||Array.isArray(input.sections)))throw new Error('Invalid sections.');

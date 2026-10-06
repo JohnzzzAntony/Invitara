@@ -2,6 +2,8 @@
 
 Production application: Node 24, Express, SQLite, Stripe Checkout and locally bundled Anime.js, Motion, Three.js and GSAP. Browser animation sources are compiled by esbuild. The production server serves `public/` and enforces purchases and event expiry.
 
+See [the current release readiness report](docs/RELEASE-READINESS.md) for the October audit fixes, verification evidence and remaining production acceptance gates.
+
 ## Start locally
 
 ```powershell

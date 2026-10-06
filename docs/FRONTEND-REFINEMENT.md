@@ -47,7 +47,7 @@ the footer links to existing destinations. Operator details remain on legal page
 | `invite.html` | Paid published invitation, RSVP submit/update, expiry | Loading surface, styled unavailable state, real retry |
 | `terms.html`, `privacy.html` | Legal content, operator configuration | Readable line length/type, common navigation/footer |
 | `404.html` | Return to collection | Common shell and typography |
-| `plan.html`, `layouts-test.html` | Existing compatibility redirects | Existing destinations preserved |
+| `plan.html`, `layouts-test.html`, former occasion pages | Server 301 redirects (`server/index.mjs`) | Occasion pages keep their filter; `plan.html` goes to pricing |
 | Occasion landing URLs | Anniversary, baby shower, baptism, birthday, gala, housewarming, wedding | Existing catalogue redirects preserved |
 | Product landing URLs | Digital invitations, online RSVP | Existing catalogue redirects preserved |
 
@@ -95,3 +95,7 @@ tests passed; storefront, visual editor, paid invitation and edition suites pass
 The refinement suite passed 104 responsive checks across the eight requested
 widths with no JavaScript errors. The paid suite additionally confirmed seven
 paid editors, publishing, public RSVP, QR sharing, dashboard and checkout handling.
+
+## 7 October follow-up
+
+See [release readiness](RELEASE-READINESS.md) for catalogue failure recovery, explicit homepage pricing/FAQ, recovery acknowledgment, mobile keyboard handling, storage failure reporting, payment retry and security/SEO improvements. Production acceptance is still separate from local test results.

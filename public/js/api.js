@@ -1,7 +1,10 @@
 (function () {
   'use strict';
   async function request(url, method, body) {
-    var r = await fetch('/api' + url, { method: method || 'GET', credentials:'same-origin', headers: {'Content-Type':'application/json'}, body:body ? JSON.stringify(body) : undefined });
+    var controller = new AbortController(), timer = setTimeout(function(){controller.abort();}, 30000), r;
+    try { r = await fetch('/api' + url, { method: method || 'GET', credentials:'same-origin', signal:controller.signal, headers: {'Content-Type':'application/json'}, body:body ? JSON.stringify(body) : undefined }); }
+    catch (error) { throw new Error(error.name === 'AbortError' ? 'The request took too long. Please try again.' : 'Unable to connect. Check your connection and try again.'); }
+    finally { clearTimeout(timer); }
     var data; try { data = await r.json(); } catch (_) { throw new Error('The invitation server is unavailable. Please try again.'); }
     if (!r.ok) throw new Error(data.error || 'Request failed.');
     return data;
