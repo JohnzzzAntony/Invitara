@@ -81,7 +81,14 @@ body.studio { font-family: var(--font-ui); font-size: 16px; line-height: 1.65; }
 .occasion-grid a { min-height: 126px; border-radius: var(--radius-md); background: var(--surface); border-color: var(--studio-line); padding: 16px 8px; color: var(--studio-ink); }
 .occasion-grid a:hover { background: var(--surface-soft); transform: translateY(-2px); }
 .occasion-grid strong { font-size: 12px; text-align: center; }
-.occasion-grid svg { width: 28px; height: 28px; stroke: var(--olive); fill: none; stroke-width: 1.3; }
+.occasion-grid a { --occasion-hue: var(--olive); position: relative; overflow: hidden; gap: 14px; transition: transform .25s, box-shadow .25s, border-color .25s, background .25s; }
+.occasion-grid a::before { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--occasion-hue) 10%, transparent), transparent 70%); opacity: 0; transition: opacity .25s; pointer-events: none; }
+.occasion-grid a:hover, .occasion-grid a:focus-visible { border-color: color-mix(in srgb, var(--occasion-hue) 35%, var(--studio-line)); box-shadow: 0 14px 30px -18px color-mix(in srgb, var(--occasion-hue) 55%, transparent); background: var(--surface); }
+.occasion-grid a:hover::before, .occasion-grid a:focus-visible::before { opacity: 1; }
+.occasion-icon { position: relative; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; color: var(--occasion-hue); background: linear-gradient(145deg, color-mix(in srgb, var(--occasion-hue) 16%, white), color-mix(in srgb, var(--occasion-hue) 7%, white)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--occasion-hue) 18%, transparent), 0 6px 14px -8px color-mix(in srgb, var(--occasion-hue) 60%, transparent); transition: transform .25s; }
+.occasion-grid a:hover .occasion-icon { transform: scale(1.06); }
+.occasion-grid svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.occasion-grid strong { position: relative; }
 .section-intro { gap: 32px; margin-bottom: 32px; }
 .section-intro > p { font-size: 16px; max-width: 42ch; color: var(--studio-muted); }
 .section-intro > a, .section-link { font-size: 14px; text-decoration: underline; text-underline-offset: 5px; }
@@ -289,7 +296,9 @@ body.studio { font-family: var(--font-ui); font-size: 16px; line-height: 1.65; }
   .studio-proof span { font-size: 11px; }
   .studio-proof b { display: block; font-size: 25px; margin: 0 0 4px; }
   .occasion-grid { gap: 10px; margin-bottom: 48px; }
-  .occasion-grid a { min-height: 112px; }
+  .occasion-grid a { min-height: 112px; gap: 10px; }
+  .occasion-icon { width: 42px; height: 42px; }
+  .occasion-grid svg { width: 20px; height: 20px; }
   .occasion-grid strong { font-size: 11px; }
   .section-intro { flex-direction: column; align-items: flex-start; gap: 20px; }
   .experience-grid { gap: 16px; }
