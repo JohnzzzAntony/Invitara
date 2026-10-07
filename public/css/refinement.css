@@ -439,3 +439,68 @@ body.studio { font-family: var(--font-ui); font-size: 16px; line-height: 1.65; }
 .discovery > .seo-faq { padding-top: 0; }
 .discovery > .discovery-sidebar { grid-row: 1 / span 4; }
 .seo-faq h2, .launch-faq h2 { font: 500 clamp(30px, 3.4vw, 44px)/1.1 var(--studio-serif); margin: 14px 0 28px; }
+
+/* ---------- Pricing page ---------- */
+.pricing-page { padding-block: 56px var(--section-spacing); }
+.pricing-hero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr); gap: clamp(40px, 6vw, 96px); align-items: center; }
+.pricing-hero h1 { font: 500 clamp(42px, 5vw, 66px)/1.04 var(--studio-serif); letter-spacing: -.035em; margin: 18px 0 24px; }
+.pricing-hero h1 em { font-style: normal; color: var(--olive); }
+.pricing-lead { font-size: 17px; line-height: 1.75; color: var(--studio-muted); max-width: 46ch; }
+.pricing-assurances { list-style: none; padding: 0; margin: 36px 0 0; display: grid; gap: 18px; }
+.pricing-assurances li { display: flex; align-items: center; gap: 16px; }
+.pricing-assurances strong { display: block; font-weight: 600; color: var(--studio-ink); }
+.pricing-assurances span:not(.occasion-icon) { font-size: 14px; color: var(--studio-muted); }
+.price-card { position: relative; overflow: hidden; padding: clamp(32px, 4vw, 48px); border-radius: 24px; color: #f3f1e8; background: radial-gradient(120% 90% at 100% 0%, #3c5a48 0%, transparent 55%), linear-gradient(160deg, #24382e, #172520); box-shadow: 0 40px 80px -48px #0d1a1499, inset 0 0 0 1px #ffffff14; }
+.price-card::after { content: ""; position: absolute; inset: auto -30% -55% auto; width: 70%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, #c9d48f33, transparent 65%); pointer-events: none; }
+.price-card-label { font: 600 11px var(--studio-sans); letter-spacing: .16em; text-transform: uppercase; color: #c9d48f; }
+.price-card-amount { display: flex; align-items: flex-start; gap: 10px; margin: 18px 0 6px; line-height: 1; }
+.price-card-currency { font: 500 20px var(--studio-sans); margin-top: 14px; color: #dfe4cf; }
+.price-card-amount strong { font: 500 clamp(80px, 9vw, 112px)/.9 var(--studio-serif); letter-spacing: -.05em; }
+.price-card-unit { font-size: 14px; color: #c3c9b6; }
+.price-card-list { list-style: none; padding: 26px 0 0; margin: 26px 0 30px; border-top: 1px solid #ffffff1f; display: grid; gap: 14px; }
+.price-card-list li { display: flex; align-items: center; gap: 12px; font-size: 15px; color: #eef0e6; }
+.price-check { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #c9d48f; color: #1d2c24; }
+.price-check svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.price-card-cta { position: relative; z-index: 1; width: 100%; justify-content: center; }
+.price-card-note { position: relative; z-index: 1; margin-top: 16px; font-size: 12px; line-height: 1.6; color: #aeb5a2; }
+.pricing-experiences { margin-top: calc(var(--section-spacing) * 1.2); padding-top: var(--section-spacing); border-top: 1px solid var(--studio-line); }
+.pricing-section-head h2 { font: 500 clamp(36px, 4.4vw, 56px)/1.05 var(--studio-serif); letter-spacing: -.03em; margin: 14px 0 36px; }
+.pricing-section-head h2 em { font-style: normal; color: var(--olive); }
+.experience-price-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.experience-price-card { --occasion-hue: var(--olive); position: relative; display: flex; flex-direction: column; gap: 14px; padding: 26px 24px; border: 1px solid var(--studio-line); border-radius: 18px; background: var(--surface); color: var(--studio-ink); text-decoration: none; transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s, border-color .3s; }
+.experience-price-card:hover, .experience-price-card:focus-visible { transform: translateY(-4px); border-color: color-mix(in srgb, var(--occasion-hue) 35%, var(--studio-line)); box-shadow: 0 24px 44px -30px color-mix(in srgb, var(--occasion-hue) 60%, transparent); }
+.experience-price-card h3 { font: 500 24px/1.15 var(--studio-serif); margin: 6px 0 0; }
+.experience-price-card p { font-size: 14px; line-height: 1.65; color: var(--studio-muted); flex: 1; }
+.experience-price-meta { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid var(--studio-line); font-size: 12px; color: var(--studio-muted); }
+.experience-price-meta b { font-weight: 600; color: var(--occasion-hue); transition: transform .25s; }
+.experience-price-card:hover .experience-price-meta b { transform: translateX(3px); }
+.pricing-page .seo-faq { margin-top: var(--section-spacing); padding-top: var(--section-spacing); border-top: 1px solid var(--studio-line); }
+@media (max-width: 1024px) { .experience-price-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 860px) { .pricing-hero { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .experience-price-grid { gap: 10px; } .experience-price-card { padding: 18px 16px; gap: 10px; border-radius: 14px; } .experience-price-card .occasion-icon { width: 40px; height: 40px; } .experience-price-card h3 { font-size: 20px; } .experience-price-card p { font-size: 13px; line-height: 1.55; } .experience-price-meta { font-size: 11px; } .pricing-page { padding-top: 32px; } }
+
+/* ---------- Template detail page ---------- */
+.detail-price-block { display: flex; flex-direction: column; gap: 4px; padding: 20px 22px; margin: 4px 0 8px; border: 1px solid var(--studio-line); border-radius: 16px; background: var(--surface); }
+.detail-copy .detail-price-block .detail-price { font: 500 30px/1.1 var(--studio-serif); color: var(--studio-ink); margin: 0; }
+.detail-price-block span { font-size: 13px; color: var(--studio-muted); }
+.detail-copy .studio-button { transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s, background .25s; }
+.detail-copy .studio-button:hover { transform: translateY(-2px); box-shadow: 0 16px 30px -20px #172520aa; }
+.detail-assurances { list-style: none; padding: 0; margin: 22px 0 6px; display: grid; gap: 12px; }
+.detail-copy .detail-assurances li { display: flex; align-items: center; gap: 14px; margin: 0; font-size: 14px; color: var(--studio-ink); }
+.detail-copy .detail-assurances li::before { content: none; }
+.detail-assurances .occasion-icon { width: 38px; height: 38px; }
+.detail-assurances .occasion-icon svg { width: 18px; height: 18px; }
+.detail-copy #detail-features li { display: flex; align-items: center; gap: 12px; }
+.detail-copy #detail-features li::before { content: ""; flex: none; width: 20px; height: 20px; margin: 0; border-radius: 50%; background: var(--surface-soft) no-repeat center / 12px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23314a3a' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E"); }
+.related-templates { margin-top: var(--section-spacing); padding-top: var(--section-spacing); border-top: 1px solid var(--studio-line); }
+.related-templates h2 { font: 500 clamp(34px, 4vw, 52px)/1.05 var(--studio-serif); letter-spacing: -.03em; margin: 14px 0 32px; }
+.related-templates .collection-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 900px) { .related-templates .collection-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .related-templates .collection-card:nth-child(3) { display: none; } }
+@media (max-width: 600px) { .related-templates .collection-grid { grid-template-columns: 1fr; } }
+
+/* ---------- Template catalogue cards ---------- */
+.studio .collection-art { transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s; }
+.studio .collection-card:hover .collection-art, .studio .collection-card:focus-within .collection-art { transform: translateY(-5px); box-shadow: 0 28px 48px -30px #1a302566; }
+.studio .collection-card .card-bottom > * { transition: transform .25s, background .25s, box-shadow .25s; }
+.studio .collection-card .card-bottom > *:hover { transform: translateY(-1px); }
+@media (prefers-reduced-motion: reduce) { .studio .collection-card:hover .collection-art, .experience-price-card:hover, .detail-copy .studio-button:hover { transform: none; } }

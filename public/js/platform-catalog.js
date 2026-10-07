@@ -6,7 +6,7 @@
   var experiences = {
     classic:{name:'Classic',description:'An elegant invitation that unfolds naturally as you scroll.',features:['Elegant vertical layout','Responsive typography','Embedded RSVP']},
     story:{name:'Story',description:'A story told in beautiful chapters, photographs and quiet moments.',features:['Progressive scroll reveals','Chapter navigation','Immersive photographs']},
-    book:{name:'Book',description:'A keepsake invitation with a beautiful cover and softly turning pages.',features:['Tap or swipe to turn pages','Desktop two-page spread','Natural scroll alternative']},
+    book:{name:'Book',description:'A keepsake invitation with a beautiful cover and softly turning pages.',features:['Tap or swipe to turn pages','Full-screen book on desktop','Natural scroll alternative']},
     magazine:{name:'Magazine',description:'Your celebration, art-directed like a luxury editorial publication.',features:['Editorial cover','Asymmetric layouts','Photography-led storytelling']},
     cinematic:{name:'Cinematic',description:'A full-screen invitation with film, photography and a sense of occasion.',features:['Background video support','Slow photographic transitions','Full-screen chapters']},
     reveal:{name:'Reveal',description:'A little anticipation. A beautiful surprise. Reveal your celebration one detail at a time.',features:['Tap to reveal chapters','Scroll to discover','Accessible reveal controls']},

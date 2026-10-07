@@ -17,7 +17,7 @@ const PAGES = {
   },
   'pricing.html': {
     title: 'Invitation Pricing: One Payment, No Subscription | Invitara',
-    description: 'Every Invitara digital invitation is a one-time payment per event from AED 79. Full editor, photo uploads, online RSVP, guest list export and a shareable link included.',
+    description: 'Every Invitara digital invitation is one payment per event, from AED 79 plus VAT. No subscription or per-guest fees. Editor, photos, online RSVP and share link included.',
     keywords: 'digital invitation price, online invitation cost, e-invitation pricing, wedding website price, RSVP website cost',
   },
   'terms.html': {
@@ -126,7 +126,11 @@ function faqSection(faqs, heading) {
   return '<section class="launch-faq seo-faq" aria-labelledby="seo-faq-title"><p class="studio-kicker">Questions, answered</p><h2 id="seo-faq-title">' + escapeHtml(heading) + '</h2>' + faqs.map(([q, a]) => '<details><summary>' + escapeHtml(q) + '</summary><p>' + escapeHtml(a) + '</p></details>').join('') + '</section>';
 }
 
-const SHARED_FAQS = [['How much does a digital invitation cost?', 'Each Invitara invitation is a one-time payment per event, starting from AED 79. There is no subscription, and you can personalise a draft for free before paying.'], ['How long can I edit my invitation?', 'You can edit wording, photos and details until midnight after your event date in your chosen timezone. The published invitation stays viewable afterwards as a keepsake.']];
+const SHARED_FAQS = [['How much does a digital invitation cost?', 'Each Invitara invitation is a one-time payment per event, starting from AED 79 plus 5% VAT. There is no subscription, and you can personalise a draft for free before paying.'], ['How long can I edit my invitation?', 'You can edit wording, photos and details until midnight after your event date in your chosen timezone. The published invitation stays viewable afterwards as a keepsake.']];
+
+const PRICING_FAQS = [SHARED_FAQS[0], ['Are there monthly or per-guest fees?', 'No. You pay once per event, and you can invite as many guests as you like. There is no subscription and no charge per reply.'], ['Is VAT included in the price?', 'Prices are shown before VAT. The UAE standard rate of 5% is added and shown clearly at checkout before you pay.'], ['Can I try a design before paying?', 'Yes. Preview every design and personalise a draft for free on your device. You only pay when you are ready to publish and share your invitation.'], SHARED_FAQS[1]];
+// Lucide icons (lucide.dev, ISC licence) for each invitation experience.
+const EXPERIENCE_ICONS = {"classic":["#3A6157","<path d=\"M15 12h-5\"/><path d=\"M15 8h-5\"/><path d=\"M19 17V5a2 2 0 0 0-2-2H4\"/><path d=\"M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3\"/>"],"story":["#C7487E","<path d=\"M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20\"/><path d=\"M8.62 9.8A2.25 2.25 0 1 1 12 6.836a2.25 2.25 0 1 1 3.38 2.966l-2.626 2.856a.998.998 0 0 1-1.507 0z\"/>"],"book":["#8E3B5C","<path d=\"M12 5v16\"/><path d=\"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z\"/>"],"magazine":["#D9653B","<path d=\"M15 18h-5\"/><path d=\"M18 14h-8\"/><path d=\"M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0v-9a2 2 0 0 1 2-2h2\"/><rect width=\"8\" height=\"4\" x=\"10\" y=\"6\" rx=\"1\"/>"],"cinematic":["#2F4B8A","<path d=\"m12.296 3.464 3.02 3.956\"/><path d=\"M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3z\"/><path d=\"M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/><path d=\"m6.18 5.276 3.1 3.899\"/>"],"reveal":["#B8862E","<path d=\"M12 7v14\"/><path d=\"M20 11v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8\"/><path d=\"M7.5 7a1 1 0 0 1 0-5A4.8 8 0 0 1 12 7a4.8 8 0 0 1 4.5-5 1 1 0 0 1 0 5\"/><rect x=\"3\" y=\"7\" width=\"18\" height=\"4\" rx=\"1\"/>"],"timeline":["#6A4FB0","<path d=\"M12 13v8\"/><path d=\"M12 3v3\"/><path d=\"M18.172 6a2 2 0 0 1 1.414.586l2.06 2.06a1.207 1.207 0 0 1 0 1.708l-2.06 2.06a2 2 0 0 1-1.414.586H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z\"/>"],"gallery":["#2E8B6A","<path d=\"m22 11-1.296-1.296a2.4 2.4 0 0 0-3.408 0L11 16\"/><path d=\"M4 8a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2\"/><circle cx=\"13\" cy=\"7\" r=\"1\" fill=\"currentColor\"/><rect x=\"8\" y=\"2\" width=\"14\" height=\"14\" rx=\"2\"/>"]};
 
 /** Returns overrides for pageHtml: title, description, canonical path, image, JSON-LD and HTML replacements. */
 export function seoFor(file, { origin, catalog, query = {}, occasion, supportEmail }) {
@@ -139,12 +143,13 @@ export function seoFor(file, { origin, catalog, query = {}, occasion, supportEma
     out.graph = html => [...graph, faqPage(visibleFaqs(html))];
   } else if (file === 'pricing.html') {
     const price = Math.min(...templates.map(t => catalog.EVER_C.startingPrice(t.id)));
-    graph.push({ '@type': 'Product', name: 'Invitara digital invitation', description: base.description, brand: { '@id': origin + '/#organization' }, image: origin + '/assets/ws-couple.jpg', offers: { '@type': 'AggregateOffer', priceCurrency: 'AED', lowPrice: price, highPrice: Math.max(...templates.map(t => catalog.EVER_C.startingPrice(t.id))), offerCount: templates.length, availability: 'https://schema.org/InStock' } }, breadcrumbs(origin, [['Home', '/'], ['Pricing', '/pricing.html']]), faqPage(SHARED_FAQS));
+    graph.push({ '@type': 'Product', name: 'Invitara digital invitation', description: base.description, brand: { '@id': origin + '/#organization' }, image: origin + '/assets/ws-couple.jpg', offers: { '@type': 'AggregateOffer', priceCurrency: 'AED', lowPrice: price, highPrice: Math.max(...templates.map(t => catalog.EVER_C.startingPrice(t.id))), offerCount: templates.length, availability: 'https://schema.org/InStock' } }, breadcrumbs(origin, [['Home', '/'], ['Pricing', '/pricing.html']]), faqPage(PRICING_FAQS));
     const cards = Object.entries(catalog.INVITARA_CATALOG.experiences).map(([key, meta]) => {
       const themes = templates.filter(t => t.experience === key); if (!themes.length) return '';
-      return '<article class="pricing-card"><p>One invitation. Your entire celebration.</p><h2>' + escapeHtml(meta.name) + '</h2><strong>From AED ' + Math.min(...themes.map(t => catalog.EVER_C.startingPrice(t.id))) + '</strong><p>One-time payment · per event</p><p>' + escapeHtml(meta.description) + '</p><a class="studio-button light" href="create.html?experience=' + key + '">Explore ' + escapeHtml(meta.name) + ' →</a></article>';
+      const [hue, icon] = EXPERIENCE_ICONS[key] || EXPERIENCE_ICONS.classic;
+      return '<a class="experience-price-card" style="--occasion-hue:' + hue + '" href="create.html?experience=' + key + '"><span class="occasion-icon"><svg viewBox="0 0 24 24" aria-hidden="true">' + icon + '</svg></span><h3>' + escapeHtml(meta.name) + '</h3><p>' + escapeHtml(meta.description) + '</p><span class="experience-price-meta">' + themes.length + (themes.length === 1 ? ' design' : ' designs') + '<b>Explore →</b></span></a>';
     }).join('');
-    out.replace.push(['<div id="pricing-grid" class="pricing-grid"></div>', '<div id="pricing-grid" class="pricing-grid">' + cards + '</div>'], ['</main>', faqSection(SHARED_FAQS, 'Pricing questions') + '</main>']);
+    out.replace.push(['<strong id="pricing-amount">79</strong>', '<strong id="pricing-amount">' + price + '</strong>'], ['<div id="pricing-grid" class="experience-price-grid"></div>', '<div id="pricing-grid" class="experience-price-grid">' + cards + '</div>'], ['</main>', faqSection(PRICING_FAQS, 'Pricing questions') + '</main>']);
   } else if (file === 'create.html' && occasion) {
     const o = occasion, designs = templates.filter(t => t.occasion === o.key);
     Object.assign(out, { title: o.title, description: o.description, keywords: o.keywords, path: '/' + o.slug, bodyOccasion: o.key });
@@ -182,11 +187,11 @@ export function llmsTxt(origin, catalog) {
   const templates = catalog.INVITARA_availableTemplates(), price = Math.min(...templates.map(t => catalog.EVER_C.startingPrice(t.id)));
   return `# ${BRAND}
 
-> ${BRAND} is an online invitation maker for interactive digital invitations with built-in online RSVP. Hosts choose a design, personalise words, photos, fonts and colours, pay once per event (from AED ${price}, no subscription) and share one link or QR code. Guests open the invitation on any device and reply online; hosts manage replies in a dashboard with CSV export.
+> ${BRAND} is an online invitation maker for interactive digital invitations with built-in online RSVP. Hosts choose a design, personalise words, photos, fonts and colours, pay once per event (from AED ${price} plus VAT, no subscription) and share one link or QR code. Guests open the invitation on any device and reply online; hosts manage replies in a dashboard with CSV export.
 
 ## Key facts
 - Product: interactive digital invitations (e-invitations) with online RSVP, guest list export, view counts, share link and QR code.
-- Pricing: one-time payment per event, from AED ${price}. Drafts can be personalised for free before paying.
+- Pricing: one-time payment per event, from AED ${price} plus 5% VAT, with no subscription or per-guest fees. Drafts can be personalised for free before paying.
 - Editing: open until midnight after the event date in the host's timezone; the published invitation stays viewable afterwards.
 - Designs: ${templates.length} art-directed designs, one per occasion, with experiences such as a page-turning book, cinematic reveal, story, gallery and timeline.
 - Guest privacy: invitations are private links (not indexed); only the host sees replies.

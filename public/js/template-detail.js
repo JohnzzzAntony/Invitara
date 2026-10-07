@@ -6,5 +6,6 @@
  document.getElementById('detail-use').onclick=function(){E.INVITARA_CARDS.use(t.id);};['detail-full','detail-preview-link'].forEach(function(id){document.getElementById(id).href='demo.html?id='+t.id;});
  var site=E.EVER_renderSite(E.EVER_siteDefaults(t.id),{});document.getElementById('detail-preview').appendChild(site);E.EVER_bindSite(site);
  document.querySelectorAll('[data-detail-width]').forEach(function(b){b.onclick=function(){document.getElementById('detail-preview').classList.toggle('wide',b.dataset.detailWidth==='desktop');document.querySelectorAll('[data-detail-width]').forEach(function(x){x.setAttribute('aria-pressed',String(x===b));});};});
- E.INVITARA_availableTemplates().filter(function(x){return x.id!==t.id&&(x.event===t.event||x.experience===t.experience);}).slice(0,4).forEach(function(x){document.getElementById('related-grid').appendChild(E.INVITARA_CARDS.card(x));});
+ // Closest matches first (same experience, then style), always filling the row.
+ E.INVITARA_availableTemplates().filter(function(x){return x.id!==t.id;}).map(function(x,i){return {x:x,score:(x.experience===t.experience?4:0)+(x.style===t.style?2:0)+(x.event===t.event?1:0),i:i};}).sort(function(a,b){return b.score-a.score||a.i-b.i;}).slice(0,3).map(function(r){return r.x;}).forEach(function(x){document.getElementById('related-grid').appendChild(E.INVITARA_CARDS.card(x));});
 })();
