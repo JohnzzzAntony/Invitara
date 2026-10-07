@@ -80,6 +80,20 @@ test('server enforces ownership, payments, expiry, immutable dates and signed we
     assert.equal((await webhook(7140)).status,200);
     assert.equal((await (await call('/projects/unpaid')).json()).paid,true);
     assert.equal((await webhook(7140)).status,200);
+    db.prepare('INSERT INTO replies VALUES (?,?,?)').run('active','guest-fixture','{}');
+    db.prepare('INSERT INTO sessions VALUES (?,?)').run('cs_active_fixture','active');
+    assert.equal((await call('/projects/active','DELETE',{},false)).status,404,'Only the owner can delete an invitation.');
+    assert.equal((await fetch(origin+'/api/projects/active',{method:'DELETE',headers:{Origin:'https://evil.example','Content-Type':'application/json',Cookie:cookie},body:'{}'})).status,403);
+    assert.equal((await call('/projects/active','DELETE',{})).status,409,'Paid deletions must be confirmed as paid.');
+    assert.equal((await call('/projects/active','DELETE',{paid:true})).status,200);
+    assert.equal((await call('/projects/active')).status,404);
+    assert.equal((await call('/projects/active','DELETE',{paid:true})).status,404);
+    assert.equal((await call('/invites/active','GET',null,false)).status,404,'Deleted invitations stop serving guests.');
+    for(const table of ['replies','invitation_views'])assert.equal(db.prepare('SELECT COUNT(*) AS n FROM '+table+' WHERE project=?').get('active').n,0);
+    assert.equal(db.prepare('SELECT COUNT(*) AS n FROM sessions WHERE project=?').get('active').n,1,'Stripe sessions stay mapped for delayed webhooks.');
+    assert.equal(db.prepare('SELECT COUNT(*) AS n FROM sessions WHERE project=?').get('unpaid').n,1,'Other projects are untouched.');
+    const listed=(await (await call('/projects')).json()).find(p=>p.id==='active');
+    assert.ok(listed.deletedAt&&listed.paid,'Deleted purchases remain in order history.');
   } finally {
     if(db) db.close();
     proc.kill();

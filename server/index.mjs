@@ -63,9 +63,10 @@ function fulfil(session) {
   }
 }
 // Webhooks can be delayed or misconfigured; the editor polls this, so confirm directly with Stripe (never from the redirect).
+const latestSession = id => db.prepare('SELECT id FROM sessions WHERE project=? ORDER BY rowid DESC LIMIT 1').get(id);
 async function reconcile(p) {
   if (p.paid || !stripe) return p;
-  const latest = db.prepare('SELECT id FROM sessions WHERE project=? ORDER BY rowid DESC LIMIT 1').get(p.id);
+  const latest = latestSession(p.id);
   if (!latest) return p;
   try { fulfil(await stripe.checkout.sessions.retrieve(latest.id)); return get(p.id); }
   catch (e) { console.error('Payment check failed:', e.type || 'provider error'); return p; }
@@ -113,17 +114,19 @@ mountAuth(app,db,production);
 
 function owned(req, res) {
   const row = db.prepare('SELECT * FROM projects WHERE id=? AND owner=?').get(req.params.id, req.owner);
-  if (!row) { res.status(404).json({ error: 'Invitation not found on this account.' }); return null; }
-  return JSON.parse(row.body);
+  const p = row && JSON.parse(row.body);
+  if (!p || p.deletedAt) { res.status(404).json({ error: 'Invitation not found on this account.' }); return null; }
+  return p;
 }
 const listProjects = db.prepare(`SELECT p.body,
   (SELECT COUNT(*) FROM invitation_views v WHERE v.project=p.id) AS views,
   (SELECT COUNT(*) FROM replies r WHERE r.project=p.id) AS replyCount
   FROM projects p WHERE p.owner=?`);
+// Deleted purchases stay listed (flagged) so the account keeps its order history.
 app.get('/api/projects', (req, res) => res.json(listProjects.all(req.owner).map(row => {
   const p = JSON.parse(row.body);
   return { ...p, expired: !!p.paid && !editable(p), views: row.views, replyCount: row.replyCount };
-})));
+}).filter(p => !p.deletedAt || p.paid)));
 app.post('/api/checkout', async (req, res) => {
   if (!stripe) return res.status(503).json({ error: 'Payments are not configured yet. Your draft is safe. Please contact the site owner.' });
   if (!req.account) return res.status(401).json({ error: 'Sign in to your account before purchasing.' });
@@ -136,14 +139,16 @@ app.post('/api/checkout', async (req, res) => {
   let expiresAt;
   try { expiresAt = eventExpiry(eventDate, timezone); } catch (e) { return res.status(400).json({ error: e.message }); }
   const q = catalog.EVER_C.quote({ themeId, plan, addons: [...new Set(addons)] });
-  const id = hash(JSON.stringify([req.owner,draftId,themeId,plan,[...new Set(addons)].sort(),eventDate,timezone])).slice(0,32);
+  let id = hash(JSON.stringify([req.owner,draftId,themeId,plan,[...new Set(addons)].sort(),eventDate,timezone])).slice(0,32);
+  // A deleted invitation keeps its record and Stripe sessions; buying again uses a fresh but still deterministic id.
+  while (get(id)?.deletedAt) id = hash(id + ':reissued').slice(0,32);
   const existing = get(id);
   if (existing?.paid) return res.json({url:origin+'/editor.html?p='+id});
   let s;try{s=invitationState(catalog,state||{},themeId,eventDate);}catch(err){return res.status(400).json({error:err.message});}
   const p = existing || { id, themeId, themeName: theme.name, layoutId: theme.layout, plan, addons, state: s, eventDate, timezone, expiresAt, amount: Math.round(q.total * 100), paid: false, status: 'PAYMENT_PENDING', published: false, createdAt: new Date().toISOString(), policyVersion: '2026-09-22', quote:q };
   db.prepare('INSERT OR IGNORE INTO projects VALUES (?,?,?)').run(id, req.owner, JSON.stringify(p));
   try {
-    const previous=db.prepare('SELECT id FROM sessions WHERE project=? ORDER BY rowid DESC LIMIT 1').get(id);
+    const previous=latestSession(id);
     let idempotencyKey=id;
     if(previous) {
       const prior=await stripe.checkout.sessions.retrieve(previous.id);
@@ -160,13 +165,40 @@ app.post('/api/checkout', async (req, res) => {
     res.json({ url: session.url });
   } catch (e) { console.error('Checkout failed:', e.type || 'provider error'); res.status(502).json({ error: 'Checkout is unavailable. Please try again.' }); }
 });
-app.get('/api/projects/:id', async (req, res) => { const p = owned(req, res); if (p) res.json(publicProject(await reconcile(p))); });
+app.get('/api/projects/:id', async (req, res) => {
+  const p = owned(req, res); if (!p) return;
+  const current = await reconcile(p);
+  if (current.deletedAt) return res.status(404).json({ error: 'Invitation not found on this account.' });
+  res.json(publicProject(current));
+});
 app.put('/api/projects/:id', (req, res) => {
   const p = owned(req, res); if (!p) return;
   if (!editable(p)) return res.status(403).json({ error: p.paid ? 'Editor access ended after your event.' : 'Payment confirmation is required.' });
   const s = req.body.state;
   if (!s || s.templateId !== p.themeId || s.layoutId !== p.layoutId || s.basics?.date !== p.eventDate || !s.sections || !Array.isArray(s.order)) return res.status(400).json({ error: 'Design and purchased event date cannot be changed.' });
   try{p.state=invitationState(catalog,s,p.themeId,p.eventDate);}catch(err){return res.status(400).json({error:err.message});} p.updatedAt = new Date().toISOString(); save(p); res.json(publicProject(p));
+});
+// Soft delete: guests lose access and replies are erased, but the order and its Stripe sessions remain on record.
+app.delete('/api/projects/:id', async (req, res) => {
+  const p = owned(req, res); if (!p) return;
+  const latest = !p.paid && stripe && latestSession(p.id);
+  if (latest) {
+    let session;
+    try { session = await stripe.checkout.sessions.retrieve(latest.id); if (session.status === 'open') session = await stripe.checkout.sessions.expire(latest.id); }
+    catch (e) { console.error('Payment check failed:', e.type || 'provider error'); return res.status(502).json({ error: 'We could not confirm this invitation’s payment status. Please try again.' }); }
+    fulfil(session);
+    if (session.status === 'complete') return res.status(409).json({ error: session.payment_status === 'paid' ? 'This invitation has just been paid. Refresh the page before deleting it.' : 'A payment for this invitation is still processing. Try again once it completes.' });
+  }
+  const current = get(p.id);
+  if (current.deletedAt) return res.json({ deleted: true });
+  if (current.paid && req.body.paid !== true) return res.status(409).json({ error: 'This invitation has just been paid. Refresh the page before deleting it.' });
+  db.exec('BEGIN');
+  try {
+    for (const table of ['replies', 'invitation_views']) db.prepare('DELETE FROM ' + table + ' WHERE project=?').run(current.id);
+    current.deletedAt = new Date().toISOString(); current.published = false; current.status = 'DELETED'; save(current);
+    db.exec('COMMIT');
+  } catch (e) { db.exec('ROLLBACK'); throw e; }
+  res.json({ deleted: true });
 });
 app.post('/api/projects/:id/publish', (req, res) => {
   const p = owned(req, res); if (!p) return;

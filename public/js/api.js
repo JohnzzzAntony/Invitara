@@ -23,7 +23,8 @@
       try { localStorage.setItem('ever-orders',JSON.stringify(orders)); } catch (_) { /* Restored from server. */ }
     }
     var list = window.EVER_C.allProjects().filter(function(p) { return !ids.has(p.id); });
-    projects.forEach(function(p) { p.server = true; list.unshift(p); });
+    // Deleted invitations only contribute their order record above.
+    projects.forEach(function(p) { if (!p.deletedAt) { p.server = true; list.unshift(p); } });
     try { localStorage.setItem('ever-projects', JSON.stringify(list)); }
     catch (_) {
       // Paid content is authoritative on the server; local drafts must survive quota pressure.
