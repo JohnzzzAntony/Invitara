@@ -1,6 +1,7 @@
 import express from 'express';
 import { resolveOrigin } from './origin.mjs';
 import { pageHtml } from './page-meta.mjs';
+import { seoFor, sitemapXml, llmsTxt, occasionBySlug, occasionByKey, occasionPath } from './seo.mjs';
 import Stripe from 'stripe';
 import QRCode from 'qrcode';
 import { DatabaseSync } from 'node:sqlite';
@@ -227,19 +228,37 @@ app.get('/api/config',(req,res)=>res.json({businessName:process.env.BUSINESS_NAM
 app.get('/api/health',(req,res)=>{db.prepare('SELECT 1').get();res.json({ok:true,paymentsConfigured:!!stripe});});
 // Explicit public allowlist: never expose database, secrets, source or dependencies.
 for (const dir of ['assets', 'mu', 'css', 'js', 'vendor']) app.use('/' + dir, express.static(path.join(publicRoot, dir), { dotfiles: 'deny' }));
-app.get('/robots.txt',(req,res)=>res.type('text/plain').send('User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /editor.html\nDisallow: /dashboard.html\nDisallow: /account.html\nDisallow: /checkout.html\nDisallow: /invite.html\nSitemap: '+origin+'/sitemap.xml\n'));
-app.get('/sitemap.xml',(req,res)=>res.type('application/xml').send('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+['/','/create.html','/pricing.html','/terms.html','/privacy.html'].map(p=>'<url><loc>'+origin+p+'</loc></url>').join('')+'</urlset>'));
-app.get('/', (req, res) => res.type('html').send(pageHtml('index.html', origin)));
+// Search engines and AI crawlers may read every public page; private app pages stay out of the index.
+const privatePaths = ['/api/', '/editor.html', '/dashboard.html', '/account.html', '/checkout.html', '/invite.html'];
+const robots = ['*', 'GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-SearchBot', 'PerplexityBot', 'Google-Extended', 'Applebot-Extended'].map(agent => 'User-agent: ' + agent + '\nAllow: /\n' + privatePaths.map(p => 'Disallow: ' + p).join('\n')).join('\n\n');
+app.get('/robots.txt',(req,res)=>res.type('text/plain').send(robots + '\n\nSitemap: ' + origin + '/sitemap.xml\n'));
+const contentDate = new Date().toISOString().slice(0, 10);
+app.get('/sitemap.xml',(req,res)=>res.type('application/xml').send(sitemapXml(origin, catalog, contentDate)));
+app.get('/llms.txt',(req,res)=>res.type('text/plain; charset=utf-8').send(llmsTxt(origin, catalog)));
+const seo = (file, extra = {}) => seoFor(file, { origin, catalog, supportEmail: process.env.SUPPORT_EMAIL, ...extra });
+app.get('/', (req, res) => res.type('html').send(pageHtml('index.html', origin, null, seo('index.html'))));
+// Keyword landing pages: the catalogue pre-filtered to one occasion, with its own copy and structured data.
+app.get('/:slug', (req, res, next) => {
+  const occasion = occasionBySlug[req.params.slug];
+  if (!occasion) return next();
+  res.type('html').send(pageHtml('create.html', origin, null, seo('create.html', { occasion })));
+});
 app.get('/invite.html', (req, res) => {
   const p = typeof req.query.e === 'string' ? get(req.query.e) : null;
   res.set('Cache-Control', 'no-store');
   res.type('html').send(pageHtml('invite.html', origin, p?.published && p.paid ? p : null));
 });
 // Former static landing pages; occasion pages keep their filter instead of dropping visitors on the full catalogue.
-const legacyPages = { 'wedding-invitations.html': 'create.html?occasion=wedding', 'birthday-invitations.html': 'create.html?occasion=birthday', 'anniversary-invitations.html': 'create.html?occasion=anniversary', 'baby-shower-invitations.html': 'create.html?occasion=baby', 'baptism-invitations.html': 'create.html', 'gala-invitations.html': 'create.html', 'housewarming-invitations.html': 'create.html', 'digital-invitations.html': 'create.html', 'online-rsvp.html': 'create.html', 'plan.html': 'pricing.html', 'layouts-test.html': 'create.html' };
+const legacyPages = { 'wedding-invitations.html': 'wedding-invitations', 'birthday-invitations.html': 'birthday-invitations', 'anniversary-invitations.html': 'anniversary-invitations', 'baby-shower-invitations.html': 'baby-shower-invitations', 'baptism-invitations.html': 'create.html', 'gala-invitations.html': 'create.html', 'housewarming-invitations.html': 'create.html', 'digital-invitations.html': 'create.html', 'online-rsvp.html': 'create.html', 'plan.html': 'pricing.html', 'layouts-test.html': 'create.html' };
 app.get('/:file', (req, res, next) => {
   if (Object.hasOwn(legacyPages, req.params.file)) return res.redirect(301, '/' + legacyPages[req.params.file]);
-  if (['index.html','create.html','design.html','pricing.html','account.html','dashboard.html','editor.html','checkout.html','demo.html','terms.html','privacy.html'].includes(req.params.file)) return res.type('html').send(pageHtml(req.params.file, origin));
+  const file = req.params.file;
+  // A catalogue filtered to a single occasion has a dedicated landing page.
+  if (file === 'create.html' && typeof req.query.occasion === 'string' && Object.keys(req.query).length === 1) {
+    const key = { 'baby-shower': 'baby', 'save-the-date': 'save-date', 'bridal-shower': 'bridal' }[req.query.occasion] || req.query.occasion;
+    if (occasionByKey[key]) return res.redirect(301, occasionPath(key));
+  }
+  if (['index.html','create.html','design.html','pricing.html','account.html','dashboard.html','editor.html','checkout.html','demo.html','terms.html','privacy.html'].includes(file)) return res.type('html').send(pageHtml(file, origin, null, seo(file, { query: { id: typeof req.query.id === 'string' ? req.query.id : '' } })));
   if (/^[a-z0-9-]+\.html$/.test(req.params.file) || ['styles.css', 'robots.txt', 'sitemap.xml'].includes(req.params.file)) return res.sendFile(path.join(publicRoot, req.params.file));
   next();
 });

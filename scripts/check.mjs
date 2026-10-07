@@ -2,6 +2,10 @@ import {readdirSync, readFileSync, existsSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import path from 'node:path';
+import {OCCASIONS} from '../server/seo.mjs';
+
+// Occasion landing pages are rendered by the server rather than stored as files.
+const serverRoutes = new Set(OCCASIONS.map(o => o.slug));
 
 function walk(dir) {
   return readdirSync(dir,{withFileTypes:true}).flatMap(entry => entry.isDirectory() ? walk(path.join(dir,entry.name)) : [path.join(dir,entry.name)]);
@@ -9,7 +13,7 @@ function walk(dir) {
 function localReference(file, reference) {
   if (/^(?:[a-z]+:|\/\/|#)/i.test(reference)) return;
   const clean = reference.split(/[?#]/)[0];
-  if (!clean) return;
+  if (!clean || serverRoutes.has(clean.replace(/^\//,''))) return;
   const resolved = clean.startsWith('/') ? path.join('public',clean) : path.resolve(path.dirname(file),clean);
   if (!existsSync(resolved)) throw new Error(file + ': missing reference ' + reference);
 }
