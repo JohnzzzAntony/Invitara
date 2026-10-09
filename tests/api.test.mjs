@@ -11,7 +11,7 @@ import Stripe from 'stripe';
 test('server enforces ownership, payments, expiry, immutable dates and signed webhooks', async () => {
   const dir = mkdtempSync(path.join(tmpdir(),'invitara-test-'));
   const origin = 'http://localhost:3197';
-  const proc = spawn(process.execPath,['server/index.mjs'],{env:{...process.env,PORT:'3197',APP_ORIGIN:origin,DATA_DIR:dir,NODE_ENV:'test',STRIPE_SECRET_KEY:'sk_test_fixture',STRIPE_WEBHOOK_SECRET:'whsec_fixture'},stdio:'pipe'});
+  const proc = spawn(process.execPath,['backend/index.mjs'],{env:{...process.env,PORT:'3197',APP_ORIGIN:origin,DATA_DIR:dir,NODE_ENV:'test',STRIPE_SECRET_KEY:'sk_test_fixture',STRIPE_WEBHOOK_SECRET:'whsec_fixture'},stdio:'pipe'});
   let db;
   try {
     await new Promise((resolve,reject) => { const timeout=setTimeout(()=>reject(new Error('Server startup timed out')),10000);proc.stdout.on('data',d=>{if(d.toString().includes('listening')){clearTimeout(timeout);resolve();}});proc.on('error',reject);proc.on('exit',c=>reject(new Error('Server exited '+c))); });

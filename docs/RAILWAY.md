@@ -3,7 +3,7 @@
 ## Service setup
 
 1. Create a Railway project from GitHub repository `JohnzzzAntony/Invitara`, branch `main`, root directory `/`.
-2. The committed `railway.json` selects the root Dockerfile and `/api/health` healthcheck. Leave custom build/start commands and pre-deploy commands empty. Docker builds the browser assets and starts `node server/index.mjs`; tables/indexes are initialized on startup.
+2. The committed `railway.json` selects the root Dockerfile and `/api/health` healthcheck. Leave custom build/start commands and pre-deploy commands empty. Docker builds the browser assets and starts `node backend/index.mjs`; tables/indexes are initialized on startup.
 3. Attach a persistent Railway volume to this service at `/app/data` BEFORE accepting users. SQLite stores accounts, paid invitations and guest replies there. Use one service replica in one region; do not add Postgres or set `DATABASE_URL`.
 4. Generate a public Railway domain in Networking (target port 3000), or configure your custom domain. Set `APP_ORIGIN` to that exact HTTPS origin, with no path. Bare hostnames are automatically prefixed with HTTPS and a trailing slash is normalized.
 5. Configure the variables below and deploy. The first automatic deployment can fail until required variables have been entered; it is safe to redeploy after configuration.

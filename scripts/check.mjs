@@ -2,7 +2,7 @@ import {readdirSync, readFileSync, existsSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import path from 'node:path';
-import {OCCASIONS} from '../server/seo.mjs';
+import {OCCASIONS} from '../backend/seo.mjs';
 
 // Occasion landing pages are rendered by the server rather than stored as files.
 const serverRoutes = new Set(OCCASIONS.map(o => o.slug));
@@ -14,10 +14,10 @@ function localReference(file, reference) {
   if (/^(?:[a-z]+:|\/\/|#)/i.test(reference)) return;
   const clean = reference.split(/[?#]/)[0];
   if (!clean || serverRoutes.has(clean.replace(/^\//,''))) return;
-  const resolved = clean.startsWith('/') ? path.join('public',clean) : path.resolve(path.dirname(file),clean);
+  const resolved = clean.startsWith('/') ? path.join('frontend/public',clean) : path.resolve(path.dirname(file),clean);
   if (!existsSync(resolved)) throw new Error(file + ': missing reference ' + reference);
 }
-const sources = ['server','src','config','public/js','scripts','tests'].flatMap(walk).filter(file => /\.m?js$/.test(file));
+const sources = ['backend','frontend/motion','config','frontend/public/js','scripts','tests'].flatMap(walk).filter(file => /\.m?js$/.test(file));
 sources.push('eslint.config.mjs');
 for (const file of sources) {
   const checked=spawnSync(process.execPath,['--check',file],{encoding:'utf8'});
@@ -30,7 +30,7 @@ for (const file of sources) {
     else createRequire(path.resolve(file)).resolve(spec);
   }
 }
-for (const file of walk('public').filter(file=>/\.(html|css)$/.test(file))) {
+for (const file of walk('frontend/public').filter(file=>/\.(html|css)$/.test(file))) {
   const content=readFileSync(file,'utf8');
   const references=file.endsWith('.html') ? /(?:src|href)="([^"<>]+)"/g : /url\(\s*['"]?([^'"()\s]+)['"]?\s*\)/g;
   for (const match of content.matchAll(references)) localReference(file,match[1]);

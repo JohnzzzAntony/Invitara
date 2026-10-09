@@ -4,7 +4,7 @@ The application still uses the existing Express server, SQLite storage, plain HT
 
 ## Application surfaces
 
-- `public/css/premium.css` supplies shared ivory/forest-green application chrome, responsive navigation, compact template cards, pricing, dashboard and editor panels. Invitation artwork remains scoped in `collection.css`.
+- `frontend/public/css/premium.css` supplies shared ivory/forest-green application chrome, responsive navigation, compact template cards, pricing, dashboard and editor panels. Invitation artwork remains scoped in `collection.css`.
 - The homepage and collection share search, occasion filters, catalogue pricing and working Preview / Use Template actions.
 - Pricing reads the commerce catalogue, rather than duplicating prices.
 - The dashboard has real project counts, search and status filters. Guest replies have search and attendance filters; CSV export remains available.

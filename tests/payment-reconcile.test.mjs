@@ -18,7 +18,7 @@ test('a paid Checkout Session unlocks publishing without a webhook, but only wit
   const origin='http://localhost:3196';
   const env={...process.env,NODE_ENV:'test',PORT:'3196',APP_ORIGIN:origin,DATA_DIR:dir,STRIPE_SECRET_KEY:'sk_test_fixture'};
   delete env.STRIPE_WEBHOOK_SECRET;
-  const child=spawn(process.execPath,['--import',pathToFileURL(fixture).href,'server/index.mjs'],{env,stdio:'pipe'});
+  const child=spawn(process.execPath,['--import',pathToFileURL(fixture).href,'backend/index.mjs'],{env,stdio:'pipe'});
   let db;
   try {
     await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error('Startup timed out')),10000);child.stdout.on('data',d=>{if(String(d).includes('listening')){clearTimeout(timer);resolve();}});child.on('error',reject);});

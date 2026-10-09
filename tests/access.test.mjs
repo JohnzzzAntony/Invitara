@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { eventExpiry, editable } from '../server/access.mjs';
+import { eventExpiry, editable } from '../backend/access.mjs';
 const now = Date.parse('2026-01-01T00:00:00Z');
 test('Dubai expires at the next local midnight', () => assert.equal(eventExpiry('2026-09-22','Asia/Dubai',now), Date.parse('2026-09-22T20:00:00Z')));
 test('DST boundaries use calendar days, not 24-hour offsets', () => {

@@ -1,6 +1,6 @@
 # Invitation layout and state contract
 
-The browser engine in `public/js/templates.js` registers layout objects with `EVER_registerLayout`. The server loads the same objects through `server/catalog.mjs`; catalogue formatting is not parsed with regular expressions.
+The browser engine in `frontend/public/js/templates.js` registers layout objects with `EVER_registerLayout`. The server loads the same objects through `backend/catalog.mjs`; catalogue formatting is not parsed with regular expressions.
 
 A layout has `id`, `label`, `events`, `basics`, `sections`, `defaults`, `render` and `mini`. Basics and section fields carry a stable key, label and field type. Optional list schemas declare their item fields and blank-item factory. `defaults()` supplies initial values. `render(data, template, options)` returns the invitation DOM root; `mini` returns the scaled static preview. The five original layouts and the platform layout remain registered for stored invitations.
 
@@ -16,7 +16,7 @@ A layout has `id`, `label`, `events`, `basics`, `sections`, `defaults`, `render`
 - `elementLinks` maps section button paths to supported HTTPS, email or section-anchor URLs.
 - `sectionTypes` maps copied section IDs to their original schema type. Hero, RSVP, contact and date are not duplicable; at most 20 additional sections are accepted.
 
-Template content deep-merges over layout defaults; arrays replace their default array. Existing template IDs, photo IDs and field paths must remain stable. Paid invitations retain their purchased design and event date. The server validates content with `server/invitation-state.mjs` before persistence. Unsupported fields do not grant new features or permissions.
+Template content deep-merges over layout defaults; arrays replace their default array. Existing template IDs, photo IDs and field paths must remain stable. Paid invitations retain their purchased design and event date. The server validates content with `backend/invitation-state.mjs` before persistence. Unsupported fields do not grant new features or permissions.
 
 ## Editing and rendering
 

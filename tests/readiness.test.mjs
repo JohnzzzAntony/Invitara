@@ -1,14 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validatePhoto } from '../server/photo.mjs';
-import { pageHtml } from '../server/page-meta.mjs';
+import { validatePhoto } from '../backend/photo.mjs';
+import { pageHtml } from '../backend/page-meta.mjs';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
-import {loadCatalog} from '../server/catalog.mjs';
+import {loadCatalog} from '../backend/catalog.mjs';
 
 test('draft creation and updates report storage failures rather than success', () => {
   const sandbox={window:loadCatalog(),localStorage:{getItem:()=>JSON.stringify([{id:'draft',state:{title:'Original'}}]),setItem:()=>{throw new Error('QuotaExceededError');}}};
-  vm.runInNewContext(readFileSync(new URL('../public/js/commerce.js',import.meta.url),'utf8'),sandbox);
+  vm.runInNewContext(readFileSync(new URL('../frontend/public/js/commerce.js',import.meta.url),'utf8'),sandbox);
   assert.equal(sandbox.window.EVER_C.createProject('edition-vow'),null);
   assert.equal(sandbox.window.EVER_C.updateProject('draft',{state:{title:'Unsaved'}}),null);
 });

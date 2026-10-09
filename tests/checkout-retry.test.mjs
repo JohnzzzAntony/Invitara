@@ -6,7 +6,7 @@ import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {DatabaseSync} from 'node:sqlite';
-import {loadCatalog} from '../server/catalog.mjs';
+import {loadCatalog} from '../backend/catalog.mjs';
 
 test('expired checkout retries preserve the invitation and reuse one replacement session', async () => {
   const dir=mkdtempSync(path.join(tmpdir(),'invitara-checkout-'));
@@ -19,7 +19,7 @@ test('expired checkout retries preserve the invitation and reuse one replacement
       return {id:'cs_replacement',url:'https://checkout.stripe.com/replacement'};
     };`);
   const origin='http://localhost:3195';
-  const child=spawn(process.execPath,['--import',pathToFileURL(fixture).href,'server/index.mjs'],{env:{...process.env,NODE_ENV:'test',PORT:'3195',APP_ORIGIN:origin,DATA_DIR:dir,STRIPE_SECRET_KEY:'sk_test_fixture'},stdio:'pipe'});
+  const child=spawn(process.execPath,['--import',pathToFileURL(fixture).href,'backend/index.mjs'],{env:{...process.env,NODE_ENV:'test',PORT:'3195',APP_ORIGIN:origin,DATA_DIR:dir,STRIPE_SECRET_KEY:'sk_test_fixture'},stdio:'pipe'});
   let db;
   try {
     await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error('Startup timed out')),10000);child.stdout.on('data',d=>{if(String(d).includes('listening')){clearTimeout(timer);resolve();}});child.on('error',reject);});

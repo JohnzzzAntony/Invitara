@@ -1,12 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {loadCatalog} from '../server/catalog.mjs';
-import {invitationState} from '../server/invitation-state.mjs';
+import {loadCatalog} from '../backend/catalog.mjs';
+import {invitationState} from '../backend/invitation-state.mjs';
 
 const catalog=loadCatalog();
 test('all active and archived designs retain their server validation contract',()=>{
-  assert.equal(catalog.INVITARA_availableTemplates().length,14);
-  assert.equal(catalog.EVER_THEMES.length,68);
+  assert.equal(catalog.INVITARA_availableTemplates().length,19);
+  assert.equal(catalog.EVER_THEMES.length,73);
   for(const theme of catalog.EVER_THEMES){
     const state=catalog.EVER_siteDefaults(theme.id);
     const valid=invitationState(catalog,state,theme.id,'2027-06-10');

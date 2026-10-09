@@ -3,7 +3,7 @@ node_modules/
 .pnp
 .pnp.*
 
-# Next.js (dev/preview server only — the product is public/)
+# Legacy framework caches (the application now uses Express)
 .next/
 out/
 next-env.d.ts

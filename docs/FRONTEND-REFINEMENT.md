@@ -12,7 +12,7 @@ consistency risk 4). The skill's generated recommendations were reviewed; glass
 effects and a blue/orange palette were unsuitable for the existing brand and the
 brief's restrained motion requirements.
 
-`public/css/refinement.css` is the shared application layer, loaded after existing
+`frontend/public/css/refinement.css` is the shared application layer, loaded after existing
 invitation styles. It owns the container, spacing, type hierarchy, controls, cards,
 navigation and responsive application surfaces. Selectors target application
 chrome and preserve the independently scoped invitation artwork. Existing legacy
@@ -47,7 +47,7 @@ the footer links to existing destinations. Operator details remain on legal page
 | `invite.html` | Paid published invitation, RSVP submit/update, expiry | Loading surface, styled unavailable state, real retry |
 | `terms.html`, `privacy.html` | Legal content, operator configuration | Readable line length/type, common navigation/footer |
 | `404.html` | Return to collection | Common shell and typography |
-| `plan.html`, `layouts-test.html`, former occasion pages | Server 301 redirects (`server/index.mjs`) | Occasion pages keep their filter; `plan.html` goes to pricing |
+| `plan.html`, `layouts-test.html`, former occasion pages | Server 301 redirects (`backend/index.mjs`) | Occasion pages keep their filter; `plan.html` goes to pricing |
 | Occasion landing URLs | Anniversary, baby shower, baptism, birthday, gala, housewarming, wedding | Existing catalogue redirects preserved |
 | Product landing URLs | Digital invitations, online RSVP | Existing catalogue redirects preserved |
 

@@ -8,7 +8,7 @@ import path from 'node:path';
 test('production boot serves built assets with security headers and secure cookies', async()=>{
   const directory=mkdtempSync(path.join(tmpdir(),'invitara-production-'));
   const endpoint='http://localhost:3199',appOrigin='https://invitara.example';
-  const child=spawn(process.execPath,['server/index.mjs'],{env:{...process.env,NODE_ENV:'production',PORT:'3199',APP_ORIGIN:'invitara.example',DATA_DIR:directory,STRIPE_SECRET_KEY:'sk_test_fixture',STRIPE_WEBHOOK_SECRET:'whsec_fixture',BUSINESS_NAME:'Test operator',SUPPORT_EMAIL:'test@example.test',TRUST_PROXY_HOPS:'0'},stdio:'pipe'});
+  const child=spawn(process.execPath,['backend/index.mjs'],{env:{...process.env,NODE_ENV:'production',PORT:'3199',APP_ORIGIN:'invitara.example',DATA_DIR:directory,STRIPE_SECRET_KEY:'sk_test_fixture',STRIPE_WEBHOOK_SECRET:'whsec_fixture',BUSINESS_NAME:'Test operator',SUPPORT_EMAIL:'test@example.test',TRUST_PROXY_HOPS:'0'},stdio:'pipe'});
   try{
     await new Promise((resolve,reject)=>{
       const timeout=setTimeout(()=>reject(new Error('Production startup timed out')),30000);
@@ -40,7 +40,7 @@ test('production boot serves built assets with security headers and secure cooki
     for(const path of ['/wedding-invitations','/design.html?id=edition-vow','/pricing.html'])assert.ok(sitemap.includes(path),path);
     assert.match(await (await fetch(endpoint+'/llms.txt')).text(),/^# Invitara/);
     assert.equal((await fetch(endpoint+'/not-an-occasion')).status,404);
-    for(const url of ['/.env','/server/index.mjs','/data/invitara.sqlite','/node_modules/express/package.json'])assert.equal((await fetch(endpoint+url)).status,404);
+    for(const url of ['/.env','/backend/index.mjs','/server/index.mjs','/frontend/motion/editions-motion.js','/frontend/README.md','/archive/atelier-2026-10-07/README.md','/data/invitara.sqlite','/node_modules/express/package.json'])assert.equal((await fetch(endpoint+url)).status,404);
     assert.equal((await fetch(endpoint+'/api/auth/login',{method:'POST',headers:{Origin:'https://untrusted.example','Content-Type':'application/json'},body:'{}'})).status,403);
   }finally{
     if(child.exitCode===null){const exited=new Promise(resolve=>child.once('exit',resolve));child.kill();await exited;}

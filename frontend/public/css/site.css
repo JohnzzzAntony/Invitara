@@ -1,0 +1,107 @@
+/* Invitara site system: shared header, typography, buttons and footer for every marketing page,
+   mobile first, with 44px tap targets and a 12px text floor.
+   Loaded last so it wins over the earlier style layers. */
+
+:root {
+  --studio-serif: 'Cormorant Garamond', Georgia, serif;
+  --serif: var(--studio-serif);
+  --olive: #5b6a39;
+  --olive-deep: #4a5730;
+  --gold: #b3955d;
+  --studio-ink: #2a2e25;
+  --studio-muted: #6c6a5f;
+  --studio-paper: #f8f5ef;
+  --studio-line: #e5dfd2;
+  --surface: #fffdf8;
+  --surface-soft: #f1ece1;
+  --home-shadow: 0 30px 60px -36px #3a2f1a55;
+  --ease-premium: cubic-bezier(.2, .8, .2, 1);
+  --tap: 44px;
+}
+body.studio { background: var(--studio-paper); color: var(--studio-ink); }
+/* Cormorant defaults to old-style figures, which drop below the line in prices and counts. `font` shorthands reset this, hence !important. */
+body.studio :not(.ws, .ws *) { font-variant-numeric: lining-nums !important; }
+
+/* Headings use the editorial serif; invitation previews keep their own typography. */
+body.studio :is(h1, h2):not(.ws *) { font-family: var(--studio-serif); font-weight: 500; letter-spacing: -.01em; }
+body.studio h3:not(.ws *) { letter-spacing: 0; }
+
+/* ---------- Header ---------- */
+.studio-logo { display: inline-flex; align-items: center; min-height: var(--tap); font: 500 19px/1 var(--studio-serif) !important; letter-spacing: .3em !important; text-transform: uppercase; color: var(--studio-ink); text-decoration: none; }
+.studio-logo::before { content: none !important; }
+.studio-links a:not(.studio-pill) { display: inline-flex; align-items: center; min-height: var(--tap); transition: color .2s; }
+.studio-links a:not(.studio-pill):hover { color: var(--olive); }
+.studio-links .studio-pill { background: var(--olive-deep) !important; border-color: var(--olive-deep) !important; color: #fff !important; font-weight: 500; justify-content: center; transition: background .25s, transform .25s var(--ease-premium), box-shadow .25s; }
+.studio-links .studio-pill:hover { background: var(--studio-ink) !important; transform: translateY(-1px); box-shadow: 0 12px 24px -16px #2a2e2599; }
+.studio-menu { min-width: var(--tap); min-height: var(--tap); }
+.studio-links .studio-login { padding-inline: 8px; }
+@media (min-width: 901px) { .studio-links .studio-login { margin-left: 10px; } }
+
+/* ---------- Buttons ---------- */
+.studio-button:not(.light):not(.lime) { background: var(--olive-deep); border-color: var(--olive-deep); color: #fff; }
+.studio-button:not(.light):not(.lime):hover { background: var(--studio-ink); }
+
+/* ---------- Footer ---------- */
+.studio-footer .studio-logo { font-size: 18px !important; }
+.studio-footer .footer-brand p { color: var(--studio-muted); }
+.studio-footer .footer-column a { display: flex; align-items: center; min-height: var(--tap); transition: color .2s; }
+.studio-footer .footer-column a:hover { color: var(--olive); }
+.footer-bottom { color: var(--studio-muted); }
+
+/* ---------- Shared small-text and tap-target floors ---------- */
+.detail-copy h2 { font: 600 16px/1.3 var(--studio-sans) !important; letter-spacing: 0; }
+.studio .collection-card .collection-tag { font-size: 12px; }
+.studio .collection-card .card-bottom > * { min-height: var(--tap); }
+.detail-toolbar a, .detail-toolbar button { display: inline-flex; align-items: center; min-height: var(--tap); }
+.price-card-label { font-size: 12px !important; }
+.price-card-amount { margin-bottom: 10px; }
+.price-card-amount strong { line-height: 1 !important; }
+.experience-price-meta { font-size: 13px !important; }
+
+/* ---------- Homepage polish (original layout) ---------- */
+/* Hero previews keep the invitation's own proportions, so no blank band shows under the design. */
+[data-page="home"] .hero-phone { height: auto !important; aspect-ratio: 390 / 690; }
+[data-page="home"] .studio-hero-note { display: flex; flex-wrap: wrap; gap: 10px; font-size: 13px !important; letter-spacing: 0; }
+[data-page="home"] .studio-hero-note span { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1px solid var(--studio-line); border-radius: 999px; background: var(--surface); color: var(--studio-ink); }
+[data-page="home"] .studio-hero-note span::before { content: ""; width: 14px; height: 14px; flex: none; background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235b6a39' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E"); }
+
+/* Experience cards: one calm surface, gold index, lift on hover. */
+[data-page="home"] .experience-card, [data-page="home"] .experience-card:nth-child(n) { background: var(--surface); border: 1px solid var(--studio-line); border-radius: 20px; transition: transform .3s var(--ease-premium), box-shadow .3s, border-color .3s; }
+[data-page="home"] .experience-number { color: var(--gold); font-weight: 600; letter-spacing: .14em; }
+[data-page="home"] .experience-link { display: flex; align-items: center; justify-content: space-between; min-height: var(--tap); margin-top: auto; padding-top: 14px; border-top: 1px solid var(--studio-line); color: var(--olive-deep); font-weight: 600; }
+@media (hover: hover) {
+  [data-page="home"] .experience-card:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--gold) 45%, var(--studio-line)); box-shadow: 0 28px 50px -34px #3a2f1a66; }
+  [data-page="home"] .occasion-grid a:hover { transform: translateY(-3px); }
+}
+
+/* Pricing teaser becomes a framed card with an editorial price. */
+[data-page="home"] .launch-pricing { align-items: center; margin-block: var(--section-spacing); padding: clamp(32px, 5vw, 64px); border: 1px solid var(--studio-line); border-radius: 28px; background: radial-gradient(90% 120% at 100% 0%, #efe7d4 0%, transparent 55%), var(--surface); box-shadow: 0 40px 80px -60px #3a2f1a55; }
+[data-page="home"] .launch-pricing h2 { font-size: clamp(36px, 4.4vw, 56px); line-height: 1.05; margin: 14px 0 18px; }
+[data-page="home"] .launch-price { font: 500 clamp(44px, 6vw, 72px)/1 var(--studio-serif) !important; letter-spacing: -.02em; margin: 0 0 8px; }
+[data-page="home"] .launch-pricing .studio-button { display: inline-flex; width: auto; padding-inline: 28px; }
+@media (max-width: 767px) { [data-page="home"] .studio-hero-copy > h1 { font-size: clamp(40px, 11vw, 60px) !important; line-height: 1.04; } [data-page="home"] .launch-pricing { margin-inline: 20px; } [data-page="home"] .launch-pricing .studio-button { width: 100%; } }
+
+/* Interactive sample frame: soften the device edges. */
+[data-page="home"] .interactive-sample { border-radius: 28px; overflow: hidden; box-shadow: 0 40px 80px -50px #3a2f1a66; }
+
+/* Homepage template carousel: Swiper coverflow, adapted from Skiper UI Carousel_003. */
+.collection-carousel{position:relative;overflow:hidden;padding:24px 0 8px}
+[data-page="home"] .collection-carousel .swiper-wrapper{display:flex;gap:0;grid-template-columns:none;align-items:flex-start}
+[data-page="home"] .collection-carousel .swiper-slide{width:340px;max-width:none;margin:0;height:auto;transition:opacity .5s ease}
+[data-page="home"] .collection-carousel .swiper-slide:not(.swiper-slide-active){opacity:.55}
+[data-page="home"] .collection-carousel .collection-art{height:auto!important;aspect-ratio:3/4;padding:0!important;border-radius:24px;box-shadow:0 36px 60px -36px #2a2e2566}
+[data-page="home"] .collection-carousel .collection-card-top{margin-top:22px;align-items:baseline;gap:12px}
+[data-page="home"] .collection-carousel .collection-card-top h3{font-size:30px;line-height:1.15}
+[data-page="home"] .collection-carousel .collection-card-top>span{white-space:nowrap;font-size:13px}
+[data-page="home"] .collection-carousel .template-meta{font-size:15px;margin-top:10px}
+[data-page="home"] .collection-carousel .card-bottom{display:none}
+[data-page="home"] .collection-carousel .collection-tag{top:18px;left:18px;padding:10px 15px;font-size:14px}
+[data-page="home"] .collection-carousel .card-experience{width:56px;height:56px;right:18px;bottom:18px}
+.carousel-controls{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px;margin:8px 0 24px}
+.carousel-controls button{min-width:44px;min-height:44px;border:1px solid var(--studio-line);border-radius:999px;background:var(--surface);color:var(--studio-ink);font:inherit;cursor:pointer;transition:background .25s,border-color .25s}
+.carousel-controls button:hover{border-color:var(--gold)}
+.carousel-controls button:focus-visible{outline:2px solid var(--olive-deep);outline-offset:4px}
+.carousel-controls .carousel-pause{padding-inline:18px;font-size:13px}
+.carousel-controls .carousel-position{position:static;width:auto;transform:none;min-width:76px;text-align:center;font:500 20px/1 var(--studio-serif);letter-spacing:.04em;color:var(--studio-muted)}
+.carousel-position .swiper-pagination-current{color:var(--studio-ink)}
+@media(max-width:600px){[data-page="home"] .collection-carousel .swiper-slide{width:74%}[data-page="home"] .collection-carousel .collection-card-top h3{font-size:26px}}

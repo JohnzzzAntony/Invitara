@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Website builder — Invitara</title>
+  <meta name="description" content="Build your event website: every section, every field, fonts and colors — with a live preview." />
+  <!-- App pages must not appear in search results -->
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#faf7f2" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23652901'/%3E%3Ctext x='16' y='21.5' font-family='Georgia,serif' font-size='15' fill='white' text-anchor='middle'%3EI%3C/text%3E%3C/svg%3E" />
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="css/commerce.css" />
+<link rel="stylesheet" href="css/collection.css"/>
+<link rel="stylesheet" href="css/studio.css"/>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Cinzel:wght@500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Great+Vibes&family=Jost:wght@300;400;500;600;700;800&family=Parisienne&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,500&display=swap"><link rel="stylesheet" href="css/premium.css"><link rel="stylesheet" href="css/platform.css"><link rel="stylesheet" href="css/platform-app.css"><link rel="stylesheet" href="css/editions.css"><link rel="stylesheet" href="css/refinement.css"><link rel="stylesheet" href="css/premium-wedding.css"></head>
+<body class="editor-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Editor top bar -->
+  <header class="ed-bar">
+    <a class="logo logo-sm" href="index.html">invitara</a>
+    <span class="ed-badge" id="ed-badge" title="Order status">Editor</span>
+
+    <div class="ed-device" role="group" aria-label="Preview device">
+      <button class="ed-dev-btn on" type="button" data-dev="desktop" aria-label="Desktop preview" aria-pressed="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="12.5" rx="1.8"/><path d="M9 20.5h6M12 17v3.5"/></svg>
+      </button>
+      <button class="ed-dev-btn" type="button" data-dev="tablet" aria-label="Tablet preview" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M10.5 18.4h3"/></svg>
+      </button>
+      <button class="ed-dev-btn" type="button" data-dev="mobile" aria-label="Mobile preview" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2.2"/><path d="M10.5 18h3"/></svg>
+      </button>
+    </div>
+
+    <div class="ed-actions">
+      <span class="ed-save" id="ed-save" aria-live="polite"></span>
+      <a class="btn btn-ghost btn-ed" href="dashboard.html">My invitations</a>
+      <button class="btn btn-ghost btn-ed" id="full-preview-btn" type="button" aria-pressed="false">Preview</button><button class="btn btn-ghost btn-ed" id="save-btn" type="button">Save</button>
+      <button class="btn btn-primary btn-ed" id="publish-btn" type="button">Publish</button>
+    </div>
+  </header>
+
+  <main class="ed-shell" id="main">
+    <!-- Sidebar -->
+    <aside class="ed-sidebar" aria-label="Website settings">
+
+      <div class="ed-plan" id="ed-plan" hidden>
+        <div>
+          <span class="ed-plan-name" id="ed-plan-name">Basic plan</span>
+          <span class="ed-plan-sub" id="ed-plan-sub">Basic editor access</span>
+        </div>
+        <a class="ed-plan-up" href="pricing.html" id="ed-plan-up">Compare plans</a>
+      </div>
+
+      <div class="editor-help" id="editor-help">Click text or a photo to edit. Your draft saves automatically. Ready? <a href="checkout.html">choose your date &amp; publish</a>.</div><div class="ed-tabs" role="tablist" aria-label="Editor panels">
+        <button class="ed-tab on" id="tab-content" type="button" role="tab" aria-selected="true" aria-controls="panel-content">Sections</button>
+        <button class="ed-tab" id="tab-design" type="button" role="tab" aria-selected="false" aria-controls="panel-design">Theme</button>
+      </div>
+
+      <!-- ============ CONTENT PANEL ============ -->
+      <div class="ed-panel" id="panel-content" role="tabpanel" aria-labelledby="tab-content">
+
+        <details class="ed-group" open>
+          <summary>Basics</summary>
+          <div class="ed-body" id="basics-body"></div>
+        </details>
+
+        <!-- Section groups are generated here -->
+        <div id="sec-groups"></div>
+
+        <p class="ed-footnote">Tip — use the arrows to reorder sections and the eye to hide one. Drafts save on this device. Purchased invitations sync to your account.</p>
+      </div>
+
+      <!-- ============ DESIGN PANEL ============ -->
+      <div class="ed-panel" id="panel-design" role="tabpanel" aria-labelledby="tab-design" hidden>
+
+        <details class="ed-group" open>
+          <summary>Template</summary>
+          <div class="ed-body">
+            <div class="tpl-chips" id="tpl-chips" role="radiogroup" aria-label="Template"></div>
+          </div>
+        </details>
+
+        <details class="ed-group" open>
+          <summary>Typography</summary>
+          <div class="ed-body">
+            <label class="ed-label">Display typography</label>
+            <div class="font-cards" id="font-cards" role="radiogroup" aria-label="Name font"></div>
+            <label class="ed-label ed-mt-sm">Body text</label>
+            <div class="font-cards" id="body-cards" role="radiogroup" aria-label="Body font"></div>
+          </div>
+        </details>
+
+        <details class="ed-group" open>
+          <summary>Accent color</summary>
+          <div class="ed-body">
+            <div class="color-dots" id="color-dots" role="radiogroup" aria-label="Accent color"></div>
+          </div>
+        </details>
+
+        <details class="ed-group" open>
+          <summary>Buttons &amp; spacing</summary>
+          <div class="ed-body">
+            <label class="ed-label" id="lbl-shape">Button shape</label>
+            <div class="shape-row" id="shape-row" role="radiogroup" aria-labelledby="lbl-shape"></div>
+            <div class="ed-field ed-mt">
+              <label for="ed-spacing">Section spacing</label>
+              <select id="ed-spacing" data-style="spacing">
+                <option value="cozy">Cozy</option>
+                <option value="normal">Normal</option>
+                <option value="airy">Airy</option>
+              </select>
+            </div>
+          </div>
+        </details>
+      </div>
+    </aside>
+
+    <!-- Canvas -->
+    <section class="ed-canvas-wrap" aria-label="Live preview">
+      <div class="canvas-tools"><button id="undo-btn" type="button" aria-label="Undo (Ctrl+Z)" disabled>↶ Undo</button><button id="redo-btn" type="button" aria-label="Redo (Ctrl+Shift+Z)" disabled>↷ Redo</button><span>Click anything you want to change</span></div><button class="replay-opening" type="button" id="replay-opening">↻ Replay opening</button><div class="canvas-frame" id="canvas-frame">
+        <div class="canvas" id="canvas"></div>
+      </div>
+      <p class="canvas-note">Live preview — this is exactly what your guests will see.</p>
+    </section>
+    <aside class="visual-inspector" id="visual-inspector" aria-label="Selected element settings"><div class="inspector-heading"><span id="inspector-title">Element settings</span><button id="inspector-close" type="button" aria-label="Close element settings">×</button></div><div id="inspector-body"><div class="inspector-empty"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="m7 4 18 14-9 1-4 9Z"/></svg><strong>Make it yours.</strong><br>Click any text or photograph<br>to see its settings here.</div></div></aside>
+  </main>
+
+  <!-- Publish: validation checklist, then the shareable link -->
+  <div class="modal-overlay" id="pub-overlay" hidden>
+    <div class="modal pub-modal" role="dialog" aria-modal="true" aria-labelledby="pub-title">
+      <button class="modal-close" type="button" id="pub-x" aria-label="Close">&times;</button>
+
+      <!-- Stage 1: checklist -->
+      <div id="pub-check-stage">
+        <h2 class="m-names" id="pub-title">Ready to publish?</h2>
+        <p class="m-meta">Anyone with your published link can view this invitation. Share it only with the people you want to invite. Guest replies stay private to your account.</p>
+        <ul class="pub-checks" id="pub-checks"></ul>
+        <div class="done-actions">
+          <button class="btn btn-ghost" id="pub-back" type="button">Keep editing</button>
+          <button class="btn btn-primary" id="pub-go" type="button">Publish now</button>
+        </div>
+      </div>
+
+      <!-- Stage 2: live -->
+      <div id="pub-live-stage" hidden>
+        <span class="done-check" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>
+        </span>
+        <h2 class="m-names">Your invitation is live</h2>
+        <p class="m-meta">Anyone with this link can view your invitation, no account needed.</p>
+        <img id="pub-qr" class="publish-qr" alt="Scan to open your invitation"><button id="pub-native-share" class="btn btn-ghost" type="button">Share invitation</button><div class="pub-url-row">
+          <input class="pub-url" id="pub-url" readonly aria-label="Invitation link" />
+          <button class="btn btn-ghost btn-sm" id="copy-url" type="button">Copy</button>
+        </div>
+        <div class="share-row">
+          <a class="share-btn" id="pub-wa" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+          <a class="share-btn" id="pub-mail">E-mail</a>
+          <a class="share-btn" id="pub-open" target="_blank" rel="noopener noreferrer">Open it</a>
+        </div>
+        <div class="done-actions">
+          <a class="btn btn-ghost" href="dashboard.html">My invitations</a>
+          <button class="btn btn-primary" id="pub-close" type="button">Keep editing</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="js/templates.js"></script>
+  <script src="js/mu.js"></script>
+  <script src="js/layouts/collection.js"></script><script src="js/platform-catalog.js"></script><script src="js/layouts/platform.js"></script><script src="js/editions-catalog.js"></script><script src="js/premium-catalog.js"></script><script src="js/editions-layout.js"></script><script src="js/premium-layout.js"></script>
+  <script src="vendor/gsap.min.js"></script>
+  <script src="vendor/ScrollTrigger.min.js"></script>
+  <script src="js/experience.js"></script><script src="js/platform-experiences.js"></script><script src="js/editions-experience.js"></script><script src="js/premium-experience.js"></script>
+  <script src="js/commerce.js"></script>
+<script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/visual-editor.js"></script><script src="js/platform-editor.js"></script><script src="js/editor.js"></script>
+<div class="editor-mobile-switch" role="group" aria-label="Editor view"><button id="mobile-edit" aria-pressed="true" type="button">Sections & Theme</button><button id="mobile-preview" aria-pressed="false" type="button">Edit on canvas</button></div><script src="js/editor-mobile.js"></script></body>
+</html>

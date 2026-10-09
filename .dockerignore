@@ -10,5 +10,7 @@ test-results
 .firecrawl
 Claude outputs
 vendor
+archive
+docs
 .env.*
 !.env.example

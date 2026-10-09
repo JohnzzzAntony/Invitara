@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {resolveOrigin} from '../server/origin.mjs';
+import {resolveOrigin} from '../backend/origin.mjs';
 
 test('Railway hostname configuration normalizes to the canonical HTTPS origin',()=>{
   const expected='https://invitara-production.up.railway.app';

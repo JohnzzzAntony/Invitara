@@ -7,8 +7,8 @@
     "node": ">=24"
   },
   "scripts": {
-    "dev": "node --watch --env-file-if-exists=.env server/index.mjs",
-    "start": "node --env-file-if-exists=.env server/index.mjs",
+    "dev": "node --watch --env-file-if-exists=.env backend/index.mjs",
+    "start": "node --env-file-if-exists=.env backend/index.mjs",
     "build": "npm run build:motion && node scripts/check.mjs",
     "check": "node scripts/check.mjs",
     "test": "node --test tests/*.test.mjs",
@@ -21,6 +21,7 @@
     "build:motion": "node scripts/build-motion.mjs",
     "test:openings": "node scripts/openings-check.mjs",
     "test:book": "node scripts/book-check.mjs",
+    "test:premium": "node scripts/premium-check.mjs",
     "test:editions": "node scripts/editions-check.mjs",
     "lint": "eslint . --max-warnings=0"
   },
@@ -39,6 +40,7 @@
     "globals": "16.5.0",
     "gsap": "3.13.0",
     "motion": "14.0.0",
+    "swiper": "14.3.0",
     "three": "0.186.1"
   }
 }

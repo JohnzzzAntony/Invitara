@@ -1,8 +1,30 @@
 # Invitara — interactive invitation platform
 
-Production application: Node 24, Express, SQLite, Stripe Checkout and locally bundled Anime.js, Motion, Three.js and GSAP. Browser animation sources are compiled by esbuild. The production server serves `public/` and enforces purchases and event expiry.
+Production application: Node 24, Express, SQLite, Stripe Checkout and locally bundled Anime.js, Motion, Three.js and GSAP. Browser animation sources are compiled by esbuild. The production server serves `frontend/public/` and enforces purchases and event expiry.
 
 See [the current release readiness report](docs/RELEASE-READINESS.md) for the October audit fixes, verification evidence and remaining production acceptance gates.
+
+## Where to work
+
+| Folder | Purpose |
+| --- | --- |
+| `frontend/public/` | Editable HTML, CSS, browser JavaScript, images and fonts |
+| `frontend/motion/` | Animation source compiled into browser bundles |
+| `backend/` | Express routes, authentication, payments, SQLite and validation |
+| `config/` | Server security headers |
+| `scripts/` | Build tools, checks and asset maintenance |
+| `tests/` | Automated backend and browser-contract tests |
+| `docs/` | Architecture, design specifications and deployment guides |
+| `vendor/` | Original template sources used by the CSS maintenance tool |
+| `archive/` | Saved Atelier work; excluded from lint and deployment |
+
+**Design work starts with [the frontend guide](frontend/README.md).**
+See [the backend guide](backend/README.md) for server responsibilities and
+[the scripts guide](scripts/README.md) for each development command.
+Run all npm commands from this repository root. Only `frontend/public/` is
+served to browsers; its paths remain `/css/`, `/js/`, `/assets/` and `/vendor/`.
+This is one application with separate source folders, so no second install or
+cross-origin API configuration is required.
 
 ## Start locally
 
@@ -16,7 +38,7 @@ Open http://localhost:3000. Drafts, previews and accounts work without payment c
 
 ## The collection
 
-The active collection contains 14 independently designed invitations covering 14 occasions. The earlier 54 designs remain available to saved invitations. All use the existing editor/state contract; content, photography, sections, typography and theme settings remain editable. Drafts are local, while paid invitations and guest replies are stored on the server.
+The catalogue registers 14 edition designs and five premium wedding designs. The earlier 54 designs remain available to saved invitations. All use the existing editor/state contract; content, photography, sections, typography and theme settings remain editable. Drafts are local, while paid invitations and guest replies are stored on the server. See docs/PREMIUM-WEDDING-IMPLEMENTATION.md for interactions, checks and media notes.
 
 ## Production deployment
 
@@ -71,4 +93,4 @@ GSAP licence: https://gsap.com/standard-license/
 
 ## Expanded platform
 
-The active catalogue contains 14 individually art-directed invitations across 14 occasions. Repeating designs are archived; existing invitations remain supported. Anime.js and Motion animate the new collection, with six lazily loaded Three.js scenes. See [the platform upgrade guide](docs/PLATFORM-UPGRADE.md) for architecture, editor features, sharing, analytics, tests and deployment configuration. Run `npm run test:editions` for the current collection, motion and breakpoint checks. `npm run test:platform` covers archived designs. Run `npm run build` after changing `src/editions-*.js` to regenerate browser bundles.
+The active catalogue contains 14 individually art-directed invitations across 14 occasions. Repeating designs are archived; existing invitations remain supported. Anime.js and Motion animate the new collection, with six lazily loaded Three.js scenes. See [the platform upgrade guide](docs/PLATFORM-UPGRADE.md) for architecture, editor features, sharing, analytics, tests and deployment configuration. Run `npm run test:editions` for the current collection, motion and breakpoint checks. `npm run test:platform` covers archived designs. Run `npm run build` after changing `frontend/motion/editions-*.js` to regenerate browser bundles.
