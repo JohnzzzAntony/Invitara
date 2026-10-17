@@ -10,6 +10,15 @@
   timer();var tick=setInterval(timer,60000);clean.push(function(){clearInterval(tick);});
   if(editing){root.classList.add('nx-editing');root.__premiumDispose=function(){if(prior)prior();clean.forEach(function(fn){fn();});};return;}
   var sections=Array.from(root.querySelectorAll(':scope > .nx-section'));
+  if(root.classList.contains('nx-decor-industrial')){
+   var motionControl=root.querySelector('.sf-motion-control'),sceneHost=root.querySelector('[data-scene-host]'),sceneDisposed=false,disposeScene;
+   root.dataset.scene='industrial';
+   function updateIndustrialMotion(){root.dataset.paused=String(reduce.matches||root.dataset.motion==='none'||motionControl?.getAttribute('aria-pressed')==='true');root.dispatchEvent(new Event('edition-motion'));if(motionControl){motionControl.hidden=reduce.matches||root.dataset.motion==='none';motionControl.textContent=root.dataset.paused==='true'?'Play animation':'Pause animation';}}
+   if(motionControl)on(motionControl,'click',function(){motionControl.setAttribute('aria-pressed',String(motionControl.getAttribute('aria-pressed')!=='true'));updateIndustrialMotion();});
+   on(reduce,'change',updateIndustrialMotion);updateIndustrialMotion();
+   if(sceneHost){sceneHost.dataset.loading='true';import('../vendor/industrial-scene.js').then(function(module){if(sceneDisposed)return;disposeScene=module.mountScene(root);sceneHost.dataset.loading='false';}).catch(function(){sceneHost.dataset.loading='false';});}
+   clean.push(function(){sceneDisposed=true;if(disposeScene)disposeScene();});
+  }
   if(root.classList.contains('nx-decor-industrial')&&!reduce.matches){var industrialHero=root.querySelector('.nx-section-hero'),frame=0;if(industrialHero){on(industrialHero,'pointermove',function(e){if(frame)return;frame=requestAnimationFrame(function(){var r=industrialHero.getBoundingClientRect();industrialHero.style.setProperty('--sf-x',((e.clientX-r.left)/r.width-.5).toFixed(3));industrialHero.style.setProperty('--sf-y',((e.clientY-r.top)/r.height-.5).toFixed(3));frame=0;});});on(industrialHero,'pointerleave',function(){industrialHero.style.setProperty('--sf-x','0');industrialHero.style.setProperty('--sf-y','0');});clean.push(function(){cancelAnimationFrame(frame);});}}
   root.tabIndex=0;root.setAttribute('aria-label',E.INVITARA_CATALOG.experiences[engine].name+' invitation');
   if(engine==='book'){

@@ -1,0 +1,53 @@
+import {chromium} from '@playwright/test';
+import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';
+import {mkdirSync,mkdtempSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import path from 'node:path';
+const origin='http://localhost:3221';
+const server=spawn(process.execPath,['backend/index.mjs'],{windowsHide:true,env:{...process.env,PORT:'3221',APP_ORIGIN:origin,NODE_ENV:'test',DATA_DIR:mkdtempSync(path.join(tmpdir(),'sf-showcase-'))},stdio:'pipe'});
+let browser;
+try{
+ await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error('Server timeout')),15000);server.stdout.on('data',data=>{if(String(data).includes('listening')){clearTimeout(timer);resolve();}});server.on('error',reject);});
+ browser=await chromium.launch({channel:'msedge',headless:true});
+ const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(origin+'/demo.html?id=steelfab-2027');
+ await page.locator('[data-width=desktop]').click();
+ await page.waitForFunction(()=>document.querySelector('.sf-machine')?.dataset.loading==='false');
+ await page.locator('.sf-machine.has-webgl canvas').waitFor();
+ await page.waitForTimeout(1600);
+ mkdirSync('artifacts',{recursive:true});
+ await page.screenshot({path:'artifacts/steelfab-showcase-desktop.png',fullPage:true});
+ await page.getByRole('button',{name:'Pause animation',exact:true}).click();
+ assert.equal(await page.locator('.nx').getAttribute('data-paused'),'true');
+ assert.equal(await page.locator('.nx').getAttribute('data-scene-running'),'false');
+ await page.getByRole('button',{name:'Play animation',exact:true}).click();
+ assert.equal(await page.locator('.nx').getAttribute('data-paused'),'false');
+ for(const width of [320,375,390,768,1440]){
+  await page.setViewportSize({width:1440,height:900});
+  await page.locator('[data-width='+ (width<700?'mobile':'desktop')+']').click();
+  await page.setViewportSize({width,height:900});
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth||document.querySelector('.nx').scrollWidth>document.querySelector('.nx').clientWidth+1),false,'Overflow at '+width);
+ }
+ await page.locator('[data-width=mobile]').click();await page.setViewportSize({width:390,height:844});
+ await page.screenshot({path:'artifacts/steelfab-showcase-mobile.png',fullPage:true});
+ await page.locator('.nx-section-hero [data-goto=rsvp]').click();
+ await page.waitForTimeout(1200);
+ assert.equal(await page.locator('.nx-section-rsvp').evaluate(el=>{const r=el.getBoundingClientRect();return r.top<innerHeight&&r.bottom>0;}),true,'RSVP is reached from the cover');
+ await page.locator('.ws-rsvp-form input[name=name]').fill('Preview Guest');
+ await page.waitForTimeout(600);
+ await page.screenshot({path:'artifacts/steelfab-showcase-rsvp.png',fullPage:true});
+ assert.equal(await page.locator('.sf-signature-cta').getAttribute('href'),'/create.html?occasion=corporate');
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await page.waitForTimeout(100);
+ assert.equal(await page.locator('.sf-motion-control').isVisible(),false);
+ assert.equal(await page.locator('.nx').getAttribute('data-scene-running'),'false');
+ await page.route('**/vendor/industrial-scene.js',route=>route.abort());
+ await page.reload();
+ await page.waitForFunction(()=>document.querySelector('.sf-machine')?.dataset.loading==='false');
+ assert.equal(await page.locator('.nx-cover-photo img').evaluate(img=>img.complete&&img.naturalWidth>0),true);
+ assert.equal(await page.locator('.ws-rsvp-form').count(),1);
+ assert.deepEqual(errors,[]);
+ console.log('SteelFab: 3D rendering, pause/resume, reduced motion, failed-module fallback, RSVP access, branding and five viewport widths passed.');
+}finally{await browser?.close();server.kill();}

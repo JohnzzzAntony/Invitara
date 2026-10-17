@@ -12,6 +12,17 @@ export function mountScene(root){
  const gold=mat({color:0xc9ae77,metalness:1,roughness:.21}),silver=mat({color:0xe0e3e0,metalness:1,roughness:.16}),cream=mat({color:0xe2d8c9,metalness:.15,roughness:.6});
  function crescentShape(radius,inner,offset){const x=(radius*radius-inner*inner+offset*offset)/(2*offset),y=Math.sqrt(radius*radius-x*x),outerAngle=Math.atan2(y,x),innerAngle=Math.atan2(y,x-offset),shape=new THREE.Shape();shape.moveTo(x,y);shape.absarc(0,0,radius,outerAngle,Math.PI*2-outerAngle,false);shape.absarc(offset,0,inner,-innerAngle,innerAngle,true);shape.closePath();return shape;}
  const animated=[];
+ if(kind==='industrial'){
+  if(matchMedia('(max-width:700px)').matches)renderer.setPixelRatio(1);
+  const steel=mat({color:0x8c9690,metalness:1,roughness:.28}),edge=mat({color:0x252e28,metalness:.9,roughness:.35}),acid=mat({color:0xd8ff52,metalness:.4,roughness:.3});
+  const ring=geo(new THREE.TorusGeometry(1.3,.19,16,72)),inner=geo(new THREE.TorusGeometry(.77,.13,12,64));
+  mesh(ring,steel);mesh(inner,steel).position.z=.16;
+  const back=mesh(geo(new THREE.TorusGeometry(1.3,.09,12,72)),edge);back.position.z=-.42;
+  const hub=mesh(geo(new THREE.CylinderGeometry(.34,.34,.38,32)),steel);hub.rotation.x=Math.PI/2;hub.position.z=.1;
+  const blade=geo(new THREE.BoxGeometry(.52,.085,.18)),bolt=geo(new THREE.CylinderGeometry(.065,.065,.15,6));
+  for(let i=0;i<12;i++){const angle=i*Math.PI/6;const fin=mesh(blade,i%3===0?acid:steel);fin.position.set(Math.cos(angle)*1.02,Math.sin(angle)*1.02,.02);fin.rotation.z=angle+.36;const screw=mesh(bolt,edge);screw.rotation.x=Math.PI/2;screw.position.set(Math.cos(angle)*1.3,Math.sin(angle)*1.3,.21);}
+  group.rotation.set(.32,-.4,-.2);group.scale.setScalar(1.35);
+ }
  if(kind==='rings'){
   const ring=geo(new THREE.TorusGeometry(1,.115,20,100));const a=mesh(ring,gold),b=mesh(ring,silver);a.position.set(-.52,.08,0);a.rotation.set(.75,.5,-.35);b.position.set(.55,-.22,.18);b.rotation.set(-.55,.2,.45);animated.push(a,b);group.rotation.z=-.2;
  }
@@ -36,7 +47,7 @@ export function mountScene(root){
  }
  let disposed=false,visible=false,last=0,elapsed=0,pointer={x:0,y:0};const reduced=matchMedia('(prefers-reduced-motion: reduce)');
  function resize(){const width=host.clientWidth,height=host.clientHeight;if(!width||!height)return;renderer.setSize(width,height,false);camera.aspect=width/height;camera.position.z=width<420?8:7;camera.updateProjectionMatrix();renderer.render(scene,camera);}const ro=new ResizeObserver(resize);ro.observe(host);resize();host.classList.add('has-webgl');
- function frame(time){if(time-last<32)return;const dt=Math.min((time-last)/1000,.05);last=time;elapsed+=dt;if(kind==='disco')group.rotation.y=elapsed*.14+pointer.x*.13;else if(kind==='snow'){group.rotation.z=Math.sin(elapsed*.035)*.2;group.position.y=-Math.sin(elapsed*.09)*.65;}else{group.rotation.y=Math.sin(elapsed*.22)*.22+pointer.x*.15;group.rotation.x=Math.sin(elapsed*.17)*.08+pointer.y*.06;}animated.forEach((object,i)=>{object.rotation.z+=dt*.05*(i%2?1:-1);});renderer.render(scene,camera);}
+ function frame(time){if(time-last<32)return;const dt=Math.min((time-last)/1000,.05);last=time;elapsed+=dt;if(kind==='industrial'){group.rotation.z=-.2+elapsed*.075;group.rotation.y=-.4+pointer.x*.18;group.rotation.x=.32+pointer.y*.1;}else if(kind==='disco')group.rotation.y=elapsed*.14+pointer.x*.13;else if(kind==='snow'){group.rotation.z=Math.sin(elapsed*.035)*.2;group.position.y=-Math.sin(elapsed*.09)*.65;}else{group.rotation.y=Math.sin(elapsed*.22)*.22+pointer.x*.15;group.rotation.x=Math.sin(elapsed*.17)*.08+pointer.y*.06;}animated.forEach((object,i)=>{object.rotation.z+=dt*.05*(i%2?1:-1);});renderer.render(scene,camera);}
  function sync(){const run=!disposed&&visible&&!document.hidden&&!reduced.matches&&root.dataset.paused!=='true'&&root.dataset.motion!=='none';last=performance.now();renderer.setAnimationLoop(run?frame:null);root.dataset.sceneRunning=String(run);if(!run&&!disposed)renderer.render(scene,camera);}
  const io=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;sync();},{threshold:.01});io.observe(host);
  function move(event){if(event.pointerType==='touch')return;pointer.x=event.clientX/innerWidth*2-1;pointer.y=event.clientY/innerHeight*2-1;}function lost(event){event.preventDefault();dispose();}
