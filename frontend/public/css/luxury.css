@@ -59,13 +59,6 @@ body.studio { color: var(--studio-ink); background: var(--studio-paper); }
 [data-page=home] .hero-float-note { background: transparent; border: 0; box-shadow: none; backdrop-filter: none; bottom: 12px; left: 0; width: 100%; text-align: center; transform: none; color: var(--studio-muted); font-size: 22px; }
 [data-page=home] .studio-hero-note { gap: 8px 20px; }
 [data-page=home] .studio-hero-note span { background: none; padding: 0; border: 0; color: var(--studio-muted); font-size: 12px; }
-[data-page=home] .studio-proof { margin-bottom: 0; padding: 24px 0; text-align: left; }
-[data-page=home] .studio-proof span { font-size: 13px; }
-[data-page=home] .studio-proof b { font: 500 22px var(--studio-serif); color: var(--studio-ink); }
-/* The process section already explains the product; avoid repeating it with a second feature panel. */
-[data-page=home] .studio-wrap.feature-strip,
-[data-page=home] .studio-editorial { display: none !important; }
-[data-page=home] .studio-links a[href="index.html#features"] { display: none; }
 .studio .section-intro h2, [data-page=home] .home-discovery > h2, [data-page=home] .studio-steps h2 { font-size: clamp(36px,4.2vw,58px); line-height: 1.08; }
 .studio .section-intro > p { font-size: 15px; line-height: 1.8; }
 
@@ -113,16 +106,13 @@ body.studio { color: var(--studio-ink); background: var(--studio-paper); }
 [data-page=home] .step-grid { gap: 40px; }
 [data-page=home] .step > span { color: var(--lux-accent); }
 [data-page=home] .step h3 { margin-top: 24px; }
-[data-page=home] .step p, [data-page=home] .feature-strip p { font-size: 15px; line-height: 1.8; }
+[data-page=home] .step p { font-size: 15px; line-height: 1.8; }
 [data-page=home] .launch-pricing { background: var(--surface-soft); box-shadow: none; border: 0; border-radius: 8px; }
 [data-page=home] .explainer-table { box-shadow: none; border-radius: 8px; }
 .studio .launch-faq details { background: transparent; border: 0; border-bottom: 1px solid var(--studio-line); border-radius: 0; margin: 0; padding-inline: 0; }
 .studio .launch-faq details[open] { background: transparent; border-color: var(--studio-line); }
 .studio .launch-faq summary { font: 500 17px/1.6 var(--studio-sans); padding-block: 24px; }
 .studio .launch-faq summary::after { background: none; border: 0; color: var(--studio-ink); }
-[data-page=home] .studio-end { background: var(--studio-ink); padding-block: 88px; }
-[data-page=home] .studio-end h2 { font-size: clamp(44px,6vw,80px); max-width: 15ch; }
-[data-page=home] .studio-end > p { color: var(--lux-base); }
 .studio .studio-footer { padding-top: 64px; gap: 40px; }
 .studio .footer-heading { color: var(--studio-muted); }
 .studio .footer-column a { font-size: 14px; }
@@ -170,9 +160,6 @@ body.studio { color: var(--studio-ink); background: var(--studio-paper); }
   [data-page=home] .hero-phone { width: 150px; }
   [data-page=home] .hero-phone:nth-of-type(4) { left: calc(50% - 75px); top: 36px; }
   [data-page=home] .hero-phone:nth-of-type(2), [data-page=home] .hero-phone:nth-of-type(3) { top: 72px; }
-  [data-page=home] .studio-proof { gap: 16px; text-align: center; }
-  [data-page=home] .studio-proof b { display: block; margin: 0 0 4px; font-size: 22px; }
-  [data-page=home] .studio-proof span { font-size: 12px; }
   [data-page=home] #home-occasions.occasion-gallery { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin-bottom: 48px; }
   [data-page=home] #home-occasions .occasion-photo-card { aspect-ratio: 3/4; }
   [data-page=home] #home-occasions .occasion-photo-card strong { font-size: 26px; }
