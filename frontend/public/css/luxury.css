@@ -62,6 +62,10 @@ body.studio { color: var(--studio-ink); background: var(--studio-paper); }
 [data-page=home] .studio-proof { margin-bottom: 0; padding: 24px 0; text-align: left; }
 [data-page=home] .studio-proof span { font-size: 13px; }
 [data-page=home] .studio-proof b { font: 500 22px var(--studio-serif); color: var(--studio-ink); }
+/* The process section already explains the product; avoid repeating it with a second feature panel. */
+[data-page=home] .studio-wrap.feature-strip,
+[data-page=home] .studio-editorial { display: none !important; }
+[data-page=home] .studio-links a[href="index.html#features"] { display: none; }
 .studio .section-intro h2, [data-page=home] .home-discovery > h2, [data-page=home] .studio-steps h2 { font-size: clamp(36px,4.2vw,58px); line-height: 1.08; }
 .studio .section-intro > p { font-size: 15px; line-height: 1.8; }
 
@@ -92,7 +96,7 @@ body.studio { color: var(--studio-ink); background: var(--studio-paper); }
 .studio .collection-card .template-meta { font-size: 13px; line-height: 1.65; }
 .studio .collection-card .collection-tag { background: var(--surface); color: var(--studio-ink); border: 0; border-radius: 4px; font-size: 11px; }
 .studio .collection-card .card-bottom { border: 0; padding-top: 4px; gap: 8px; }
-.studio .collection-card .card-bottom > * { border-radius: 6px; font-size: 13px; flex: 1; }
+.studio .collection-card .card-bottom > * { border-radius: 6px; font-size: 12px; flex: 1; padding-inline: 10px; gap: 6px; white-space: nowrap; justify-content: center; }
 .studio .collection-card .card-bottom > button { color: var(--surface); background: var(--studio-ink); border-color: var(--studio-ink); }
 .studio :is(.studio-filter,.experience-chips button,.account-tabs button) { border-radius: 6px; box-shadow: none; transform: none; }
 .studio :is(.studio-filter,.experience-chips button)[aria-pressed=true], .studio .account-tabs button[aria-selected=true] { background: var(--studio-ink); border-color: var(--studio-ink); color: var(--surface); box-shadow: none; transform: none; }
@@ -103,12 +107,7 @@ body.studio { color: var(--studio-ink); background: var(--studio-paper); }
 [data-page=home] .premium-intro h2 { font-size: clamp(30px,3vw,42px); max-width: 28ch; }
 
 /* Informational pages and account flows share the same calm surface language. */
-[data-page=home] .studio-wrap.feature-strip { border-inline: 0; box-shadow: none; }
-[data-page=home] .feature-strip article { padding: 0; }
 .studio .feature-icon, .studio .pricing-assurances .occasion-icon, .studio .detail-assurances .occasion-icon { background: var(--surface-soft); box-shadow: none; color: var(--studio-ink); border-radius: 6px; }
-[data-page=home] .studio-editorial { background: var(--surface-soft); border: 0; }
-[data-page=home] .studio-editorial h2 { font-size: clamp(48px,6vw,78px); }
-[data-page=home] .studio-editorial h2 em { font-style: italic; color: var(--lux-accent); }
 [data-page=home] .step { padding: 28px 0; border: 0; border-top: 1px solid var(--studio-line); border-radius: 0; background: transparent; }
 [data-page=home] .step::after { display: none; }
 [data-page=home] .step-grid { gap: 40px; }
@@ -185,7 +184,7 @@ body.studio { color: var(--studio-ink); background: var(--studio-paper); }
   [data-page=home] #home-experiences .experience-card h3 { font-size: 29px; }
   [data-page=home] .premium-intro { padding: 28px 24px; }
   .studio .collection-grid, .studio .discovery .collection-grid { gap: 32px 16px; }
-  .studio .collection-card-top { flex-wrap: wrap; }
+  .studio .collection-card-top { flex-wrap: nowrap; }
   .studio .studio-shell { width: calc(100% - 32px); padding: 28px 24px; margin-block: 36px 64px; }
   .studio .policy-page { width: calc(100% - 40px); padding: 0; background: transparent; border: 0; }
   .studio .launch-faq summary { font-size: 16px; }
