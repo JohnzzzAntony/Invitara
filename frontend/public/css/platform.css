@@ -135,6 +135,7 @@
 @media(prefers-reduced-motion:reduce){.nx-decor-industrial *{animation:none!important;transition:none!important}.nx-decor-industrial .nx-cover-photo,.nx-decor-industrial .nx-cover-copy{transform:none!important}}
 
 /* A lightweight procedural steel assembly; the photograph remains the fallback. */
+.nx-decor-industrial .nx-section-rsvp{--nx-primary:var(--sf-paper);--nx-muted:#aab1aa}
 .nx-decor-industrial .sf-machine{position:absolute;inset:19% 3% 19% 57%;z-index:3;pointer-events:none}
 .nx-decor-industrial .nx-section-hero h1{font-size:clamp(50px,7cqw,104px)}
 .nx-decor-industrial .sf-machine canvas{display:block;width:100%;height:100%;filter:drop-shadow(0 24px 24px #0008)}

@@ -35,6 +35,7 @@ try{
  await page.locator('.nx-section-hero [data-goto=rsvp]').click();
  await page.waitForTimeout(1200);
  assert.equal(await page.locator('.nx-section-rsvp').evaluate(el=>{const r=el.getBoundingClientRect();return r.top<innerHeight&&r.bottom>0;}),true,'RSVP is reached from the cover');
+ assert.equal(await page.locator('.nx-section-rsvp h2').evaluate(el=>getComputedStyle(el).color),'rgb(235, 236, 229)','RSVP heading has the light foreground');
  await page.locator('.ws-rsvp-form input[name=name]').fill('Preview Guest');
  await page.waitForTimeout(600);
  await page.screenshot({path:'artifacts/steelfab-showcase-rsvp.png',fullPage:true});
