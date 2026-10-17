@@ -6,7 +6,7 @@ import {invitationState} from '../backend/invitation-state.mjs';
 const catalog=loadCatalog();
 test('all active and archived designs retain their server validation contract',()=>{
   assert.equal(catalog.INVITARA_availableTemplates().length,19);
-  assert.equal(catalog.EVER_THEMES.length,73);
+  assert.equal(catalog.EVER_THEMES.length,74);
   for(const theme of catalog.EVER_THEMES){
     const state=catalog.EVER_siteDefaults(theme.id);
     const valid=invitationState(catalog,state,theme.id,'2027-06-10');
