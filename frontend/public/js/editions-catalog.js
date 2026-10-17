@@ -1,7 +1,7 @@
 /* Curated editions. Each artDirection owns a composition, not a palette variant. */
 (function(){
  'use strict';var E=window;
- E.EVER_THEMES.forEach(function(t){t.archived=true;});
+ E.EVER_THEMES.forEach(function(t){t.archived=t.id!=='steelfab-2027';});
  var editions=[
   {key:'vow',occasion:'wedding',name:'The Vow',style:'Luxury',experience:'book',bg:'#F9F9F9',ink:'#121212',accent:'#D44A3A',soft:'#E6E2DD',font:'corm',photo:'assets/ws-couple.jpg',host:'Sarah',partner:'Daniel',title:'A lifetime,\nin the making.',kicker:'A celebration of love',note:'One extraordinary day. Our favourite people. The beginning of everything.',scene:'',description:'A fashion editorial becomes a wedding keepsake. Monumental type, intimate film frames, and a page that opens into your story.'},
   {key:'orbit',occasion:'engagement',name:'Orbit of Us',style:'Modern',experience:'classic',bg:'#1B2A49',ink:'#F9F6F0',accent:'#E2D8C9',soft:'#1B2A49',font:'pfd',photo:'assets/ws-proposal.jpg',host:'Leila',partner:'Adam',title:'Some things\nare written\nin the stars.',kicker:'Two worlds. One beautiful orbit.',note:'Join us as we say yes to a lifetime of finding each other.',scene:'rings',description:'Two sculptural rings suspended in a midnight orbit. A celestial engagement invitation with quietly magnetic depth.'},

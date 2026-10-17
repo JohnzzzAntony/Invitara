@@ -18,4 +18,5 @@ test('SteelFab 2027 is a focused corporate RSVP template with its local artwork 
   assert.equal(state.sections.hero.buttonTarget, 'rsvp');
   assert.ok(existsSync(new URL('../frontend/public/assets/steelfab-2027/welding.webp', import.meta.url)));
   assert.ok(catalog.INVITARA_CATALOG.styles.includes('Industrial'));
+  assert.ok(catalog.INVITARA_availableTemplates().some(theme => theme.id === 'steelfab-2027'));
 });
