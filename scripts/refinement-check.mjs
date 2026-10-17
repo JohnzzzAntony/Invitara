@@ -57,7 +57,8 @@ try {
   const names = await page.locator('.collection-card h3').allTextContents();
   assert.deepEqual(names, [...names].sort((a, b) => a.localeCompare(b)));
   await page.locator('#load-more').click();
-  assert.equal(await page.locator('.collection-card').count(), 14);
+  const catalogueSize = await page.evaluate(() => window.INVITARA_availableTemplates().length);
+  assert.equal(await page.locator('.collection-card').count(), Math.min(24, catalogueSize));
   await page.locator('.card-bottom button').first().click();
   await page.waitForURL('**/editor.html');
   await page.locator('#mobile-edit').click();
