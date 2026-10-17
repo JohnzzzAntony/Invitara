@@ -10,6 +10,7 @@
   timer();var tick=setInterval(timer,60000);clean.push(function(){clearInterval(tick);});
   if(editing){root.classList.add('nx-editing');root.__premiumDispose=function(){if(prior)prior();clean.forEach(function(fn){fn();});};return;}
   var sections=Array.from(root.querySelectorAll(':scope > .nx-section'));
+  if(root.classList.contains('nx-decor-industrial')&&!reduce.matches){var industrialHero=root.querySelector('.nx-section-hero'),frame=0;if(industrialHero){on(industrialHero,'pointermove',function(e){if(frame)return;frame=requestAnimationFrame(function(){var r=industrialHero.getBoundingClientRect();industrialHero.style.setProperty('--sf-x',((e.clientX-r.left)/r.width-.5).toFixed(3));industrialHero.style.setProperty('--sf-y',((e.clientY-r.top)/r.height-.5).toFixed(3));frame=0;});});on(industrialHero,'pointerleave',function(){industrialHero.style.setProperty('--sf-x','0');industrialHero.style.setProperty('--sf-y','0');});clean.push(function(){cancelAnimationFrame(frame);});}}
   root.tabIndex=0;root.setAttribute('aria-label',E.INVITARA_CATALOG.experiences[engine].name+' invitation');
   if(engine==='book'){
    var cover=root.querySelector('.nx-section-hero'),pages=document.createElement('div');pages.className='nx-book-pages';
