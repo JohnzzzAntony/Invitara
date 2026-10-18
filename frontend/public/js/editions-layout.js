@@ -8,6 +8,7 @@
  function lattice(){return '<svg class="ed-mosaic-art" viewBox="0 0 400 400" aria-hidden="true"><defs><pattern id="edition-tile" width="80" height="80" patternUnits="userSpaceOnUse"><path d="m40 2 11 27 27 11-27 11-11 27-11-27L2 40l27-11Z" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="20" y="20" width="40" height="40" transform="rotate(45 40 40)" fill="none" stroke="currentColor" stroke-width=".5"/></pattern></defs><rect width="400" height="400" fill="url(#edition-tile)"/></svg>';}
  E.INVITARA_artDirect=function(root,d,t,opts){
   if(!t.artDirection)return;var key=t.artDirection,hero=root.querySelector('.nx-section-hero');
+  if(key==='aangan'&&E.INVITARA_housewarmingRender){E.INVITARA_housewarmingRender(root,d,t,opts);return;}
   root.classList.add('edition','edition-'+key);root.dataset.edition=key;root.dataset.scene=t.editionScene||'';
   ['classic','story','book','magazine','cinematic','reveal','timeline','gallery-experience'].forEach(function(k){root.classList.remove('nx-'+k);});
   if(!hero)return;

@@ -5,6 +5,7 @@
   if(!root.dataset.edition){base(root,options);return;}
   // Reuse RSVP/navigation plumbing without running the older motion system.
   base(root,Object.assign({},options,{editing:true}));
+  if(root.dataset.edition==='aangan'){E.INVITARA_housewarmingBind(root,options);return;}
   if(root.__editionBound)return;root.__editionBound=true;
   var prior=root.__premiumDispose,clean=[],disposed=false,editing=options&&options.editing,key=root.dataset.edition,reduced=matchMedia('(prefers-reduced-motion: reduce)');
   function on(node,event,fn,opts){node.addEventListener(event,fn,opts);clean.push(function(){node.removeEventListener(event,fn,opts);});}

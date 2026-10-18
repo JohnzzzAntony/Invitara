@@ -11,7 +11,7 @@
    var status=document.createElement('p');status.setAttribute('role','status');status.className='ex-form-note';form.appendChild(status);
    if(payload.closed){form.querySelectorAll('input,textarea,select,button').forEach(function(el){el.disabled=true;});status.textContent='This event has ended. Guest replies are now closed.';return;}
    form.addEventListener('submit',async function(e){e.preventDefault();if(!form.reportValidity())return;var button=form.querySelector('button[type=submit]');button.disabled=true;status.textContent='Sending your reply…';
-    try{await E.EVER_API.request('/invites/'+encodeURIComponent(id)+'/rsvp','POST',Object.fromEntries(new FormData(form)));status.textContent=payload.s.sections.rsvp.success||'Your reply has reached the host. Thank you!';button.textContent='Update my reply ↗';}
+    try{await E.EVER_API.request('/invites/'+encodeURIComponent(id)+'/rsvp','POST',Object.fromEntries(new FormData(form)));status.textContent=payload.s.sections.rsvp.success||'Your reply has reached the host. Thank you!';if(payload.t==='edition-aangan'){var attendance=new FormData(form).get('attend');if(attendance==='no')status.textContent='Thank you for sending your love. Your reply has reached us.';if(attendance==='maybe')status.textContent='Your reply has reached us. You can update it when you know.';form.classList.add('hw-reply-saved');}button.textContent='Update my reply ↗';}
     catch(err){status.textContent=err.message;}finally{button.disabled=false;}
    });
   });

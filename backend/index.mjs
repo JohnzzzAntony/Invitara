@@ -213,15 +213,21 @@ app.get('/api/invites/:id', (req, res) => {
   if(req.owner!==db.prepare('SELECT owner FROM projects WHERE id=?').get(p.id).owner)db.prepare('INSERT OR IGNORE INTO invitation_views VALUES (?,?)').run(p.id,req.sessionHash);
   res.json({ s: p.state, t: p.themeId, n: p.slug, closed:!editable(p) });
 });
+app.get('/api/invites/:id/qr',async(req,res)=>{
+ const p=get(req.params.id);if(!p?.published||!p.paid)return res.status(404).json({error:'Invitation unavailable.'});
+ if(limited('qr:'+req.ip,30))return res.status(429).json({error:'Please wait before requesting another QR code.'});
+ try{const svg=await QRCode.toString(origin+'/invite.html?e='+encodeURIComponent(p.id),{type:'svg',errorCorrectionLevel:'M',margin:4,color:{dark:'#233d32',light:'#f8f3ea'}});res.type('image/svg+xml').send(svg);}catch(_){res.status(500).json({error:'Could not generate the QR code.'});}
+});
 app.post('/api/invites/:id/rsvp',(req,res)=>{
  const p=get(req.params.id);if(!p?.published||!editable(p))return res.status(403).json({error:'Guest replies are closed for this invitation.'});
  if(limited('rsvp:'+req.ip,30))return res.status(429).json({error:'Please wait a minute before sending another reply.'});
  if(p.state.sections.rsvp?.on===false||!p.state.order.includes('rsvp'))return res.status(403).json({error:'Guest replies are disabled for this invitation.'});
- const {name,attend,msg='',meal='',dietary='',accommodation=''}=req.body,guests=Number(req.body.guests);
+ const {name,attend,msg='',meal='',dietary='',accommodation='',phone=''}=req.body,guests=Number(req.body.guests);
+ if(typeof phone!=='string'||phone.length>40||!/^[-+()\d\s.]*$/.test(phone))return res.status(400).json({error:'Enter a valid phone number, or leave it blank.'});
  if(typeof meal!=='string'||meal.length>120||(p.state.sections.rsvp.mealEnabled&&!String(p.state.sections.rsvp.mealOptions||'No preference').split(',').map(s=>s.trim()).includes(meal)))return res.status(400).json({error:'Choose a valid meal preference.'});
- if(typeof name!=='string'||!name.trim()||name.length>120||!['yes','no'].includes(attend)||!Number.isInteger(guests)||guests<1||guests>Math.min(50,Number(p.state.sections.rsvp.guestsMax)||6)||typeof msg!=='string'||msg.length>2000)return res.status(400).json({error:'Add your name, attendance and a valid guest count. Keep your message under 2,000 characters.'});
+ if(typeof name!=='string'||!name.trim()||name.length>120||!(p.themeId==='edition-aangan'?['yes','no','maybe']:['yes','no']).includes(attend)||!Number.isInteger(guests)||guests<1||guests>Math.min(50,Number(p.state.sections.rsvp.guestsMax)||6)||typeof msg!=='string'||msg.length>2000)return res.status(400).json({error:'Add your name, attendance and a valid guest count. Keep your message under 2,000 characters.'});
  if(typeof dietary!=='string'||dietary.length>1000||!['','yes','no'].includes(accommodation))return res.status(400).json({error:'Use valid dietary and accommodation details.'});
- const reply={dietary:p.state.sections.rsvp.dietaryEnabled?dietary.trim():'',accommodation:p.state.sections.rsvp.accommodationEnabled?accommodation:'',name:name.trim(),attend,guests,msg:msg.trim(),meal:p.state.sections.rsvp.mealEnabled?meal:'',updatedAt:new Date().toISOString()};db.prepare('INSERT INTO replies VALUES (?,?,?) ON CONFLICT(project,guest) DO UPDATE SET body=excluded.body').run(p.id,req.sessionHash,JSON.stringify(reply));res.json({ok:true});
+ const reply={dietary:p.state.sections.rsvp.dietaryEnabled?dietary.trim():'',accommodation:p.state.sections.rsvp.accommodationEnabled?accommodation:'',name:name.trim(),attend,guests,msg:msg.trim(),phone:phone.trim(),meal:p.state.sections.rsvp.mealEnabled?meal:'',updatedAt:new Date().toISOString()};db.prepare('INSERT INTO replies VALUES (?,?,?) ON CONFLICT(project,guest) DO UPDATE SET body=excluded.body').run(p.id,req.sessionHash,JSON.stringify(reply));res.json({ok:true});
 });
 app.get('/api/projects/:id/replies',(req,res)=>{const p=owned(req,res);if(!p)return;res.json(db.prepare('SELECT body FROM replies WHERE project=?').all(p.id).map(r=>JSON.parse(r.body)));});
 app.get('/api/projects/:id/qr',async(req,res)=>{const p=owned(req,res);if(!p)return;if(!p.paid||!p.published)return res.status(409).json({error:'Publish your invitation before sharing.'});try{const svg=await QRCode.toString(origin+'/invite.html?e='+encodeURIComponent(p.id),{type:'svg',errorCorrectionLevel:'M',margin:4,color:{dark:'#203e36',light:'#ffffff'}});res.type('image/svg+xml').send(svg);}catch(_){res.status(500).json({error:'Could not generate the QR code.'});}});
