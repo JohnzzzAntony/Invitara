@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
 
 :root{--cinema-ink:#f7f4ee;--cinema-panel:#fffdfa;--cinema-paper:#1c2942;--cinema-muted:#657084;--cinema-accent:#b45d47;--cinema-line:#dcd5ca;--cinema-display:'Cormorant Garamond',Georgia,serif;--cinema-body:'DM Sans',sans-serif}
 [data-page=home] .home-discovery,[data-page=home] .collection-section,[data-page=home] .studio-steps,[data-page=collection] .collection-section{position:relative;isolation:isolate;width:100%;max-width:none;margin:0;padding:clamp(62px,9vw,130px) max(24px,calc((100vw - 1440px)/2));overflow:hidden;background:var(--cinema-ink);color:var(--cinema-paper);border-top:1px solid var(--cinema-line)}
@@ -69,4 +69,17 @@
 [data-page=home] .carousel-pagination .carousel-dot:focus-visible{outline:2px solid var(--cinema-accent);outline-offset:4px}
 @media(max-width:767px){[data-page=home] .home-discovery,[data-page=home] .collection-section,[data-page=home] .studio-steps,[data-page=collection] .collection-section{padding:62px 18px}[data-page=home] .home-discovery>h2,[data-page=home] .collection-section h2,[data-page=home] .studio-steps>h2{font-size:clamp(48px,13vw,76px)}[data-page=collection] .collection-card{transform:none!important;filter:none!important;will-change:auto}[data-page=home] #home-occasions .occasion-photo-card{transform:none!important;filter:none!important;will-change:auto}[data-page=home] #home-experiences.experience-stack>.experience-card{transform:none!important;filter:none!important;will-change:auto}}
 @media(max-width:600px){[data-page=home] .collection-carousel{height:clamp(390px,116vw,470px)}[data-page=home] .collection-carousel .collection-card-top h3{font-size:22px}}
+
+/* Compact Manrope typography and an evenly sized occasion gallery. */
+[data-page=home]{--font-ui:'Manrope',sans-serif;--studio-sans:'Manrope',sans-serif;--studio-serif:'Manrope',sans-serif;--cinema-display:'Manrope',sans-serif;--cinema-body:'Manrope',sans-serif;font-family:'Manrope',sans-serif}
+[data-page=home] .home-discovery>h2,[data-page=home] .collection-section h2,[data-page=home] .studio-steps>h2{max-width:850px;font-size:clamp(30px,4vw,56px);font-weight:600;line-height:1.15;letter-spacing:-.04em;text-transform:none}
+[data-page=home] #home-occasions.occasion-parallax-gallery{height:auto;min-height:0;width:100%;max-width:1080px;margin:32px auto 64px;padding:20px;gap:20px;grid-template-columns:repeat(4,minmax(0,1fr));perspective:none;overflow:visible;border-radius:16px}
+[data-page=home] #home-occasions.occasion-parallax-gallery .occasion-photo-card{aspect-ratio:4/5;min-height:0;border-radius:12px;transform:none;filter:none;will-change:auto;transition:transform .45s cubic-bezier(.22,1,.36,1),box-shadow .45s ease}
+[data-page=home] #home-occasions.occasion-parallax-gallery .occasion-photo-card strong{font:600 clamp(17px,1.5vw,22px)/1.2 'Manrope',sans-serif;letter-spacing:-.025em;text-transform:none}
+[data-page=home] #home-occasions .occasion-photo-card .occasion-caption{inset:auto 36px 18px 16px}
+[data-page=home] #home-occasions .occasion-photo-card .occasion-note{font-family:'Manrope',sans-serif;font-size:11px;margin-top:6px}
+[data-page=home] #home-occasions .occasion-arrow{right:10px;bottom:18px;width:24px;height:24px}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){[data-page=home] #home-occasions .occasion-photo-card:is(:hover,:focus-visible){transform:translateY(-6px);filter:none;box-shadow:0 16px 30px -16px #1c294255}}
+@media(max-width:767px){[data-page=home] #home-occasions.occasion-parallax-gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:10px;margin:24px auto 40px}[data-page=home] #home-occasions .occasion-photo-card .occasion-caption{inset:auto 10px 12px}[data-page=home] #home-occasions .occasion-arrow{top:10px;bottom:auto}[data-page=home] #home-occasions .occasion-photo-card .occasion-note{font-size:10px}}
+@media(prefers-reduced-motion:reduce){[data-page=home] #home-occasions .occasion-photo-card{transition:none}}
 @media(prefers-reduced-motion:reduce){[data-page=collection] .collection-card,[data-page=home] #home-occasions .occasion-photo-card,[data-page=home] #home-experiences.experience-stack>.experience-card{transform:none!important;filter:none!important;will-change:auto}[data-page=home] .collection-carousel *{scroll-behavior:auto!important;transition-duration:0s!important;animation-duration:0s!important}}

@@ -1,7 +1,7 @@
 /* Scroll-linked depth for the occasion, template, and experience showcases. */
 (function(){
  'use strict';
- var cards='[data-page="home"] .occasion-photo-card,[data-page="home"] .collection-card,[data-page="collection"] .collection-card,.experience-card';
+ var cards='[data-page="home"] .collection-card,[data-page="collection"] .collection-card,.experience-card';
  var reduced=matchMedia('(prefers-reduced-motion: reduce)'),desktop=matchMedia('(min-width: 768px)'),frame=0;
  function paint(){
   frame=0;

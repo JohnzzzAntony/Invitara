@@ -9,11 +9,17 @@
  var columns=[];gallery.classList.add('occasion-gallery');gallery.setAttribute('aria-label','Explore invitations by occasion');
  for(var i=0;i<4;i++){var col=document.createElement('div');col.className='occasion-column';gallery.append(col);columns.push(col);}
  cards.forEach(function(card,index){var key=keys[index],label=card.querySelector('strong').textContent,icon=card.querySelector('.occasion-icon');card.className='occasion-photo-card';card.style.setProperty('--occasion-order',index);card.setAttribute('aria-label',label+' invitations');var img=document.createElement('img');img.src='assets/occasions/'+key+(['graduation','ramadan','eid'].includes(key)?'.svg':'.webp');img.alt='';img.width=640;img.height=820;img.loading='lazy';img.decoding='async';var caption=document.createElement('span');caption.className='occasion-caption';var title=document.createElement('strong');title.textContent=label;var note=document.createElement('span');note.className='occasion-note';note.textContent=notes[index];caption.append(title,note);var arrow=document.createElement('span');arrow.className='occasion-arrow';arrow.setAttribute('aria-hidden','true');arrow.textContent='↗';card.replaceChildren(img,icon,caption,arrow);columns[index%4].append(card);});
- var reduced=matchMedia('(prefers-reduced-motion: reduce)'),desktop=matchMedia('(min-width: 768px)'),frame=0,visible=false,travel=[2,3.3,1.25,3];
+ var reduced=matchMedia('(prefers-reduced-motion: reduce)'),animations=[];
  gallery.classList.add('occasion-parallax-gallery');
- function update(){frame=0;var enabled=!reduced.matches&&desktop.matches;var rect=gallery.getBoundingClientRect(),p=Math.max(0,Math.min(1,(innerHeight-rect.top)/(innerHeight+rect.height)));columns.forEach(function(col,i){col.style.transform=enabled?'translate3d(0,'+(p*innerHeight*travel[i])+'px,0)':'';});}
- function queue(){if(!frame&&visible)frame=requestAnimationFrame(update);}
- var observer=new IntersectionObserver(function(entries){visible=entries[0].isIntersecting;if(visible)queue();},{rootMargin:'150px'});observer.observe(gallery);
- addEventListener('scroll',queue,{passive:true});addEventListener('resize',update,{passive:true});reduced.addEventListener('change',update);desktop.addEventListener('change',update);update();
- addEventListener('pagehide',function(){cancelAnimationFrame(frame);});
+ var observer=new IntersectionObserver(function(entries){entries.forEach(function(entry){
+  if(!entry.isIntersecting)return;
+  observer.unobserve(entry.target);
+  if(reduced.matches)return;
+  var index=cards.indexOf(entry.target);
+  var animation=entry.target.animate([{opacity:0,translate:'0 24px'},{opacity:1,translate:'0 0'}],{duration:650,delay:(index%4)*65,easing:'cubic-bezier(.22,1,.36,1)',fill:'backwards'});
+  animations.push(animation);animation.onfinish=function(){animations=animations.filter(function(item){return item!==animation;});};
+ });},{threshold:.08});
+ cards.forEach(function(card){observer.observe(card);});
+ reduced.addEventListener('change',function(){if(reduced.matches){animations.forEach(function(animation){animation.cancel();});animations=[];}});
+ addEventListener('pagehide',function(){animations.forEach(function(animation){animation.cancel();});});
 })();
