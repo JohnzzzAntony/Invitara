@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   var E = window;
-  var occasions = [['wedding','Wedding'],['engagement','Engagement'],['save-date','Save the Date'],['birthday','Birthday'],['anniversary','Anniversary'],['baby','Baby Shower'],['bridal','Bridal Shower'],['graduation','Graduation'],['party','Party'],['corporate','Corporate Event'],['ramadan','Ramadan'],['eid','Eid'],['holiday','Holiday'],['housewarming','Housewarming'],['other','Other']];
+  var occasions = [['wedding','Wedding'],['engagement','Engagement'],['save-date','Save the Date'],['birthday','Birthday'],['anniversary','Anniversary'],['baby','Baby Shower'],['bridal','Bridal Shower'],['graduation','Graduation'],['party','Party'],['corporate','Corporate Event'],['ramadan','Ramadan'],['eid','Eid'],['holiday','Holiday'],['housewarming','Housewarming'],['brand-launch','Brand Launch'],['store-opening','Store Opening'],['product-launch','Product Launch'],['restaurant-opening','Restaurant Opening'],['property-launch','Property Launch'],['other','Other']];
   var experiences = {
     classic:{name:'Classic',description:'An elegant invitation that unfolds naturally as you scroll.',features:['Elegant vertical layout','Responsive typography','Embedded RSVP']},
     story:{name:'Story',description:'A story told in beautiful chapters, photographs and quiet moments.',features:['Progressive scroll reveals','Chapter navigation','Immersive photographs']},

@@ -22,3 +22,14 @@
 [data-page=home] #home-occasions .occasion-photo-card .occasion-caption strong{text-align:left;margin:0}
 [data-page=home] #home-occasions .occasion-photo-card .occasion-note{display:block;width:auto;height:auto;margin:10px 0 0;padding:0;background:none;border:0;border-radius:0;box-shadow:none;font:400 11px/1.5 var(--studio-sans);color:#f1ece3;text-align:left}
 @media(max-width:767px){[data-page=home] #home-occasions .occasion-photo-card .occasion-caption{inset:auto 12px 16px}[data-page=home] #home-occasions .occasion-photo-card .occasion-note{font-size:10px;margin-top:7px}}
+[data-page=home] #home-occasions.occasion-parallax-gallery{position:relative;height:220svh;min-height:1000px;grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch;gap:2vw;box-sizing:border-box;margin:36px -20px 70px;padding:2vw;overflow:hidden;border-radius:0;background:#fff}
+[data-page=home] .home-discovery{overflow:visible}
+.occasion-parallax-gallery .occasion-column{position:relative;display:flex;height:100%;min-height:0;gap:2vw;padding:0;will-change:transform}
+.occasion-parallax-gallery .occasion-column:nth-child(2){top:-95%;padding:0}
+.occasion-parallax-gallery .occasion-column:nth-child(3){top:-45%;padding:0}
+.occasion-parallax-gallery .occasion-column:nth-child(4){top:-75%;padding:0}
+[data-page=home] #home-occasions.occasion-parallax-gallery .occasion-photo-card{flex:1 1 0;min-height:0;aspect-ratio:auto;border-radius:8px;box-shadow:0 16px 34px -24px #1c243c60}
+.occasion-parallax-gallery .occasion-caption{left:18px;right:18px;bottom:20px}
+[data-page=home] #home-occasions.occasion-parallax-gallery .occasion-photo-card strong{font-size:clamp(20px,2vw,30px)}
+@media(max-width:767px){[data-page=home] #home-occasions.occasion-parallax-gallery{height:auto;min-height:0;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:24px -8px 48px;padding:12px;background:#fff;border-radius:14px}.occasion-parallax-gallery .occasion-column{display:contents}.occasion-parallax-gallery .occasion-column:nth-child(n){top:auto;padding:0}.occasion-parallax-gallery .occasion-photo-card{order:var(--occasion-order,0)}[data-page=home] #home-occasions.occasion-parallax-gallery .occasion-photo-card{aspect-ratio:3/4;min-height:0;border-radius:10px}.occasion-parallax-gallery .occasion-caption{left:12px;right:12px;bottom:14px}[data-page=home] #home-occasions.occasion-parallax-gallery .occasion-photo-card strong{font-size:clamp(19px,5vw,25px)}}
+@media(prefers-reduced-motion:reduce){.occasion-parallax-gallery .occasion-column{transform:none!important}}

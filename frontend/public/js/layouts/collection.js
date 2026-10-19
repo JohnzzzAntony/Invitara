@@ -129,7 +129,7 @@
         if(s.items)spec.list={k:'items',label:'Moment',blank:function(){return{time:'18:00',title:'A new moment',text:'Tell your guests what to expect.'};},fields:[F('time','Time / day'),F('title','Title'),F('text','Description','textarea')]};
         return spec;
       }),defaults:function(){return JSON.parse(JSON.stringify(def));},render:render,
-      mini:function(d,t){var box=document.createElement('div');box.className='ex-mini';box.setAttribute('aria-hidden','true');var inner=render(d,t,{mini:true});box.appendChild(inner);inner.style.width='390px';inner.style.transformOrigin='top left';function fit(){inner.style.transform='scale('+(box.clientWidth/390)+')';}if(window.ResizeObserver){var ro=new ResizeObserver(fit);ro.observe(box);box.__dispose=function(){ro.disconnect();};}requestAnimationFrame(fit);return box;}
+      mini:function(d,t,opts){opts=opts||{};var box=document.createElement('div');box.className='ex-mini';box.setAttribute('aria-hidden','true');var inner=render(d,t,{mini:true});box.appendChild(inner);inner.style.width='390px';inner.style.transformOrigin='top left';function fit(){var scale=box.clientWidth/390;if(opts.square&&box.clientHeight){var hero=inner.querySelector('.vellum-hero,.nocturne-hero,.confetti-hero,.bloom-hero,.atlas-hero')||inner.firstElementChild||inner,heroHeight=Math.max(hero.scrollHeight,hero.offsetHeight,1);scale=Math.min(scale,box.clientHeight/heroHeight);inner.style.left='50%';inner.style.transformOrigin='top center';inner.style.transform='translateX(-50%) scale('+scale+')';}else inner.style.transform='scale('+scale+')';}if(window.ResizeObserver){var ro=new ResizeObserver(fit);ro.observe(box);box.__dispose=function(){ro.disconnect();};}requestAnimationFrame(fit);return box;}
     });
   });
 })();

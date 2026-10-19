@@ -9,7 +9,7 @@ try{
  await page.goto(origin+'/create.html');await page.locator('.collection-card').first().waitFor();
  const catalogue=await page.evaluate(()=>window.INVITARA_availableTemplates().filter(t=>!t.premium&&t.artDirection).map(t=>({id:t.id,key:t.artDirection,occasion:t.occasion,scene:t.editionScene})));
  assert.equal(catalogue.length,15);assert.equal(new Set(catalogue.map(t=>t.occasion)).size,15);assert.equal(new Set(catalogue.map(t=>t.key)).size,15);
- await page.locator('#load-more').click();assert.equal(await page.locator('.collection-card').count(),21);assert.equal(await page.locator('canvas').count(),0,'Catalogue must not allocate WebGL contexts');await page.screenshot({path:'artifacts/editions/collection-desktop.png',fullPage:true});
+ while(await page.locator('#load-more').isVisible())await page.locator('#load-more').click();assert.equal(await page.locator('.collection-card').count(),27);assert.equal(await page.locator('canvas').count(),0,'Catalogue must not allocate WebGL contexts');await page.screenshot({path:'artifacts/editions/collection-desktop.png',fullPage:true});
  for(const width of [320,375,390,414,768,1024,1280,1440,1920]){await page.setViewportSize({width,height:1000});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'Catalogue overflow '+width);}
  for(const t of catalogue){
   await page.setViewportSize({width:390,height:844});await page.goto(origin+'/demo.html?id='+t.id);if(await page.locator('.ed-opening-button').count())await page.locator('.ed-opening-button').click();await page.locator('.edition-'+t.key+' .ed-hero').waitFor();assert.equal(await page.locator('.ed-scene canvas').count(),0,'Reduced motion does not load WebGL');
