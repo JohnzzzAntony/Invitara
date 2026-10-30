@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
 
 :root{--cinema-ink:#f7f4ee;--cinema-panel:#fffdfa;--cinema-paper:#1c2942;--cinema-muted:#657084;--cinema-accent:#b45d47;--cinema-line:#dcd5ca;--cinema-display:'Cormorant Garamond',Georgia,serif;--cinema-body:'DM Sans',sans-serif}
 [data-page=home] .home-discovery,[data-page=home] .collection-section,[data-page=home] .studio-steps,[data-page=collection] .collection-section{position:relative;isolation:isolate;width:100%;max-width:none;margin:0;padding:clamp(62px,9vw,130px) max(24px,calc((100vw - 1440px)/2));overflow:hidden;background:var(--cinema-ink);color:var(--cinema-paper);border-top:1px solid var(--cinema-line)}
