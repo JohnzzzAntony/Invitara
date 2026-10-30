@@ -111,3 +111,8 @@ img:not([src$=".svg"]):not([src*="logo"]), video, picture img {
   .studio .premium-showroom-bar { grid-template-columns: auto minmax(0, 1fr) auto !important; grid-template-areas: 'back title favorite' 'modes modes modes' !important; }
   .studio .premium-showroom-footer > span, .studio .premium-showroom-footer .showroom-detail { display: none; }
 }
+/* Template-fixed bottom bars sit above the preview footer instead of under it. */
+.premium-showroom .hw-nav { bottom: calc(49px + 14px); }
+/* Card "experience" arrow was #222 on near-black; brand square with white arrow. */
+.studio .card-experience { background: var(--brand) !important; color: #fff !important; }
+.studio .card-experience:hover { background: #2e2725 !important; }

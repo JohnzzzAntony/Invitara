@@ -11,7 +11,7 @@
     var reduced=matchMedia('(prefers-reduced-motion: reduce)');
     var cover=root.querySelector('.ex-cover'),open=root.querySelector('[data-open]');
     var gs=opts&&opts.editing?null:E.gsap,context=gs?gs.context(function(){},root):null;
-    var scroller=root.closest('.ed-canvas-wrap');
+    var scroller=root.closest('.ed-canvas-wrap')||window.EVER_scrollHost(root);
     var active=true;
     function on(el,event,fn,options){el.addEventListener(event,fn,options);clean.push(function(){el.removeEventListener(event,fn,options);});}
     function tween(fn){if(context)context.add(fn);else fn();}

@@ -146,3 +146,9 @@
 .demo-body:has(.hw-entered) .demo-bar{visibility:visible;opacity:1;pointer-events:auto}
 @media(max-width:600px){.edition-aangan.hw-scroll-experience .nx-section.hw-hero{padding:95px 7% 55px}.edition-aangan.hw-scroll-experience .hw-title{font-size:clamp(39px,10.5vw,58px);margin:20px auto}.hw-scroll-experience .hw-enter{margin:0}.hw-scroll-experience .hw-hosts{margin:22px auto}.hw-scroll-experience .hw-portal-layer .hw-architecture{width:min(94%,calc(var(--hw-stage-height)*.68));max-width:460px;aspect-ratio:.83}.hw-scroll-cue{bottom:max(25px,env(safe-area-inset-bottom));font-size:10px}.hw-scroll-experience .hw-sample{font-size:8px}}
 @media(max-height:600px){.edition-aangan.hw-scroll-experience .nx-section.hw-hero{justify-content:flex-start;padding-top:90px}.hw-scroll-experience .hw-scroll-cue{bottom:12px}.hw-scroll-cue span{height:12px;margin-top:5px}}
+
+/* Aangan sections are full-bleed bands; the shared 1180px card cap left a gap on wide screens. */
+.edition-aangan.nx .nx-section{max-width:none}
+/* Card thumbnails render at phone width: stack the hero so the title keeps whole words. */
+.ex-mini .hw-hero-grid{grid-template-columns:1fr;min-height:0}
+.ex-mini .hw-title{font-size:44px}

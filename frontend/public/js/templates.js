@@ -880,6 +880,8 @@
   window.EVER_tickCountdowns = tickCountdowns;
   window.EVER_bindSite = bindSite;
   window.EVER_esc = esc;
+  // Nearest scrolling ancestor (editor canvas, preview dialog, demo frame); null means the window scrolls.
+  window.EVER_scrollHost = function (el) { for (var n = el && el.parentElement; n && n !== document.body; n = n.parentElement) { if (/(auto|scroll)/.test(getComputedStyle(n).overflowY)) return n; } return null; };
   window.EVER_safeUrl = safeUrl;
   window.EVER_photoSrc = photoSrc;
   window.EVER_fmtHeroDate = fmtHeroDate;
