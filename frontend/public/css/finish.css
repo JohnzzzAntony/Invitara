@@ -58,7 +58,7 @@ img:not([src$=".svg"]):not([src*="logo"]), video, picture img {
   --brand: #443B38;
   --lux-ink: var(--brand); --lux-accent: var(--brand);
   --studio-ink: var(--brand); --olive: var(--brand); --olive-deep: var(--brand); --gold: var(--brand);
-  --cinema-paper: var(--brand); --cinema-accent: var(--brand); --cinema-muted: #7a706c; --studio-muted: #6f6663;
+  --cinema-paper: var(--brand); --cinema-accent: var(--brand); --cinema-muted: #6f6663; --studio-muted: #6f6663;
 }
 ::selection, body.studio ::selection { background: var(--brand); color: #fff; }
 .ui-scroll-progress { background: var(--brand) !important; }
@@ -116,3 +116,10 @@ img:not([src$=".svg"]):not([src*="logo"]), video, picture img {
 /* Card "experience" arrow was #222 on near-black; brand square with white arrow. */
 .studio .card-experience { background: var(--brand) !important; color: #fff !important; }
 .studio .card-experience:hover { background: #2e2725 !important; }
+/* UI/UX floor: readable sizes, AA contrast, comfortable measure, 44px tap areas. */
+.studio :is(.occasion-note, .footer-heading, .discovery-sidebar legend, .collection-selector legend, .step > span) { font-size: 12px !important; }
+.studio .experience-price-meta b { color: var(--brand) !important; }
+.studio main p { max-width: 72ch; }
+.studio .carousel-dot { position: relative; }
+.studio .carousel-dot::after { content: ''; position: absolute; inset: -18px -6px; }
+.studio .detail-hint { margin-inline: auto; color: var(--studio-muted) !important; }
