@@ -1,0 +1,87 @@
+/* Site-wide finish: one typeface, quiet imagery, no eyebrow labels. Loaded last on every page. */
+
+/* One font everywhere, including JS-rendered templates. Icon-font elements keep their glyph font. */
+html, body,
+body *:not([class^="ti-"]):not([class*=" ti-"]):not([class^="flaticon"]):not([class*=" flaticon"]) {
+  font-family: "Inter Tight", system-ui, -apple-system, "Segoe UI", sans-serif !important;
+}
+body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+h1, h2, h3, h4 { text-wrap: balance; letter-spacing: -0.02em; }
+p, li { text-wrap: pretty; }
+
+/* Eyebrows / kickers removed: decorative labels above headings that repeat the heading. */
+.kicker, .nx-kicker, .studio-kicker, .suite-kicker, .business-kicker,
+.ed-eyebrow, .ed-opening-eyebrow, .hw-eyebrow, .ex-eyebrow,
+.cover-copy > span:first-child, .cover-copy > small,
+.vellum-number, .business-chapter, .suite-chapter, .hw-topline, .sf-topline { display: none !important; }
+
+/* Minimal, premium image grade: softer saturation, gentle contrast. Logos and SVG art untouched. */
+img:not([src$=".svg"]):not([src*="logo"]), video, picture img {
+  filter: saturate(.82) contrast(1.04) brightness(1.01);
+}
+
+/* Sharp corners on every card, button, input, panel and image.
+   Round stays only where the circle carries meaning: radios, dots/indicators, avatars/seals, spinners, CSS-drawn art.
+   shortcut: exemptions match class-name fragments, add a fragment here if a new round shape gets squared. */
+*:not(input[type="radio"]):not(.rounded-circle):not(.tpl-swatch):not(.ex-index):not(.sf-live):not(.price-check):not([class*="dot"]):not([class*="seal"]):not([class*="avatar"]):not([class*="spinner"]):not([class*="circle"]):not([class*="orb"]):not([class*="moon"]):not([class*="halo"]):not([class*="ring"]):not([class*="crest"]):not([class*="knob"]):not([class*="heart"]):not([class*="sticker"]):not([class*="cloud"]):not([class*="hills"]):not([class*="-arch"]):not([class*="crescent"]):not([class*="disco"]):not([class*="record"]):not([class*="petal"]) {
+  border-radius: 0 !important;
+}
+
+/* Visible keyboard focus everywhere. */
+:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+
+/* Template filters: off-canvas drawer, closed until "Filters" is pressed (native popover: Esc + outside click close it). */
+.studio .discovery { grid-template-columns: minmax(0, 1fr) !important; }
+.studio .discovery > * { grid-column: 1 / -1 !important; grid-row: auto !important; }
+.collection-tools > label:first-of-type { flex: 1; }
+.filter-toggle { min-height: 44px; padding: 0 20px; border: 1px solid currentColor; background: transparent; color: inherit; font-size: 14px; font-weight: 500; cursor: pointer; }
+.discovery-sidebar[popover] {
+  position: fixed; inset: 0 auto 0 0; width: min(340px, 88vw); height: 100dvh; max-height: none; margin: 0;
+  padding: 24px; border: 0; border-right: 1px solid var(--studio-line, #e3e5de); background: var(--surface, #faf8f2); color: inherit;
+  overflow-y: auto; translate: -100% 0;
+  transition: translate .3s ease, display .3s allow-discrete, overlay .3s allow-discrete;
+}
+.discovery-sidebar[popover]:popover-open { translate: 0 0; }
+@starting-style { .discovery-sidebar[popover]:popover-open { translate: -100% 0; } }
+.discovery-sidebar[popover]::backdrop { background: rgba(18, 20, 16, .35); }
+.discovery-sidebar[popover] .filter-heading { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+.discovery-sidebar[popover] .filter-heading h2 { flex: 1; font-size: 18px; }
+.filter-close { min-width: 44px; min-height: 44px; border: 0; background: transparent; color: inherit; font-size: 24px; line-height: 1; cursor: pointer; }
+.discovery-sidebar[popover] fieldset { display: block !important; border: 0; margin: 0 0 24px; }
+.discovery-sidebar[popover] legend { margin-bottom: 10px; font-weight: 600; }
+.discovery-sidebar[popover] fieldset div { display: flex; flex-direction: row; flex-wrap: wrap; gap: 8px; overflow: visible; }
+.discovery-sidebar[popover] fieldset button { white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .discovery-sidebar[popover] { transition: none; } }
+
+/* Single brand colour #443B38: every brand token points at it; neutrals stay neutral. */
+:root {
+  --brand: #443B38;
+  --lux-ink: var(--brand); --lux-accent: var(--brand);
+  --studio-ink: var(--brand); --olive: var(--brand); --olive-deep: var(--brand); --gold: var(--brand);
+  --cinema-paper: var(--brand); --cinema-accent: var(--brand); --cinema-muted: #7a706c; --studio-muted: #6f6663;
+}
+::selection, body.studio ::selection { background: var(--brand); color: #fff; }
+.ui-scroll-progress { background: var(--brand) !important; }
+.occasion-icon { color: var(--brand) !important; }
+[data-page=home] .carousel-pagination .carousel-dot { background: rgba(68, 59, 56, .22); }
+
+/* Motion: short, purposeful feedback on interactive elements (100–300ms, ease-out). */
+.studio a, .studio button, .studio input, .studio select, .studio textarea {
+  transition: color .2s ease-out, background-color .2s ease-out, border-color .2s ease-out, transform .2s ease-out, box-shadow .2s ease-out;
+}
+.studio-button:hover, .studio-pill:hover, .filter-toggle:hover { transform: translateY(-1px); }
+.studio-button:active, .studio-pill:active, .filter-toggle:active { transform: translateY(0) scale(.98); }
+.collection-card, .occasion-grid a, .pricing-card { transition: transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s ease-out; }
+.collection-card:hover, .occasion-grid a:hover, .pricing-card:hover { transform: translateY(-4px); box-shadow: 0 14px 30px -18px rgba(68, 59, 56, .45); }
+.collection-card img, .occasion-grid a img { transition: transform .6s cubic-bezier(.22,1,.36,1); }
+.collection-card:hover img, .occasion-grid a:hover img { transform: scale(1.03); }
+@media (prefers-reduced-motion: reduce) {
+  .studio *, .studio *::before, .studio *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+  .collection-card:hover, .occasion-grid a:hover, .pricing-card:hover, .collection-card:hover img, .occasion-grid a:hover img { transform: none; }
+}
+
+/* Selected filters and focused fields in the brand colour (they were green). */
+.studio .collection-selector button[aria-pressed="true"],
+.studio .discovery-sidebar button[aria-pressed="true"],
+.studio .studio-filter[aria-pressed="true"] { background: var(--brand) !important; color: #fff !important; border-color: var(--brand) !important; }
+.studio :is(.collection-tools input, .collection-tools select, .studio-form input, .studio-form select, .studio-form textarea):focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(68, 59, 56, .12); }
