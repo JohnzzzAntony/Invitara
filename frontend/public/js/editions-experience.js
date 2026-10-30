@@ -48,44 +48,85 @@
   if(key==='postmark'&&trigger){var date=hero.querySelector('.ed-date');date.classList.add('ed-sealed-date');trigger.setAttribute('aria-expanded','false');on(trigger,'click',function(e){if(trigger.getAttribute('aria-expanded')==='true')return;e.preventDefault();e.stopImmediatePropagation();date.classList.remove('ed-sealed-date');trigger.setAttribute('aria-expanded','true');trigger.querySelector('span').textContent='The details are yours';date.setAttribute('role','status');root.dispatchEvent(new CustomEvent('edition-reveal',{detail:{node:date}}));},true);}
   if(key==='mosaic'&&trigger){root.classList.add('ed-courtyard-closed');trigger.setAttribute('aria-expanded','false');on(trigger,'click',function(e){if(trigger.getAttribute('aria-expanded')==='true')return;e.preventDefault();e.stopImmediatePropagation();root.classList.remove('ed-courtyard-closed');root.classList.add('ed-courtyard-open');trigger.setAttribute('aria-expanded','true');trigger.querySelector('span').textContent='Come on in';root.dispatchEvent(new CustomEvent('edition-reveal',{detail:{node:hero.querySelector('.ed-courtyard-copy')}}));},true);}
   var opening,openingAnimations=[],openingStarted=false,startMotion=function(){};
+  // [eyebrow, button, label, signature object]; each object is a short keyframe script below.
   var entrances={
-   orbit:['The next chapter begins','Open the ring box','YES, TO US','ringbox'],
-   postmark:['A little note, just for you','Unseal the invitation','WITH LOVE','envelope'],
+   vow:['Two lives, one story','Untie the ribbon','OUR VOWS','vowbook'],
+   orbit:['The next chapter begins','Bring the rings together','YES, TO US','orbit'],
+   postmark:['A little note, just for you','Postmark the letter','SAVE THE DATE','postmark'],
    encore:['Your name is on the list','Tear your ticket','ADMIT ONE','ticket'],
    archive:['A lifetime of little moments','Open our album','OUR STORY','album'],
-   universe:['Someone wonderful is on the way','Welcome our little wonder','HELLO, LITTLE ONE','nursery'],
-   petal:['An afternoon in full bloom','Unwrap the flowers','THE PETAL SOCIETY','botanical'],
-   next:['You are part of what comes next','Unroll the announcement','THE NEXT CHAPTER','scroll'],
-   disco:['The evening belongs to you','Draw the curtains','AFTER DARK','curtain'],
-   form:['An invitation to think forward','Open your invitation','FORM / FUTURE','folder'],
-   majlis:['An evening of light and gratitude','Open the lantern screen','UNDER ONE MOON','lantern'],
-   mosaic:['Our doors are open to you','Enter the courtyard','EID MUBARAK','doors'],
-   solstice:['A little warmth, wrapped for you','Unwrap the gathering','IN GOOD COMPANY','parcel'],
-   elsewhere:['Somewhere worth being together','Open the travel wallet','YOU ARE INVITED','wallet']
+   universe:['Someone wonderful is on the way','Set the stars in motion','HELLO, LITTLE ONE','universe'],
+   petal:['An afternoon in full bloom','Let it bloom','THE PETAL SOCIETY','bloom'],
+   next:['You are part of what comes next','Toss the cap','THE NEXT CHAPTER','graduation'],
+   disco:['The evening belongs to you','Drop the mirrorball','AFTER DARK','mirrorball'],
+   form:['An invitation to think forward','Open the structure','FORM / FUTURE','structure'],
+   majlis:['An evening of light and gratitude','Light the lantern','UNDER ONE MOON','lantern'],
+   mosaic:['Our doors are open to you','Turn the mosaic','EID MUBARAK','mosaic'],
+   solstice:['A little warmth, wrapped for you','Raise the winter moon','IN GOOD COMPANY','solstice'],
+   elsewhere:['Somewhere worth being together','Take your boarding pass','YOU ARE INVITED','boarding']
+  };
+  function many(cls,n,style){var out='';for(var i=0;i<n;i++)out+='<i class="'+cls+'" style="'+(style?style(i):'')+'"></i>';return out;}
+  var L='<span class="o-label"></span>';
+  var objects={
+   vowbook:'<div class="o-page">'+L+'</div><div class="o-cover"><span class="o-mono">✦</span></div><i class="o-ribbon o-ribbon-l"></i><i class="o-ribbon o-ribbon-r"></i><i class="o-bow"></i>',
+   orbit:'<i class="o-stars"></i><div class="o-orbit"><i class="o-ring o-ring-a"></i></div><div class="o-orbit"><i class="o-ring o-ring-b"></i></div><i class="o-flare"></i>'+L,
+   postmark:'<i class="o-env-back"></i><div class="o-letter">'+L+'</div><i class="o-env-front"></i><i class="o-flap"></i><i class="o-stamp"></i><i class="o-postmark"></i>',
+   ticket:'<div class="o-ticket">'+L+'<small>ROW A · SEAT 01</small></div><div class="o-stub"><i></i></div>'+many('o-bit',10),
+   album:'<i class="o-photo"></i><i class="o-photo"></i><i class="o-photo"></i><div class="o-album">'+L+'</div>',
+   universe:'<i class="o-path"></i><i class="o-path"></i><i class="o-path"></i><div class="o-orbit"><i class="o-sat"></i></div><div class="o-orbit"><i class="o-sat"></i></div><div class="o-orbit"><i class="o-sat"></i></div><i class="o-core"></i>'+L,
+   bloom:many('o-petal',8,function(i){return 'transform:rotate('+i*45+'deg) scale(.55)';})+'<i class="o-heart"></i>'+L,
+   graduation:'<div class="o-paper">'+L+'</div><i class="o-roll o-roll-l"></i><i class="o-roll o-roll-r"></i><div class="o-cap"><i class="o-crown"></i><i class="o-board"></i><i class="o-tassel"></i></div>',
+   mirrorball:many('o-beam',4)+'<div class="o-drop"><i class="o-string"></i><div class="o-ball"><i class="o-facets"></i></div></div>'+L,
+   structure:L+many('o-slab',4),
+   lantern:'<i class="o-moon"></i><i class="o-glow"></i><div class="o-lantern"><i class="o-cap"></i><div class="o-body"><i class="o-light"></i></div><i class="o-base"></i></div>'+L,
+   mosaic:'<div class="o-star"></div>'+L+many('o-tile',8,function(i){return 'transform:rotate('+i*45+'deg)';})+'<i class="o-rosette"></i>',
+   solstice:'<i class="o-sky"></i><i class="o-moon"></i><i class="o-ridge o-ridge-back"></i><i class="o-ridge o-ridge-front"></i>'+many('o-flake',12,function(i){return 'left:'+(6+i*7.6)+'%;top:'+(i%3*9)+'%';})+L,
+   boarding:'<div class="o-pass">'+L+'<small>GATE 01 · SEAT 1A</small><i class="o-code"></i></div><div class="o-pocket"></div><i class="o-visa">ARRIVED</i>'
+  };
+  // [selector, keyframes | fn(index), duration, delay, easing, stagger] — every script ends by ~1.15s.
+  var EASE='cubic-bezier(.22,.7,.18,1)',IN='cubic-bezier(.55,0,.8,.3)',SWING='cubic-bezier(.45,0,.2,1)';
+  function rot(a,rest){return {transform:'rotate('+a+'deg)'+(rest||'')};}
+  var moves={
+   vowbook:[['.o-bow',[{transform:'rotate(45deg)'},{transform:'rotate(45deg) scale(0)',opacity:0}],260,0,IN],['.o-ribbon-l',[{transform:'none'},{transform:'translateX(-130%)',opacity:0}],380,120,IN],['.o-ribbon-r',[{transform:'none'},{transform:'translateX(130%)',opacity:0}],380,120,IN],['.o-cover',[{transform:'rotateY(0)'},{transform:'rotateY(-165deg)'}],760,380,SWING],['.o-page',[{transform:'none'},{transform:'scale(1.06)'}],600,550,EASE]],
+   orbit:[['.o-orbit',[{transform:'rotate(0)'},{transform:'rotate(360deg)'}],1000,0,SWING],['.o-ring-a',[{transform:'translateX(-70px)'},{transform:'translateX(-22px)'}],1000,0,SWING],['.o-ring-b',[{transform:'translateX(70px)'},{transform:'translateX(22px)'}],1000,0,SWING],['.o-flare',[{transform:'scale(0)',opacity:0},{transform:'scale(1.6) rotate(45deg)',opacity:1,offset:.5},{transform:'scale(2.4) rotate(90deg)',opacity:0}],500,650,EASE]],
+   postmark:[['.o-postmark',[{transform:'scale(2.4) rotate(-40deg)',opacity:0},{transform:'rotate(-12deg)',opacity:.9}],260,0,IN],['.o-flap',[{transform:'rotateX(0)'},{transform:'rotateX(180deg)',opacity:1,offset:.7},{transform:'rotateX(180deg)',opacity:0}],520,320,SWING],['.o-letter',[{transform:'none'},{transform:'translateY(-42%)'}],520,640,EASE]],
+   ticket:[['.o-stub',[{transform:'none'},{transform:'rotate(5deg)',offset:.25},{transform:'translate(30px,160px) rotate(32deg)',opacity:0}],720,0,IN],['.o-ticket',[{transform:'none'},{transform:'translateX(10%) scale(1.04)'}],600,350,EASE],['.o-bit',function(i){var a=i/10*Math.PI*2,r=90+i%3*30;return [{transform:'scale(.4)',opacity:0},{opacity:1,offset:.2},{transform:'translate('+Math.round(Math.cos(a)*r)+'px,'+Math.round(Math.sin(a)*r)+'px) rotate('+i*70+'deg)',opacity:0}];},800,250,EASE]],
+   album:[['.o-album',[{transform:'rotateY(0)'},{transform:'rotateY(-160deg)',opacity:0}],650,0,SWING],['.o-photo',function(i){return [{transform:'none'},{transform:['translate(-88px,12px) rotate(-14deg)','translateY(-10px) scale(1.08)','translate(88px,16px) rotate(12deg)'][i]}];},650,380,EASE,60]],
+   universe:[['.o-path',[{transform:'scale(.2)',opacity:0},{transform:'none',opacity:.45}],800,100,EASE,80],['.o-orbit',function(i){return [rot(0),rot(200+i*70)];},1100,0,EASE],['.o-sat',function(i){return [{transform:'scale(.3)'},{transform:'translateX('+(56+i*30)+'px)'}];},900,80,EASE,60],['.o-core',[{transform:'none'},{transform:'scale(1.18)'}],1000,0,EASE]],
+   bloom:[['.o-petal',function(i){var a=i*45;return [rot(a,' scale(.55)'),Object.assign(rot(a+10),{offset:.4}),Object.assign(rot(a+50,' translateY(-150px) scale(.6)'),{opacity:0})];},950,0,'cubic-bezier(.3,.6,.3,1)',25],['.o-heart',[{transform:'none'},{transform:'scale(1.5)',opacity:0}],600,450,EASE]],
+   graduation:[['.o-cap',[{transform:'none'},{transform:'translate(30px,-230px) rotate(-340deg) scale(.7)',opacity:0}],850,0,'cubic-bezier(.2,.65,.35,1)'],['.o-paper',[{transform:'scaleX(.06)'},{transform:'none'}],700,300,EASE],['.o-roll-l',[{transform:'translateX(100%)'},{transform:'none'}],700,300,EASE],['.o-roll-r',[{transform:'translateX(-100%)'},{transform:'none'}],700,300,EASE]],
+   mirrorball:[['.o-drop',[{transform:'translateY(-46px)'},{transform:'translateY(8px)',offset:.7},{transform:'none'}],480,0,IN],['.o-facets',[rot(0),rot(140)],1150,0,'linear'],['.o-beam',function(i){var a=-50+i*33;return [rot(a,' scaleY(.3)'),{opacity:.85,offset:.35},Object.assign(rot(a+24),{opacity:0})];},750,300,EASE,40]],
+   structure:[['.o-slab',function(i){return [{transform:'none'},{transform:'translateX('+(i%2?118:-118)+'%)'}];},620,120,'cubic-bezier(.7,0,.2,1)',90],['.o-label',[{transform:'scale(.92)',opacity:.3},{transform:'none',opacity:1}],500,600,EASE]],
+   lantern:[['.o-lantern',[rot(0),Object.assign(rot(8),{offset:.3}),Object.assign(rot(-5),{offset:.6}),Object.assign(rot(2),{offset:.85}),rot(0)],1150,0,'ease-in-out'],['.o-light',[{opacity:0},{opacity:1}],500,150,EASE],['.o-glow',[{transform:'scale(.3)',opacity:0},{transform:'scale(1.9)',opacity:1}],900,250,EASE]],
+   mosaic:[['.o-tile',function(i){var a=i*45;return [rot(a),Object.assign(rot(a+90,' scale(.15)'),{opacity:0})];},700,0,'cubic-bezier(.6,0,.3,1)',35],['.o-rosette',[rot(0),rot(180,' scale(0)')],500,0,IN],['.o-star',[{transform:'rotate(-135deg) scale(0)'},{transform:'none'}],650,450,'cubic-bezier(.2,1.3,.4,1)'],['.o-label',[{opacity:0},{opacity:1}],400,750,EASE]],
+   solstice:[['.o-moon',[{transform:'none'},{transform:'translateY(-120px)'}],1050,0,EASE],['.o-ridge-back',[{transform:'rotate(-10deg)'},{transform:'rotate(-10deg) translateY(30px)'}],900,200,EASE],['.o-ridge-front',[{transform:'rotate(9deg)'},{transform:'rotate(9deg) translateY(60px)'}],900,200,EASE],['.o-flake',function(i){return [{transform:'translateY(-20px)',opacity:0},{opacity:.9,offset:.3},{transform:'translateY('+(110+i%4*25)+'px)',opacity:0}];},750,100,'linear',30],['.o-label',[{opacity:0},{opacity:1}],400,650,EASE]],
+   boarding:[['.o-pass',[{transform:'none'},{transform:'translateY(-72px)'}],600,0,EASE],['.o-visa',[{transform:'scale(2.2) rotate(-30deg)',opacity:0},{transform:'rotate(-10deg)',opacity:.9}],260,620,IN]]
   };
   if(hero&&entrances[key]){
-   var entrance=entrances[key];opening=document.createElement('section');opening.className='ed-opening ed-opening-'+entrance[3];opening.setAttribute('aria-label','Open your invitation');
+   var entrance=entrances[key],nameList=Array.from(hero.querySelectorAll('.ed-name')).map(function(node){return node.textContent.trim();}).filter(Boolean),photo=hero.querySelector('img');
+   opening=document.createElement('section');opening.className='ed-opening ed-opening-'+entrance[3];opening.setAttribute('aria-label','Open your invitation');
+   if(photo&&photo.src)opening.style.setProperty('--ed-photo','url('+JSON.stringify(photo.src)+')');
    var eyebrow=document.createElement('p');eyebrow.className='ed-opening-eyebrow';eyebrow.textContent=entrance[0];
-   var object=document.createElement('div');object.className='ed-opening-object';object.setAttribute('aria-hidden','true');object.innerHTML='<div class="ed-opening-inside"><span>YOU ARE INVITED</span></div><div class="ed-opening-leaf ed-opening-left"><span></span></div><div class="ed-opening-leaf ed-opening-right"><span></span></div><div class="ed-opening-seal">✦</div>';object.querySelector('.ed-opening-left span').textContent=entrance[2];
-   var names=document.createElement('h2');names.className='ed-opening-names';names.textContent=Array.from(hero.querySelectorAll('.ed-name')).map(function(node){return node.textContent;}).join(' & ')||'A celebration awaits';
+   var object=document.createElement('div');object.className='ed-opening-object';object.setAttribute('aria-hidden','true');object.innerHTML=objects[entrance[3]];object.querySelector('.o-label').textContent=entrance[2];
+   var mono=object.querySelector('.o-mono');if(mono&&nameList.length)mono.textContent=nameList.map(function(n){return n.charAt(0);}).join('&');
+   var names=document.createElement('h2');names.className='ed-opening-names';names.textContent=nameList.join(' & ')||'A celebration awaits';
    var openButton=document.createElement('button');openButton.type='button';openButton.className='ed-opening-button';openButton.textContent=entrance[1];openButton.setAttribute('aria-expanded','false');
    var caption=document.createElement('p');caption.className='ed-opening-caption';caption.textContent='A personal invitation · Tap to open';
    opening.append(eyebrow,object,names,openButton,caption);root.prepend(opening);root.classList.add('ed-awaiting-open');
    var concealed=Array.from(root.children).filter(function(node){return node!==opening;});concealed.forEach(function(node){node.inert=true;});
-   function finishOpening(){if(!opening||disposed)return;openingAnimations.forEach(function(a){a.cancel();});openingAnimations=[];root.classList.remove('ed-awaiting-open');root.dataset.opened='true';concealed.forEach(function(node){node.inert=false;});opening.remove();opening=null;
+   function finishOpening(){if(!opening||disposed)return;openingAnimations.forEach(function(a){a.onfinish=null;a.cancel();});openingAnimations=[];root.classList.remove('ed-awaiting-open');root.dataset.opened='true';concealed.forEach(function(node){node.inert=false;});opening.remove();opening=null;
     // The outer letter/doors already reveal these details; avoid a second gate.
     if(key==='postmark'){hero.querySelector('.ed-date')?.classList.remove('ed-sealed-date');trigger?.setAttribute('aria-expanded','true');}
     if(key==='mosaic'){root.classList.remove('ed-courtyard-closed');root.classList.add('ed-courtyard-open');trigger?.setAttribute('aria-expanded','true');}
     hero.tabIndex=-1;hero.focus({preventScroll:true});startMotion();
    }
-   function openInvitation(){if(openingStarted)return;openingStarted=true;openButton.setAttribute('aria-expanded','true');openButton.textContent='Opening your invitation…';
+   function openInvitation(){
+    if(openingStarted){finishOpening();return;} // a second tap skips the rest
+    openingStarted=true;openButton.setAttribute('aria-expanded','true');
     if(reduced.matches||root.dataset.motion==='none'){finishOpening();return;}
-    opening.classList.add('is-opening');
-    var leaves=opening.querySelectorAll('.ed-opening-leaf'),seal=opening.querySelector('.ed-opening-seal');
-    var transitions={ringbox:['rotateX(110deg)','translateY(20%)'],envelope:['rotateX(180deg)','translateY(110%)'],ticket:['translate(-110%, -12%) rotate(-12deg)','translate(115%, 18%) rotate(15deg)'],album:['rotateY(-150deg)','rotateY(15deg)'],nursery:['translateX(-105%)','translateX(105%)'],botanical:['translate(-80%, 70%) rotate(-50deg)','translate(80%, 70%) rotate(50deg)'],scroll:['translateY(-105%) scaleY(.08)','translateY(105%) scaleY(.08)'],curtain:['translateX(-100%) scaleX(.2)','translateX(100%) scaleX(.2)'],folder:['rotateY(-120deg)','rotateY(120deg)'],lantern:['translateY(-110%)','translateY(110%)'],doors:['rotateY(-105deg)','rotateY(105deg)'],parcel:['translateX(-115%) rotate(-8deg)','translateX(115%) rotate(8deg)'],wallet:['rotateX(130deg)','translateY(110%)']};
-    leaves.forEach(function(leaf,i){openingAnimations.push(leaf.animate([{transform:'none'},{transform:transitions[entrance[3]][i]}],{duration:1200,delay:120+i*90,easing:'cubic-bezier(.22,.7,.18,1)',fill:'forwards'}));});
-    openingAnimations.push(seal.animate([{transform:'scale(1)',opacity:1},{transform:'scale(1.3) translateY(15px)',opacity:0}],{duration:400,fill:'forwards'}));
-    var exit=opening.animate([{opacity:1},{opacity:0}],{duration:400,delay:1300,fill:'forwards'});openingAnimations.push(exit);exit.onfinish=finishOpening;
+    openButton.textContent='Skip';opening.classList.add('is-opening');var end=0;
+    moves[entrance[3]].forEach(function(m){object.querySelectorAll(m[0]).forEach(function(node,i){var delay=m[3]+i*(m[5]||0);end=Math.max(end,delay+m[2]);openingAnimations.push(node.animate(typeof m[1]==='function'?m[1](i):m[1],{duration:m[2],delay:delay,easing:m[4],fill:'forwards'}));});});
+    var exit=opening.animate([{opacity:1},{opacity:0}],{duration:300,delay:end-100,fill:'forwards'});openingAnimations.push(exit);exit.onfinish=finishOpening;
    }
    on(openButton,'click',openInvitation);on(object,'click',openInvitation);on(reduced,'change',function(){if(reduced.matches&&openingStarted)finishOpening();});
    clean.push(function(){openingAnimations.forEach(function(a){a.onfinish=null;a.cancel();});});

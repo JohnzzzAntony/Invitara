@@ -23,7 +23,7 @@ img:not([src$=".svg"]):not([src*="logo"]), video, picture img {
 /* Sharp corners on every card, button, input, panel and image.
    Round stays only where the circle carries meaning: radios, dots/indicators, avatars/seals, spinners, CSS-drawn art.
    shortcut: exemptions match class-name fragments, add a fragment here if a new round shape gets squared. */
-*:not(input[type="radio"]):not(.rounded-circle):not(.tpl-swatch):not(.ex-index):not(.sf-live):not(.price-check):not([class*="dot"]):not([class*="seal"]):not([class*="avatar"]):not([class*="spinner"]):not([class*="circle"]):not([class*="orb"]):not([class*="moon"]):not([class*="halo"]):not([class*="ring"]):not([class*="crest"]):not([class*="knob"]):not([class*="heart"]):not([class*="sticker"]):not([class*="cloud"]):not([class*="hills"]):not([class*="-arch"]):not([class*="crescent"]):not([class*="disco"]):not([class*="record"]):not([class*="petal"]) {
+*:not(input[type="radio"]):not(.rounded-circle):not(.tpl-swatch):not(.ex-index):not(.sf-live):not(.price-check):not([class*="dot"]):not([class*="seal"]):not([class*="avatar"]):not([class*="spinner"]):not([class*="circle"]):not([class*="orb"]):not([class*="moon"]):not([class*="halo"]):not([class*="ring"]):not([class*="crest"]):not([class*="knob"]):not([class*="heart"]):not([class*="sticker"]):not([class*="cloud"]):not([class*="hills"]):not([class*="-arch"]):not([class*="crescent"]):not([class*="disco"]):not([class*="record"]):not([class*="petal"]):not(.ed-opening-object *) {
   border-radius: 0 !important;
 }
 

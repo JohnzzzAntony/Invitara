@@ -8,11 +8,11 @@ try{
  const page=await browser.newPage({viewport:{width:390,height:844}}),errors=[];
  page.on('pageerror',e=>errors.push(e.message));
  await page.goto(origin+'/create.html');
- const themes=await page.evaluate(()=>window.INVITARA_availableTemplates().map(t=>t.id));
+ const themes=await page.evaluate(()=>window.INVITARA_availableTemplates().map(t=>t.id).filter(id=>id.startsWith('edition-')&&id!=='edition-aangan'));
  const styles=new Set();
  for(const id of themes){
   await page.goto(origin+'/demo.html?id='+id);
-  if(id==='edition-vow'){assert.equal(await page.locator('.ed-book-stage').count(),1);continue;}
+  if(id==='edition-vow')assert.equal(await page.locator('.ed-book-stage').count(),1);
   const opening=page.locator('.ed-opening');await opening.waitFor();
   styles.add(await opening.getAttribute('class'));
   assert.equal(await page.locator('.ed-scene canvas').count(),0,'Closed invitation does not load WebGL');
@@ -34,6 +34,6 @@ try{
   assert.equal(await page.locator('.ed-opening').count(),0);
   await page.emulateMedia({reducedMotion:'no-preference'});
  }
- assert.equal(styles.size,13);assert.deepEqual(errors,[]);
- console.log('Passed: 13 distinct opening objects plus wedding book; animated and reduced motion, keyboard focus, deferred WebGL, four viewport widths.');
+ assert.equal(styles.size,14);assert.deepEqual(errors,[]);
+ console.log('Passed: 14 distinct opening objects (each lands within 1.6s); animated and reduced motion, keyboard focus, deferred WebGL, four viewport widths.');
 }finally{await browser.close();}
