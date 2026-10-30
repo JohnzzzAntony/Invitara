@@ -63,12 +63,6 @@ body.studio { color: var(--studio-ink); background: var(--studio-paper); }
 .studio .section-intro > p { font-size: 15px; line-height: 1.8; }
 
 /* Consistent photographic tiles, without staggered columns or scroll stacking. */
-[data-page=home] #home-occasions.occasion-gallery { grid-template-columns: repeat(4,minmax(0,1fr)); margin: 32px 0 72px; padding: 0; gap: 20px; background: transparent; border-radius: 0; }
-[data-page=home] #home-occasions .occasion-column { display: contents; }
-[data-page=home] #home-occasions .occasion-photo-card { aspect-ratio: 4/5; border-radius: 8px; box-shadow: none; order: var(--occasion-order,0); }
-[data-page=home] #home-occasions .occasion-photo-card .occasion-icon { display: none; }
-[data-page=home] #home-occasions .occasion-photo-card strong { font-size: clamp(24px,2.4vw,34px); }
-[data-page=home] #home-occasions .occasion-photo-card .occasion-note { font-size: 12px; }
 [data-page=home] #home-experiences.experience-stack { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px; padding: 0; align-items: stretch; }
 [data-page=home] #home-experiences.experience-stack > .experience-card { position: relative; top: auto; z-index: auto; height: auto; min-height: 280px; width: 100%; grid-template-columns: 1.2fr 1fr; background: var(--surface-soft); color: var(--studio-ink); border: 0; border-radius: 8px; box-shadow: none; transform: none; }
 [data-page=home] #home-experiences .stack-copy { padding: 28px; }
@@ -160,10 +154,6 @@ body.studio { color: var(--studio-ink); background: var(--studio-paper); }
   [data-page=home] .hero-phone { width: 150px; }
   [data-page=home] .hero-phone:nth-of-type(4) { left: calc(50% - 75px); top: 36px; }
   [data-page=home] .hero-phone:nth-of-type(2), [data-page=home] .hero-phone:nth-of-type(3) { top: 72px; }
-  [data-page=home] #home-occasions.occasion-gallery { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin-bottom: 48px; }
-  [data-page=home] #home-occasions .occasion-photo-card { aspect-ratio: 3/4; }
-  [data-page=home] #home-occasions .occasion-photo-card strong { font-size: 26px; }
-  [data-page=home] #home-occasions .occasion-photo-card .occasion-note { font-size: 11px; }
   [data-page=home] #home-experiences.experience-stack { grid-template-columns: 1fr; gap: 20px; }
   [data-page=home] #home-experiences.experience-stack > .experience-card { grid-template-columns: 1fr 1fr; grid-template-rows: auto; min-height: 280px; }
   [data-page=home] #home-experiences .stack-visual { grid-row: auto; }

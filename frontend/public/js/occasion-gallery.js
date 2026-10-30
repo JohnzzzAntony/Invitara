@@ -1,25 +1,40 @@
-/* Occasion gallery adapted from user-supplied Skiper30 / Skiper UI
- * https://skiper-ui.com/ — inspired by https://www.siena.film/films/my-project-x
- * Native scrolling, bounded column movement, and complete reduced-motion fallback. */
+/* Occasion marquee: two rows of photo cards drifting in opposite directions.
+ * shop.js renders one link per occasion; this file restyles them and duplicates each row once
+ * (the copy is inert and hidden from assistive tech) so the CSS loop is seamless.
+ * Motion pauses on hover, keyboard focus, off-screen, or via the visible pause button (WCAG 2.2.2).
+ * Reduced motion: no drift, rows become swipeable scroll-snap strips. */
 (function(){
  'use strict';
  var gallery=document.getElementById('home-occasions');if(!gallery)return;
- var cards=Array.from(gallery.children),keys=['wedding','engagement','save-date','birthday','anniversary','baby','bridal','graduation','party','corporate','ramadan','eid','holiday','party','corporate','party','corporate','party','corporate','other'];
- var notes=['A beautiful beginning','The easiest yes','Something to look forward to','Another year, more magic','A love worth celebrating','A little wonder awaits','For the bride-to-be','Here’s to what comes next','Good people. Great memories.','Make a lasting impression','Gather in gratitude','Together in celebration','The joy of coming together','A new chapter at home','A first look at what’s next','Meet what’s coming','Doors open to something lovely','A new favourite table awaits','A place to call your own','Make it your own'];
- var columns=[];gallery.classList.add('occasion-gallery');gallery.setAttribute('aria-label','Explore invitations by occasion');
- for(var i=0;i<4;i++){var col=document.createElement('div');col.className='occasion-column';gallery.append(col);columns.push(col);}
- cards.forEach(function(card,index){var key=keys[index],label=card.querySelector('strong').textContent,icon=card.querySelector('.occasion-icon');card.className='occasion-photo-card';card.style.setProperty('--occasion-order',index);card.setAttribute('aria-label',label+' invitations');var img=document.createElement('img');img.src='assets/occasions/'+key+(['graduation','ramadan','eid'].includes(key)?'.svg':'.webp');img.alt='';img.width=640;img.height=820;img.loading='lazy';img.decoding='async';var caption=document.createElement('span');caption.className='occasion-caption';var title=document.createElement('strong');title.textContent=label;var note=document.createElement('span');note.className='occasion-note';note.textContent=notes[index];caption.append(title,note);var arrow=document.createElement('span');arrow.className='occasion-arrow';arrow.setAttribute('aria-hidden','true');arrow.textContent='↗';card.replaceChildren(img,icon,caption,arrow);columns[index%4].append(card);});
- var reduced=matchMedia('(prefers-reduced-motion: reduce)'),animations=[];
- gallery.classList.add('occasion-parallax-gallery');
- var observer=new IntersectionObserver(function(entries){entries.forEach(function(entry){
-  if(!entry.isIntersecting)return;
-  observer.unobserve(entry.target);
-  if(reduced.matches)return;
-  var index=cards.indexOf(entry.target);
-  var animation=entry.target.animate([{opacity:0,translate:'0 24px'},{opacity:1,translate:'0 0'}],{duration:650,delay:(index%4)*65,easing:'cubic-bezier(.22,1,.36,1)',fill:'backwards'});
-  animations.push(animation);animation.onfinish=function(){animations=animations.filter(function(item){return item!==animation;});};
- });},{threshold:.08});
- cards.forEach(function(card){observer.observe(card);});
- reduced.addEventListener('change',function(){if(reduced.matches){animations.forEach(function(animation){animation.cancel();});animations=[];}});
- addEventListener('pagehide',function(){animations.forEach(function(animation){animation.cancel();});});
+ var images={wedding:'occasions/wedding.webp',engagement:'occasions/engagement.webp','save-date':'occasions/save-date.webp',birthday:'occasions/birthday.webp',anniversary:'occasions/anniversary.webp',baby:'occasions/baby.webp',bridal:'occasions/bridal.webp',graduation:'occasions/graduation.svg',party:'occasions/party.webp',corporate:'occasions/corporate.webp',ramadan:'occasions/ramadan.svg',eid:'occasions/eid.svg',holiday:'occasions/holiday.webp',housewarming:'ev-home.jpg','brand-launch':'ev-star.jpg','store-opening':'ev-silver.jpg','product-launch':'premium/gala-640.webp','restaurant-opening':'premium/decor-640.webp','property-launch':'ev-cottage.jpg',other:'occasions/other.webp'};
+ var notes={wedding:'A beautiful beginning',engagement:'The easiest yes','save-date':'Something to look forward to',birthday:'Another year, more magic',anniversary:'A love worth celebrating',baby:'A little wonder awaits',bridal:'For the bride-to-be',graduation:'Here’s to what comes next',party:'Good people. Great memories.',corporate:'Make a lasting impression',ramadan:'Gather in gratitude',eid:'Together in celebration',holiday:'The joy of coming together',housewarming:'A new chapter at home','brand-launch':'A first look at what’s next','store-opening':'Meet what’s coming','product-launch':'Doors open to something new','restaurant-opening':'A new favourite table awaits','property-launch':'A place to call your own',other:'Make it your own'};
+ var cards=Array.from(gallery.children);if(!cards.length)return;
+ cards.forEach(function(card){
+  var key=card.dataset.occasion||'other',label=card.querySelector('strong').textContent,icon=card.querySelector('.occasion-icon');
+  card.className='occasion-photo-card';card.setAttribute('aria-label',label+' invitations');
+  var img=document.createElement('img');img.src='assets/'+(images[key]||images.other);img.alt='';img.width=640;img.height=800;img.loading='lazy';img.decoding='async';
+  var caption=document.createElement('span');caption.className='occasion-caption';
+  var title=document.createElement('strong');title.textContent=label;
+  var note=document.createElement('span');note.className='occasion-note';note.textContent=notes[key]||'';
+  caption.append(title,note);
+  var arrow=document.createElement('span');arrow.className='occasion-arrow';arrow.setAttribute('aria-hidden','true');arrow.textContent='↗';
+  card.replaceChildren(img,icon,caption,arrow);
+ });
+ gallery.className='occasion-marquee';gallery.setAttribute('role','region');gallery.setAttribute('aria-label','Invitations by occasion');
+ var half=Math.ceil(cards.length/2),rows=[cards.slice(0,half),cards.slice(half)];
+ gallery.replaceChildren();
+ rows.forEach(function(set,index){
+  var row=document.createElement('div');row.className='occasion-row';row.style.setProperty('--marquee-duration',(set.length*6)+'s');if(index)row.classList.add('is-reverse');
+  var track=document.createElement('div');track.className='occasion-track';
+  var group=document.createElement('div');group.className='occasion-set';set.forEach(function(card){group.append(card);});
+  var clone=group.cloneNode(true);clone.classList.add('is-clone');clone.setAttribute('aria-hidden','true');clone.inert=true;
+  track.append(group,clone);row.append(track);gallery.append(row);
+ });
+ var toggle=document.createElement('button');toggle.type='button';toggle.className='marquee-toggle';
+ function setLabel(paused){toggle.setAttribute('aria-pressed',String(paused));toggle.innerHTML=paused?'<span aria-hidden="true">▶</span> Play motion':'<span aria-hidden="true">❚❚</span> Pause motion';}
+ setLabel(false);
+ toggle.addEventListener('click',function(){var paused=!gallery.classList.contains('is-paused');gallery.classList.toggle('is-paused',paused);setLabel(paused);});
+ gallery.after(toggle);
+ var visibility=new IntersectionObserver(function(entries){gallery.classList.toggle('is-offscreen',!entries[0].isIntersecting);});visibility.observe(gallery);
+ addEventListener('pagehide',function(){visibility.disconnect();});
 })();

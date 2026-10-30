@@ -18,7 +18,7 @@
  function queue(){if(!frame)frame=requestAnimationFrame(paint);}
  addEventListener('scroll',queue,{passive:true});addEventListener('resize',queue,{passive:true});
  reduced.addEventListener('change',queue);desktop.addEventListener('change',queue);
- var observer=new MutationObserver(queue);['collection-grid','home-occasions','home-experiences'].forEach(function(id){var node=document.getElementById(id);if(node)observer.observe(node,{childList:true,subtree:true});});
+ var observer=new MutationObserver(queue);['collection-grid','home-experiences'].forEach(function(id){var node=document.getElementById(id);if(node)observer.observe(node,{childList:true,subtree:true});});
  document.addEventListener('visibilitychange',function(){if(document.hidden){cancelAnimationFrame(frame);frame=0;}else queue();});
  addEventListener('pagehide',function(){cancelAnimationFrame(frame);observer.disconnect();});
  queue();

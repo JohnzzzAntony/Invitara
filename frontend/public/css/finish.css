@@ -123,3 +123,5 @@ img:not([src$=".svg"]):not([src*="logo"]), video, picture img {
 .studio .carousel-dot { position: relative; }
 .studio .carousel-dot::after { content: ''; position: absolute; inset: -18px -6px; }
 .studio .detail-hint { margin-inline: auto; color: var(--studio-muted) !important; }
+/* 404: the primary path forward and a way home, side by side (H3 user control). */
+.error-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
