@@ -53,26 +53,31 @@ img:not([src$=".svg"]):not([src*="logo"]), video, picture img {
 .discovery-sidebar[popover] fieldset button { white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) { .discovery-sidebar[popover] { transition: none; } }
 
-/* Single brand colour #B96955: every brand token derives from it; neutrals stay neutral.
-   #B96955 is 4.0:1 on white, so it carries logo, icons, borders, large headings and decoration.
-   Small text, and fills behind white labels, use --brand-strong (5.6:1 on white, >= 4.7:1 on the cream surfaces) for WCAG AA. */
+/* Brand: orange #FF6A00 into black #111, as a gradient. Every brand token derives from these; neutrals stay neutral.
+   #FF6A00 is only 2.9:1 on white, so it carries the logo, large headings and decoration.
+   Small text and fills behind white labels use --brand-strong #C2410C (5.2:1 on white, 4.7:1 on cream) for WCAG AA; body ink is black. */
 :root {
-  --brand: #B96955; --brand-rgb: 185, 105, 85;
-  --brand-strong: #9E5240; --brand-hover: #874434; --brand-deep: #6B3529;
-  --brand-tint: #F6ECE8; --brand-soft: rgba(var(--brand-rgb), .14);
-  --lux-ink: var(--brand-strong); --lux-accent: var(--brand);
-  --studio-ink: var(--brand-strong); --olive: var(--brand-strong); --olive-deep: var(--brand-strong); --gold: var(--brand);
-  --cinema-paper: var(--brand-strong); --cinema-accent: var(--brand); --cinema-muted: #6f6663; --studio-muted: #6f6663;
+  --brand: #FF6A00; --brand-rgb: 255, 106, 0;
+  --brand-strong: #C2410C; --brand-hover: #9A3412; --brand-deep: #7C2D12;
+  --brand-tint: #FFF1E6; --brand-soft: rgba(var(--brand-rgb), .14);
+  --brand-ink: #111111;
+  --brand-gradient: linear-gradient(115deg, #FF6A00 0%, #C2410C 45%, #111111 100%);
+  /* Every stop keeps white labels at >= 4.5:1. */
+  --brand-fill: linear-gradient(115deg, #C2410C 0%, #9A3412 40%, #111111 100%);
+  --lux-ink: var(--brand-ink); --lux-accent: var(--brand);
+  --studio-ink: var(--brand-ink); --olive: var(--brand-strong); --olive-deep: var(--brand-ink); --gold: var(--brand);
+  --cinema-paper: var(--brand-ink); --cinema-accent: var(--brand-strong); --cinema-muted: #5f5a57; --studio-muted: #5f5a57;
   --primary: var(--brand-strong); --teal: var(--brand-strong); --teal-dark: var(--brand-hover); --teal-deep: var(--brand-deep); --teal-tint: var(--brand-tint);
   --action: var(--brand-strong); --action-hover: var(--brand-hover); --action-text: #fff;
 }
-.editor-page { --primary: var(--brand-strong); --studio-ink: var(--brand-strong); }
+.editor-page { --primary: var(--brand-strong); --studio-ink: var(--brand-ink); }
 :focus-visible { outline-color: var(--brand); }
 ::selection, body.studio ::selection { background: var(--brand-strong); color: #fff; }
-.ui-scroll-progress { background: var(--brand) !important; }
+.ui-scroll-progress { background: var(--brand-gradient) !important; }
 .occasion-icon { color: var(--brand) !important; }
-/* Large display headings take the brand colour itself (3:1 is the AA floor for large text). */
-.studio :is(h1, h2) { color: var(--brand); }
+/* Large display headings carry the orange-to-black gradient (the orange end clears the 3:1 floor for large text). */
+.studio :is(h1, h2) { color: var(--brand-ink); background: var(--brand-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.studio .hs :is(h1, h2) { background: none; -webkit-text-fill-color: currentColor; }
 .studio footer a:not([class]) { color: inherit; }
 /* Logos are exempt from contrast minimums (WCAG 1.4.3), so the wordmark shows the true brand colour. */
 .studio-logo, .studio .studio-logo { color: var(--brand) !important; }
@@ -93,9 +98,10 @@ img:not([src$=".svg"]):not([src*="logo"]), video, picture img {
 [data-page=home] .carousel-pagination .carousel-dot { background: rgba(var(--brand-rgb), .3); }
 [data-page=home] .carousel-pagination .carousel-dot:is(.is-active, [aria-current="true"]) { background: var(--brand); }
 
-/* Primary actions: AA fill at rest, darker on hover, deepest while pressed. */
-.studio-links .studio-pill:hover, .studio-button:not(.light):not(.lime):hover { background: var(--brand-hover) !important; border-color: var(--brand-hover) !important; box-shadow: 0 12px 24px -16px rgba(var(--brand-rgb), .6); }
-.studio-links .studio-pill:active, .studio-button:not(.light):not(.lime):active { background: var(--brand-deep) !important; border-color: var(--brand-deep) !important; }
+/* Primary actions: orange-to-black gradient fill; hover slides toward black, press darkens. */
+.studio-links .studio-pill, .studio-button:not(.light):not(.lime) { background: var(--brand-fill) !important; background-size: 200% 100% !important; background-position: 0 0 !important; border-color: transparent !important; color: #fff !important; transition: background-position .5s ease, box-shadow .3s, transform .35s; }
+.studio-links .studio-pill:hover, .studio-button:not(.light):not(.lime):hover { background-position: 100% 0 !important; box-shadow: 0 12px 24px -16px rgba(var(--brand-rgb), .6); }
+.studio-links .studio-pill:active, .studio-button:not(.light):not(.lime):active { filter: brightness(.88); }
 
 /* Motion: short, purposeful feedback on interactive elements (100–300ms, ease-out). */
 .studio a, .studio button, .studio input, .studio select, .studio textarea {
