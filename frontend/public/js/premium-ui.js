@@ -23,7 +23,7 @@
   drop:{frames:[{opacity:0,transform:'translateY(-18px)'},{opacity:1,transform:'none'}],duration:650},
   fade:{frames:[{opacity:0,transform:'translateY(14px)'},{opacity:1,transform:'none'}],duration:700,stagger:90}
  },GROUPS=[
-  ['blur-rise','.studio-hero-copy,.pricing-hero,.discovery-heading,.account-panel'],
+  ['blur-rise','.pricing-hero,.discovery-heading,.account-panel'],
   ['curtain','.section-intro,.home-discovery>h2,.studio-steps>h2,.launch-faq>h2,.pricing-section-head,.premium-intro,.studio-end>h2,.legal-page h1'],
   ['cascade-x','.step'],
   ['zoom-wipe','.launch-pricing>div,.collection-carousel,.pricing-card'],

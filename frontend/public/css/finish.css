@@ -188,3 +188,44 @@ img:not([src$=".svg"]):not([src*="logo"]), video, picture img {
   [data-page=home] .step { scroll-snap-align: start; }
   [data-page=home] .step::before { left: 0; } /* the -5px offset was clipped by the scroller */
 }
+
+/* Home hero: editorial headline on the left; an arch "display case" of three live invitations on the right.
+   Motion lives in js/luxury-motion.js; without it (reduced motion, no JS) this static layout is the finished state. */
+[data-page=home] .studio-hero.hx { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: center; gap: clamp(32px, 5vw, 72px); min-height: 0; padding: clamp(48px, 7vw, 96px) 0 clamp(56px, 7vw, 104px); }
+.hx-title { margin: 0 0 28px; font-size: clamp(44px, 6.2vw, 90px) !important; font-weight: 500; line-height: .98; letter-spacing: -.045em; color: var(--brand); }
+.hx-line { display: block; overflow: hidden; padding-bottom: .14em; margin-bottom: -.14em; }
+.hx-line > span { display: inline-block; }
+.hx-title em { font-style: italic; font-weight: 400; color: var(--brand-strong); }
+.hx-lead { max-width: 44ch; margin: 0 0 32px; font-size: clamp(16px, 1.3vw, 18px); line-height: 1.7; color: var(--studio-muted); }
+.hx-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.hx-proof { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 28px 0 0; padding: 0; list-style: none; font-size: 13px; color: var(--studio-muted); }
+.hx-proof li { display: inline-flex; align-items: center; gap: 10px; }
+.hx-proof li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--brand); }
+
+.hx-stage { position: relative; isolation: isolate; height: clamp(440px, 44vw, 580px); }
+/* Arch and its inner hairline are pseudo-elements so the site-wide square-corner rule leaves their curve alone. */
+.hx-stage::before { content: ''; position: absolute; inset: 0 7%; z-index: -2; border-radius: 999px 999px 0 0; background: radial-gradient(120% 85% at 50% 0%, var(--brand-tint) 0%, #f2e2db 55%, #e8cfc5 100%); }
+.hx-stage::after { content: ''; position: absolute; inset: 22px calc(7% + 22px) 0; z-index: -1; border: 1px solid rgba(var(--brand-rgb), .3); border-bottom: 0; border-radius: 999px 999px 0 0; }
+.hx-card { --w: clamp(140px, 14.5vw, 200px); position: absolute; bottom: 8%; width: var(--w); aspect-ratio: 9 / 18; overflow: hidden; background: #fff; border: 5px solid #fff; box-shadow: 0 44px 60px -38px rgba(107, 53, 41, .6), 0 10px 22px -14px rgba(107, 53, 41, .35); }
+.hx-card .ex-mini { height: 100%; }
+.hx-card-left { left: 6%; transform: rotate(-9deg); }
+.hx-card-right { right: 6%; transform: rotate(8deg); }
+.hx-card-center { --w: clamp(160px, 16.5vw, 228px); left: 50%; bottom: 12%; z-index: 2; margin-left: calc(var(--w) / -2); transform: rotate(-1.5deg); }
+.hx-seal { position: absolute; top: 4%; right: 2%; z-index: 3; width: clamp(92px, 8.5vw, 120px); height: auto; overflow: visible; }
+.hx-seal circle { fill: #fffdf8; stroke: rgba(var(--brand-rgb), .45); stroke-width: 1; }
+.hx-seal textPath { fill: var(--brand-strong); font-size: 9.5px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; }
+.hx-seal-mark { fill: var(--brand); font-size: 34px; font-weight: 500; }
+.hx-note { position: absolute; left: 0; bottom: 0; z-index: 3; margin: 0; padding: 12px 18px; border: 1px solid var(--studio-line, #e2d8c9); background: #fffdf8; box-shadow: 0 18px 30px -22px rgba(107, 53, 41, .45); color: var(--brand-strong); font-size: 15px; font-style: italic; }
+
+@media (max-width: 959px) {
+  [data-page=home] .studio-hero.hx { grid-template-columns: minmax(0, 1fr); gap: 40px; padding-top: 40px; }
+  .hx-stage { width: min(100%, 560px); justify-self: center; height: clamp(380px, 70vw, 520px); }
+  .hx-title { font-size: clamp(44px, 9vw, 80px) !important; }
+}
+@media (max-width: 479px) {
+  .hx-title { font-size: clamp(40px, 11.5vw, 54px) !important; }
+  .hx-actions > .studio-button { flex: 1 1 100%; justify-content: center; }
+  .hx-card { --w: 30vw; }
+  .hx-card-center { --w: 36vw; }
+  .hx-note { font-size: 13px; padding: 10px 14px; }
+}

@@ -22,5 +22,4 @@ var OCCASION_ICONS={"wedding":["#C2415B","<path d=\"M2 9.5a5.5 5.5 0 0 1 9.591-3
  safeRender();document.querySelectorAll('[data-mini]').forEach(function(el){el.setAttribute('aria-hidden','true');el.inert=true;el.appendChild(E.EVER_renderSiteMini(E.EVER_findTemplate(el.dataset.mini)));});
  var price=document.getElementById('home-price');if(price){var prices=E.INVITARA_availableTemplates().map(function(t){return E.EVER_C.quote({themeId:t.id,plan:'studio',addons:[]}).total;});price.textContent='From AED '+Math.min.apply(null,prices).toFixed(2);}
  var sample=document.getElementById('interactive-sample');if(sample){var s=E.EVER_siteDefaults('vellum');s.order=['date'];var site=E.EVER_renderSite(s,{});var nav=site.querySelector('.ex-nav'),cover=site.querySelector('.ex-cover');if(nav)nav.remove();if(cover)cover.remove();sample.appendChild(site);E.EVER_bindSite(site);}
- if(E.gsap&&!matchMedia('(prefers-reduced-motion: reduce)').matches)E.gsap.from('.studio-hero-copy > *',{y:18,opacity:0,stagger:.08,duration:.8,clearProps:'all'});
 })();
