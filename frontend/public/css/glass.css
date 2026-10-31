@@ -1,0 +1,153 @@
+/* Liquid glass: frosted, translucent surfaces over soft warm light, for the site chrome and the editor.
+   Loaded last on studio pages and the editor. Never applies to invitation designs (invite.html, the
+   editor canvas), which keep their own styling. */
+:root {
+  --glass-bg: rgba(255, 252, 248, .46);
+  --glass-strong: rgba(255, 252, 248, .7);
+  --glass-edge: rgba(255, 255, 255, .7);
+  --glass-sheen: linear-gradient(140deg, rgba(255, 255, 255, .62) 0%, rgba(255, 255, 255, .14) 42%, rgba(255, 255, 255, .3) 100%);
+  --glass-blur: blur(22px) saturate(175%);
+  --glass-shadow: 0 1px 0 rgba(255, 255, 255, .85) inset, 0 -1px 0 rgba(255, 255, 255, .25) inset, 0 18px 50px -24px rgba(74, 40, 28, .32);
+  --glass-radius: 24px;
+  --liquid: linear-gradient(180deg, #cc8068 0%, #b96955 48%, #9e5240 100%);
+  --liquid-shadow: 0 1px 0 rgba(255, 255, 255, .45) inset, 0 -2px 6px rgba(80, 30, 18, .25) inset, 0 10px 26px -12px rgba(158, 82, 64, .7);
+}
+
+/* Ambient light behind the glass. */
+body.studio, body.editor-page { background: #f6f1ea; isolation: isolate; }
+body.studio::before, body.editor-page::before {
+  content: ""; position: fixed; inset: -10vmax; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(38vmax 34vmax at 12% 18%, rgba(185, 105, 85, .30), transparent 70%),
+    radial-gradient(34vmax 30vmax at 88% 12%, rgba(214, 170, 120, .30), transparent 70%),
+    radial-gradient(40vmax 36vmax at 78% 82%, rgba(150, 165, 140, .24), transparent 70%),
+    radial-gradient(30vmax 28vmax at 20% 88%, rgba(220, 150, 130, .22), transparent 70%);
+  filter: blur(10px);
+  animation: glass-drift 36s ease-in-out infinite alternate;
+}
+@keyframes glass-drift { to { transform: translate3d(3vmax, -2vmax, 0) scale(1.06); } }
+
+/* Shared glass surface. */
+.studio-header, body.studio.ui-scrolled > .studio-header,
+.studio :is(.step, .launch-pricing, .launch-faq details, .experience-price-card, .dashboard-stat, .loading-card, .checkout-summary, .studio-form, .collection-empty, .prompt-card, .template-detail-grid > *:first-child),
+.studio :is(.studio-filter, .carousel-arrow, .carousel-autoplay, .marquee-toggle, .collection-tools :is(input, select), .studio-button.light),
+.demo-bar,
+.editor-page :is(.ed-bar, .editor-journey, .ed-sidebar, .visual-inspector, .canvas-tools button, .replay-opening, .ed-tabs, .ai-msg.ai-bot, .ai-suggest button, .ai-compose, .ai-attach, .editor-help, .ed-group) {
+  background-color: var(--glass-bg);
+  background-image: var(--glass-sheen);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Liquid (filled) buttons. */
+.studio :is(.studio-button:not(.light):not(.lime), .studio-pill, .studio-filter[aria-pressed=true], .studio-filter.is-active, .carousel-dot.is-active),
+.editor-page :is(.btn-primary, .ed-tab.on, .ai-msg.ai-user) {
+  background: var(--liquid); color: #fffaf5; border: 1px solid rgba(255, 255, 255, .28); box-shadow: var(--liquid-shadow);
+}
+.studio :is(.studio-button, .studio-pill, .studio-filter, .carousel-arrow, .carousel-autoplay, .marquee-toggle),
+.editor-page :is(.btn, .btn-ed, .ed-tab, .canvas-tools button, .replay-opening, .ai-suggest button, .ai-attach, .editor-journey button) {
+ 
+  transition: transform .2s cubic-bezier(.2, .8, .2, 1), box-shadow .2s, background-color .2s, filter .2s;
+}
+.studio :is(.studio-button, .studio-pill, .studio-filter):hover,
+.editor-page :is(.btn, .ed-tab, .ai-suggest button, .ai-attach):hover { transform: translateY(-1px); filter: brightness(1.04); }
+.studio :is(.studio-button, .studio-pill, .studio-filter):active,
+.editor-page :is(.btn, .ed-tab, .ai-suggest button):active { transform: translateY(0) scale(.98); }
+
+/* Site sections: let the light through, round the glass cards. */
+.studio :is(.home-discovery, .collection-section, .studio-steps, .launch-faq, .studio-footer) { background: transparent; }
+.studio .studio-header { background-color: rgba(250, 246, 240, .6); border-width: 0 0 1px; }
+.studio .launch-pricing { }
+.studio :is(.step, .experience-price-card, .dashboard-stat, .loading-card, .checkout-summary, .studio-form, .collection-empty, .prompt-card) { }
+.studio .step { padding: 26px 24px; }
+.studio .launch-faq details { padding-inline: 22px; margin-block: 10px; }
+.studio .collection-tools :is(input, select) { }
+.studio .price-card { background: var(--liquid); box-shadow: var(--liquid-shadow), 0 30px 70px -30px rgba(158, 82, 64, .65); }
+.studio .experience-price-card:hover { transform: translateY(-3px); box-shadow: var(--glass-shadow), 0 26px 60px -28px rgba(74, 40, 28, .45); }
+/* Light buttons on the dark home hero become smoked glass. */
+.studio .hs :is(.studio-button.light, .hs-motion) {
+  background-color: rgba(255, 255, 255, .08); background-image: linear-gradient(140deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, .02) 50%);
+  border: 1px solid rgba(255, 255, 255, .28); color: #fff;
+  -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+}
+
+/* ---------------- Editor ---------------- */
+.editor-page .ed-bar { border-width: 0 0 1px; background-color: rgba(250, 246, 240, .62); }
+.editor-page .editor-journey { border-width: 0 0 1px; background-color: rgba(250, 246, 240, .4); box-shadow: none; }
+.editor-page .editor-journey button[aria-current=step] { background: rgba(185, 105, 85, .14); color: #8a4535; }
+.editor-page .ed-canvas-wrap { background: transparent; }
+.editor-page .canvas-frame { overflow: hidden; border: 1px solid rgba(255, 255, 255, .8); box-shadow: 0 30px 80px -40px rgba(74, 40, 28, .45); }
+.editor-page .canvas-tools button, .editor-page .replay-opening { color: #5b4a42; }
+.editor-page .ed-group { margin: 10px 12px; overflow: hidden; }
+.editor-page .ed-group summary { background: transparent; }
+.editor-page .editor-help { margin: 12px 12px 0; padding: 12px 14px; color: #6b5a52; }
+.editor-page .ed-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 12px; padding: 4px; position: sticky; top: 8px; z-index: 5; }
+.editor-page .ed-tab { min-height: 40px; border: 0; background: transparent; box-shadow: none; font-size: 11px; letter-spacing: .08em; color: #6b5a52; }
+.editor-page .ed-tab:not(.on):hover { background: rgba(255, 255, 255, .5); color: #8a4535; }
+/* Only show element settings while something is selected; the canvas gets the room otherwise. */
+.editor-page .visual-inspector:not(.has-selection) { display: none; }
+.editor-page .visual-inspector { }
+@media (min-width: 1050px) {
+  .editor-page .ed-shell { grid-template-columns: 360px minmax(0, 1fr); gap: 14px; padding: 14px; }
+  .editor-page .ed-shell:has(.visual-inspector.has-selection) { grid-template-columns: 360px minmax(0, 1fr) 290px; }
+  .editor-page .ed-sidebar { }
+  .editor-page .ed-canvas-wrap { }
+}
+@media (min-width: 768px) and (max-width: 1049px) {
+  .editor-page .ed-shell { grid-template-columns: 300px minmax(0, 1fr); }
+}
+
+/* Assistant chat. */
+.editor-page .ai-chat { display: flex; flex-direction: column; gap: 12px; padding: 4px 12px 14px; min-height: calc(100% - 140px); }
+.editor-page .ai-log { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.editor-page .ai-msg { margin: 0; padding: 11px 14px; max-width: 92%; font: 13px/1.6 'Inter Tight', Arial, sans-serif; color: #3d302a; white-space: pre-wrap; overflow-wrap: anywhere; }
+.editor-page .ai-msg.ai-bot { align-self: flex-start; }
+.editor-page .ai-msg.ai-user { align-self: flex-end; color: #fffaf5; }
+.editor-page .ai-wait::after { content: ""; display: inline-block; width: 1.4em; text-align: left; animation: ai-dots 1.2s steps(4) infinite; }
+@keyframes ai-dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
+.editor-page .ai-undo { margin-left: 4px; border: 0; background: none; padding: 0; font: inherit; color: #9e5240; text-decoration: underline; cursor: pointer; }
+.editor-page .ai-undo:disabled { color: #8d817a; text-decoration: none; cursor: default; }
+.editor-page .ai-suggest { display: flex; flex-wrap: wrap; gap: 6px; }
+.editor-page .ai-suggest button { min-height: 34px; padding: 6px 13px; font: 12px 'Inter Tight', Arial, sans-serif; color: #5b4a42; cursor: pointer; }
+.editor-page .ai-compose { position: sticky; bottom: 10px; display: flex; flex-direction: column; gap: 8px; padding: 10px; background-color: var(--glass-strong); }
+.editor-page .ai-compose textarea { width: 100%; min-height: 76px; max-height: 260px; resize: vertical; border: 0; outline: 0; background: transparent; padding: 6px 8px; font: 14px/1.55 'Inter Tight', Arial, sans-serif; color: #2f2520; }
+.editor-page .ai-compose:focus-within { box-shadow: var(--glass-shadow), 0 0 0 3px rgba(185, 105, 85, .25); }
+.editor-page .ai-compose-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.editor-page .ai-attach { display: inline-flex; align-items: center; min-height: 38px; padding: 0 14px; font: 12px 'Inter Tight', Arial, sans-serif; color: #5b4a42; cursor: pointer; box-shadow: none; }
+.editor-page .ai-attach:focus-within { outline: 2px solid #b96955; outline-offset: 2px; }
+.editor-page .ai-go { width: auto; min-height: 38px; padding: 0 22px; }
+.editor-page .ai-go:disabled { opacity: .55; cursor: progress; transform: none; }
+.editor-page .ai-attached { display: flex; flex-wrap: wrap; gap: 6px; }
+.editor-page :is(.ai-suggest, .ai-attached)[hidden] { display: none; }
+.editor-page .ai-attached button { border: 0; padding: 5px 10px; background: rgba(185, 105, 85, .14); color: #8a4535; font: 11px 'Inter Tight', Arial, sans-serif; cursor: pointer; }
+
+/* Readable fallbacks: no blur support, or the visitor asked for less transparency or motion. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root { --glass-bg: rgba(255, 252, 248, .92); --glass-strong: #fffcf8; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  :root { --glass-bg: #fffcf8; --glass-strong: #fffcf8; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.studio::before, body.editor-page::before { animation: none; }
+  .studio :is(.studio-button, .studio-pill, .studio-filter, .experience-price-card), .editor-page :is(.btn, .ed-tab, .ai-suggest button) { transition: none; transform: none !important; }
+}
+
+/* Rounded glass shapes. finish.css squares every corner with an unlayered !important rule; a layered
+   !important declaration outranks it, so these radii apply only to the glass surfaces listed here. */
+@layer glass {
+  .studio :is(.studio-button, .studio-pill, .studio-filter, .carousel-arrow, .carousel-autoplay, .marquee-toggle, .collection-tools input, .collection-tools select, .hs-motion),
+  .editor-page :is(.btn, .btn-ed, .ed-tab, .ed-tabs, .ed-device, .ed-dev-btn, .ed-badge, .canvas-tools button, .replay-opening, .ai-suggest button, .ai-attach, .ai-attached button, .editor-journey button) { border-radius: 999px !important; }
+  .studio :is(.step, .experience-price-card, .dashboard-stat, .loading-card, .checkout-summary, .studio-form, .collection-empty, .prompt-card),
+  .editor-page :is(.ed-sidebar, .ed-canvas-wrap, .visual-inspector) { border-radius: var(--glass-radius) !important; }
+  .studio .launch-pricing { border-radius: 32px !important; }
+  .studio .price-card { border-radius: 30px !important; }
+  .studio .launch-faq details, .editor-page :is(.ed-group, .canvas-frame, .ai-msg) { border-radius: 18px !important; }
+  .editor-page .editor-help { border-radius: 16px !important; }
+  .editor-page .ai-compose { border-radius: 22px !important; }
+  .editor-page :is(.ed-body input, .ed-body select, .ed-body textarea, .visual-inspector input, .visual-inspector select, .visual-inspector textarea) { border-radius: 12px !important; }
+  .editor-page .ai-msg.ai-bot { border-bottom-left-radius: 6px !important; }
+  .editor-page .ai-msg.ai-user { border-bottom-right-radius: 6px !important; }
+}

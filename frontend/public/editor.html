@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="css/studio.css"/>
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&display=swap"><link rel="stylesheet" href="css/premium.css"><link rel="stylesheet" href="css/platform.css"><link rel="stylesheet" href="css/platform-app.css"><link rel="stylesheet" href="css/editions.css"><link rel="stylesheet" href="css/refinement.css"><link rel="stylesheet" href="css/premium-wedding.css"><link rel="stylesheet" href="css/luxury.css"><link rel="stylesheet" href="css/housewarming.css"><link rel="stylesheet" href="css/business.css"><link rel="stylesheet" href="css/couture.css">
-<link rel="stylesheet" href="css/finish.css">
+<link rel="stylesheet" href="css/finish.css"><link rel="stylesheet" href="css/glass.css">
 </head>
 <body class="editor-page">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -60,34 +60,38 @@
         <a class="ed-plan-up" href="pricing.html" id="ed-plan-up">Compare plans</a>
       </div>
 
-      <div class="editor-help" id="editor-help">Click text or a photo to edit. Your draft saves automatically. Ready? <a href="checkout.html">choose your date &amp; publish</a>.</div><div class="ed-tabs" role="tablist" aria-label="Editor panels">
-        <button class="ed-tab" id="tab-ai" type="button" role="tab" aria-selected="false" aria-controls="panel-ai">AI</button>
-        <button class="ed-tab on" id="tab-content" type="button" role="tab" aria-selected="true" aria-controls="panel-content">Sections</button>
-        <button class="ed-tab" id="tab-design" type="button" role="tab" aria-selected="false" aria-controls="panel-design">Theme</button>
+      <div class="editor-help" id="editor-help">Ask the assistant, or click anything on the page to edit it. Saves automatically. <a href="checkout.html">Choose your date &amp; publish</a>.</div><div class="ed-tabs" role="tablist" aria-label="Editor panels">
+        <button class="ed-tab on" id="tab-ai" type="button" role="tab" aria-selected="true" aria-controls="panel-ai">Assistant</button>
+        <button class="ed-tab" id="tab-content" type="button" role="tab" aria-selected="false" aria-controls="panel-content">Content</button>
+        <button class="ed-tab" id="tab-design" type="button" role="tab" aria-selected="false" aria-controls="panel-design">Style</button>
       </div>
 
       <!-- ============ AI PANEL ============ -->
-      <div class="ed-panel" id="panel-ai" role="tabpanel" aria-labelledby="tab-ai" hidden>
-        <form class="ed-body ai-form" id="ai-form">
-          <p class="ai-intro">Add the essentials. AI writes every section of this design, places your photos and can create images for the rest.</p>
-          <div class="ed-field"><label for="ai-names">Names</label><input id="ai-names" maxlength="200" placeholder="Anna &amp; Ben" required /></div>
-          <div class="ed-2col">
-            <div class="ed-field"><label for="ai-date">Date</label><input id="ai-date" type="date" /></div>
-            <div class="ed-field"><label for="ai-time">Time</label><input id="ai-time" maxlength="60" placeholder="4:00 PM" /></div>
+      <div class="ed-panel" id="panel-ai" role="tabpanel" aria-labelledby="tab-ai">
+        <div class="ai-chat">
+          <div class="ai-log" id="ai-log" role="log" aria-live="polite">
+            <p class="ai-msg ai-bot">Tell me what you’d like. I can write every section, restyle colours and fonts, add, hide or reorder sections, place your photos and create new images. Select something on the page first to change just that.</p>
           </div>
-          <div class="ed-field"><label for="ai-venue">Venue &amp; city</label><input id="ai-venue" maxlength="300" placeholder="Al Habtoor Palace, Dubai" /></div>
-          <div class="ed-field"><label for="ai-notes">Anything else (optional)</label><textarea id="ai-notes" rows="4" maxlength="3000" placeholder="Our story, schedule, dress code, RSVP deadline, language…"></textarea></div>
-          <div class="ed-field"><label for="ai-tone">Tone</label><select id="ai-tone"><option>Elegant</option><option>Warm</option><option>Playful</option><option>Formal</option><option>Minimal</option></select></div>
-          <div class="ed-field"><label for="ai-photos">Your photos (optional, up to 6)</label><input id="ai-photos" type="file" accept="image/jpeg,image/png,image/webp" multiple /></div>
-          <div class="ed-field ed-check"><input type="checkbox" id="ai-images" checked /><label for="ai-images">Create images with AI for empty photo spots</label></div>
-          <button class="btn btn-primary ai-go" id="ai-go" type="submit">Write my invitation</button>
-          <p class="ai-status" id="ai-status" role="status" aria-live="polite"></p>
-          <p class="ed-footnote">Review everything before publishing. Undo restores your previous text in one step.</p>
-        </form>
+          <div class="ai-suggest" id="ai-suggest" aria-label="Suggestions">
+            <button type="button" data-text="Write every section for our event. Names: , date: , time: , venue: . Details: ">Write everything</button>
+            <button type="button" data-text="Make the whole design feel more premium and luxurious.">Make it premium</button>
+            <button type="button" data-text="Create beautiful images for every empty photo.">Fill empty photos</button>
+            <button type="button" data-text="Rewrite all the text to be shorter and more elegant.">Polish the words</button>
+          </div>
+          <form class="ai-compose" id="ai-form">
+            <div class="ai-attached" id="ai-attached" hidden></div>
+            <label class="sr-only" for="ai-input">Message the assistant</label>
+            <textarea id="ai-input" rows="3" maxlength="4000" placeholder="e.g. We’re Anna &amp; Ben, 12 June 2027 at Al Habtoor Palace. Make it black-tie with gold accents." required></textarea>
+            <div class="ai-compose-row">
+              <label class="ai-attach"><input id="ai-photos" class="sr-only" type="file" accept="image/jpeg,image/png,image/webp" multiple />+ Photos</label>
+              <button class="btn btn-primary ai-go" id="ai-go" type="submit">Send</button>
+            </div>
+          </form>
+        </div>
       </div>
 
       <!-- ============ CONTENT PANEL ============ -->
-      <div class="ed-panel" id="panel-content" role="tabpanel" aria-labelledby="tab-content">
+      <div class="ed-panel" id="panel-content" role="tabpanel" aria-labelledby="tab-content" hidden>
 
         <details class="ed-group" open>
           <summary>Basics</summary>

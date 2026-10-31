@@ -62,6 +62,7 @@ try {
   await page.locator('.card-bottom button').first().click();
   await page.waitForURL('**/editor.html');
   await page.locator('#mobile-edit').click();
+  await page.locator('#tab-content').click();
   await page.locator('#basics-body input[type=text]').first().fill('A lovely celebration');
   await page.locator('#save-btn').click();
   for (const width of widths) {

@@ -24,7 +24,7 @@ for(const id of ['vellum','nocturne','confetti','bloom','atlas']){
  for(const width of [768,1440]){await page.setViewportSize({width,height:1000});await page.locator('[data-width="'+(width===768?'tablet':'desktop')+'"]').click();await page.waitForTimeout(150);if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth))throw new Error(id+' has overflow at '+width);}
  await page.locator('.demo-scroll').evaluate(el=>el.scrollTop=0);await page.screenshot({path:'artifacts/'+id+'-desktop.png'});results.push(id);await page.setViewportSize({width:390,height:844});
 }
-await page.goto(origin+'/demo.html?id=bloom');await page.locator('#demo-select').click();await page.locator('#mobile-edit').click();await page.waitForSelector('#basics-body input');
+await page.goto(origin+'/demo.html?id=bloom');await page.locator('#demo-select').click();await page.locator('#mobile-edit').click();await page.locator('#tab-content').click();await page.waitForSelector('#basics-body input');
 await page.locator('#basics-body input[type=text]').first().fill('Milo');await page.locator('#save-btn').click();
 await page.locator('#mobile-preview').click();await page.waitForSelector('.ex-bloom');await page.screenshot({path:'artifacts/editor-mobile.png'});
 if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth))throw new Error('Editor mobile overflow');
