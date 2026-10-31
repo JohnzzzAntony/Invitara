@@ -1,5 +1,6 @@
 import {readdir,unlink,copyFile} from 'node:fs/promises';
 import {build} from 'esbuild';
+await build({entryPoints:['frontend/motion/hero-shelf.js'],outfile:'frontend/public/vendor/hero-shelf.js',bundle:true,minify:true,format:'esm',target:['es2022'],legalComments:'linked'});
 await build({entryPoints:['frontend/motion/industrial-scene.js'],outfile:'frontend/public/vendor/industrial-scene.js',bundle:true,minify:true,format:'esm',target:['es2022'],legalComments:'linked'});
 await build({entryPoints:{'editions-motion':'frontend/motion/editions-motion.js','premium-motion':'frontend/motion/premium-motion.js','business-openings':'frontend/motion/business-openings.js'},outdir:'frontend/public/vendor/editions',bundle:true,minify:true,splitting:true,format:'esm',target:['es2022'],legalComments:'linked',chunkNames:'[name]-[hash]',metafile:true}).then(async result=>{const outputs=new Set(Object.keys(result.metafile.outputs).map(p=>p.split('/').pop()));for(const file of await readdir('frontend/public/vendor/editions'))if(/^(?:editions-scenes|business-openings)-[A-Z0-9]+\.js(?:\.LEGAL\.txt)?$/.test(file)&&!outputs.has(file))await unlink('frontend/public/vendor/editions/'+file);console.log('Built invitation motion:',Object.keys(result.metafile.outputs).join(', '));});
 
