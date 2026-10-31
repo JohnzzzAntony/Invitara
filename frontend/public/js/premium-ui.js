@@ -23,14 +23,15 @@
   drop:{frames:[{opacity:0,transform:'translateY(-18px)'},{opacity:1,transform:'none'}],duration:650},
   fade:{frames:[{opacity:0,transform:'translateY(14px)'},{opacity:1,transform:'none'}],duration:700,stagger:90}
  },GROUPS=[
-  ['blur-rise','.pricing-hero,.discovery-heading,.account-panel'],
-  ['curtain','.section-intro,.home-discovery>h2,.studio-steps>h2,.launch-faq>h2,.pricing-section-head,.premium-intro,.studio-end>h2,.legal-page h1'],
+  ['blur-rise','.account-panel'],
+  // Headings reveal word by word (js/motion.js marks them); their containers only fade so the motions don't stack.
+  ['curtain','.home-discovery>h2,.studio-steps>h2,.launch-faq>h2,.studio-end>h2,.legal-page h1'],
   ['cascade-x','.step'],
   ['zoom-wipe','.launch-pricing>div,.editorial-gallery,.pricing-card'],
   ['slide-left','.launch-faq details,.seo-faq details'],
   ['tilt-up','.feature-strip article,.editorial-grid>div,.invitation-explainer>div,.pricing-included,.occasion-guide'],
   ['drop','.collection-tools,.collection-selector,.carousel-controls'],
-  ['fade','.footer-column,.legal-page section,.seo-faq']
+  ['fade','.footer-column,.legal-page section,.seo-faq,.section-intro,.pricing-section-head,.premium-intro,.pricing-hero,.discovery-heading']
  ];
  function stagger(node,motion){if(!motion.stagger)return 0;var parent=node.parentElement,index=parent?Array.prototype.indexOf.call(parent.children,node):0;return (index%6)*motion.stagger;}
  var observer=new IntersectionObserver(function(entries){entries.forEach(function(entry){if(!entry.isIntersecting)return;observer.unobserve(entry.target);var motion=MOTIONS[entry.target.dataset.motion]||MOTIONS.fade;animate(entry.target,motion.frames,{duration:motion.duration,delay:(parseFloat(getComputedStyle(entry.target).getPropertyValue('--reveal-delay'))||0)+stagger(entry.target,motion),easing:ease,fill:'backwards'});});},{threshold:.12,rootMargin:'0px 0px -6% 0px'});

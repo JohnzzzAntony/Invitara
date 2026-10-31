@@ -1,0 +1,71 @@
+/* Respondr motion layer (js/motion.js, js/invite-motion.js, js/collection-carousel.js).
+   Every hidden starting state is scoped to html.rs-motion, which only JavaScript adds, so content never disappears without it. */
+:root{--rs-ease:cubic-bezier(.22,.61,.36,1);--rs-ease-out:cubic-bezier(.22,1,.36,1);--rs-ink:#1c2942;--rs-paper:#f7f4ee;--rs-accent:#b45d47}
+
+/* Splash: shown once per browser session on the homepage. Hides itself after 3.2s even if scripts fail. */
+.rs-splash{position:fixed;inset:0;z-index:250;display:grid;place-items:center;align-content:center;gap:24px;background:var(--rs-paper);color:var(--rs-ink);transition:opacity .6s ease;animation:rs-splash-out .6s ease 3.2s forwards}
+.rs-splash.out{opacity:0;pointer-events:none}
+html.rs-seen .rs-splash{display:none}
+html.rs-splashing{overflow:hidden}
+.rs-splash-mark{display:flex;align-items:center;gap:14px;margin:0;font:600 clamp(26px,4vw,46px)/1 'Manrope',sans-serif;letter-spacing:.32em;text-transform:uppercase;color:var(--rs-accent);opacity:0;animation:rs-rise 1.25s ease .15s forwards}
+.rs-splash-mark img{width:clamp(34px,4vw,48px);height:auto}
+.rs-splash-bar{display:block;width:clamp(120px,17vw,210px);height:1px;background:#1c294222}
+.rs-splash-bar s{display:block;height:100%;background:var(--rs-accent);transform:scaleX(0);transform-origin:left;transition:transform .55s ease}
+.rs-splash-tag{margin:0;font:500 10px/1 'Manrope',sans-serif;letter-spacing:.26em;text-transform:uppercase;color:#1c294270;opacity:0;animation:rs-rise .9s ease .7s forwards}
+@keyframes rs-rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+@keyframes rs-splash-out{to{opacity:0;visibility:hidden}}
+
+/* Headings: words blur and rise into place, staggered. */
+html.rs-motion .rs-words .rs-word{display:inline-block;opacity:0;transform:translateY(.42em);filter:blur(7px);transition:opacity 1.05s var(--rs-ease),transform 1.15s var(--rs-ease),filter 1.05s var(--rs-ease);transition-delay:calc(.08s + var(--i) * .085s)}
+html.rs-motion .rs-words.is-in .rs-word{opacity:1;transform:none;filter:blur(0)}
+
+/* Cursor dot follows fine pointers; the native cursor stays visible. */
+.rs-dot{position:fixed;left:0;top:0;z-index:300;width:19px;height:19px;margin:-9.5px;border:1px solid transparent;border-radius:50%;background:rgba(214,212,209,.9);mix-blend-mode:difference;pointer-events:none;opacity:0;transition:width .35s ease,height .35s ease,margin .35s ease,background .35s ease,border-color .35s ease,opacity .3s ease}
+.rs-dot.on{opacity:1}
+.rs-dot.wide{width:52px;height:52px;margin:-26px;background:rgba(244,242,239,.14);border-color:rgba(244,242,239,.75)}
+@media (hover:none),(pointer:coarse){.rs-dot{display:none}}
+
+/* Menu button: two bars that cross into an X. */
+.studio-menu svg path{transition:transform .5s var(--rs-ease);transform-box:view-box;transform-origin:12px 12px}
+.studio-menu:hover svg .m2{transform:scaleX(.7) translateX(4px)}
+.studio-menu[aria-expanded=true] svg .m1{transform:translateY(4px) rotate(45deg)}
+.studio-menu[aria-expanded=true] svg .m2{transform:translateY(-4px) rotate(-45deg)}
+
+/* Full-screen menu below the desktop breakpoint: wipes down with clip-path, links rise in sequence. */
+@media(max-width:900px){
+ body.rs-menu-live .studio-header{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+ body.studio .studio-nav .studio-logo,body.studio .studio-nav .studio-menu{position:relative;z-index:2}
+ body.studio .studio-links,body.studio .studio-links.is-open{display:flex!important;position:fixed!important;inset:0!important;max-height:none!important;overflow-y:auto!important;z-index:1!important;flex-direction:column;align-items:center;justify-content:center;gap:clamp(4px,1vw,10px)!important;margin:0;padding:calc(90px + env(safe-area-inset-top)) 24px calc(40px + env(safe-area-inset-bottom))!important;border:0!important;border-radius:0!important;background:var(--rs-paper)!important;box-shadow:none!important;clip-path:inset(0 0 100% 0);visibility:hidden;transition:clip-path .85s var(--rs-ease),visibility 0s linear .85s}
+ body.studio .studio-links.is-open{clip-path:inset(0);visibility:visible;transition:clip-path .85s var(--rs-ease),visibility 0s}
+ body.studio .studio-links a:not(.studio-pill){justify-content:center;min-height:48px;padding:0!important;font:500 clamp(30px,9vw,54px)/1.08 'Manrope',sans-serif!important;letter-spacing:-.03em;color:var(--rs-ink)!important;opacity:0;transform:translateY(24px);transition:opacity .5s ease,transform .7s var(--rs-ease),letter-spacing .4s ease}
+ body.studio .studio-links a:not(.studio-pill)::after{display:none}
+ body.studio .studio-links .studio-pill{margin-top:24px;opacity:0;transform:translateY(24px);transition:opacity .5s ease,transform .7s var(--rs-ease)}
+ body.studio .studio-links.is-open a{opacity:1!important;transform:none}
+ body.studio .studio-links.is-open a:not(.studio-pill):hover{letter-spacing:-.015em;color:var(--rs-accent)!important}
+ body.studio .studio-links.is-open a:nth-child(1){transition-delay:.25s}
+ body.studio .studio-links.is-open a:nth-child(2){transition-delay:.31s}
+ body.studio .studio-links.is-open a:nth-child(3){transition-delay:.37s}
+ body.studio .studio-links.is-open a:nth-child(4){transition-delay:.43s}
+ body.studio .studio-links.is-open a:nth-child(5){transition-delay:.49s}
+}
+
+/* Every card's art opens the interactive showroom (premium-showroom.js adds the trigger; only premium cards were styled to cover the art). */
+.collection-card .collection-art .premium-preview-trigger{position:absolute;inset:0;width:100%;height:100%;padding:0;background:transparent;border:0;cursor:pointer;z-index:2}
+
+/* Homepage ring: back cards wash into the paper instead of fading; dragging shows a grab cursor. */
+[data-page=home] .eg-stage{touch-action:pan-y;cursor:grab}
+[data-page=home] .eg-stage.is-dragging{cursor:grabbing}
+[data-page=home] .eg-stage.is-dragging .collection-card{pointer-events:none}
+[data-page=home] .eg-ring .collection-art::after{content:"";position:absolute;inset:0;z-index:3;border-radius:inherit;background:rgba(247,244,238,var(--d,0));box-shadow:inset 0 0 0 1px #ffffff12;pointer-events:none}
+[data-page=home] .eg-ring .collection-art .nx-mini,[data-page=home] .eg-ring .collection-art .ex-mini{transition:transform .5s ease}
+[data-page=home] .eg-ring .collection-card:hover .collection-art .nx-mini,[data-page=home] .eg-ring .collection-card:hover .collection-art .ex-mini{transform:scale(1.045)}
+[data-page=home] .eg-ring .collection-card-top,[data-page=home] .eg-ring .template-meta{opacity:calc(1 - var(--d,0) * 1.2)}
+.eg-vig{position:absolute;inset:0;z-index:3;pointer-events:none;background:radial-gradient(ellipse 88% 92% at 50% 50%,transparent 58%,#f7f4ee66 84%,#f7f4eedd 100%)}
+
+/* Invitation templates: text blurs up and images unveil as they scroll into view. */
+html.rs-motion .rs-pre{opacity:0}
+@media print{html.rs-motion .rs-pre,html.rs-motion .rs-words .rs-word{opacity:1!important;transform:none!important;filter:none!important}}
+
+@media (prefers-reduced-motion:reduce){
+ .rs-splash,.rs-splash *,.rs-words .rs-word,.studio-links,.studio-links a,.studio-menu svg path{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.14s!important;transition-delay:0s!important}
+}
