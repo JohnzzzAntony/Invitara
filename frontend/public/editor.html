@@ -61,8 +61,29 @@
       </div>
 
       <div class="editor-help" id="editor-help">Click text or a photo to edit. Your draft saves automatically. Ready? <a href="checkout.html">choose your date &amp; publish</a>.</div><div class="ed-tabs" role="tablist" aria-label="Editor panels">
+        <button class="ed-tab" id="tab-ai" type="button" role="tab" aria-selected="false" aria-controls="panel-ai">AI</button>
         <button class="ed-tab on" id="tab-content" type="button" role="tab" aria-selected="true" aria-controls="panel-content">Sections</button>
         <button class="ed-tab" id="tab-design" type="button" role="tab" aria-selected="false" aria-controls="panel-design">Theme</button>
+      </div>
+
+      <!-- ============ AI PANEL ============ -->
+      <div class="ed-panel" id="panel-ai" role="tabpanel" aria-labelledby="tab-ai" hidden>
+        <form class="ed-body ai-form" id="ai-form">
+          <p class="ai-intro">Add the essentials. AI writes every section of this design, places your photos and can create images for the rest.</p>
+          <div class="ed-field"><label for="ai-names">Names</label><input id="ai-names" maxlength="200" placeholder="Anna &amp; Ben" required /></div>
+          <div class="ed-2col">
+            <div class="ed-field"><label for="ai-date">Date</label><input id="ai-date" type="date" /></div>
+            <div class="ed-field"><label for="ai-time">Time</label><input id="ai-time" maxlength="60" placeholder="4:00 PM" /></div>
+          </div>
+          <div class="ed-field"><label for="ai-venue">Venue &amp; city</label><input id="ai-venue" maxlength="300" placeholder="Al Habtoor Palace, Dubai" /></div>
+          <div class="ed-field"><label for="ai-notes">Anything else (optional)</label><textarea id="ai-notes" rows="4" maxlength="3000" placeholder="Our story, schedule, dress code, RSVP deadline, language…"></textarea></div>
+          <div class="ed-field"><label for="ai-tone">Tone</label><select id="ai-tone"><option>Elegant</option><option>Warm</option><option>Playful</option><option>Formal</option><option>Minimal</option></select></div>
+          <div class="ed-field"><label for="ai-photos">Your photos (optional, up to 6)</label><input id="ai-photos" type="file" accept="image/jpeg,image/png,image/webp" multiple /></div>
+          <div class="ed-field ed-check"><input type="checkbox" id="ai-images" checked /><label for="ai-images">Create images with AI for empty photo spots</label></div>
+          <button class="btn btn-primary ai-go" id="ai-go" type="submit">Write my invitation</button>
+          <p class="ai-status" id="ai-status" role="status" aria-live="polite"></p>
+          <p class="ed-footnote">Review everything before publishing. Undo restores your previous text in one step.</p>
+        </form>
       </div>
 
       <!-- ============ CONTENT PANEL ============ -->
@@ -185,6 +206,6 @@
   <script src="js/commerce.js"></script>
 <script src="js/api.js"></script>
   <script src="js/app.js"></script>
-  <script src="js/visual-editor.js"></script><script src="js/platform-editor.js"></script><script src="js/editor.js"></script>
+  <script src="js/visual-editor.js"></script><script src="js/platform-editor.js"></script><script src="js/editor.js"></script><script src="js/ai-assistant.js"></script>
 <div class="editor-mobile-switch" role="group" aria-label="Editor view"><button id="mobile-edit" aria-pressed="true" type="button">Sections & Theme</button><button id="mobile-preview" aria-pressed="false" type="button">Edit on canvas</button></div><script src="js/editor-mobile.js"></script></body>
 </html>

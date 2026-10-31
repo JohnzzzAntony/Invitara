@@ -14,6 +14,7 @@ import { invitationState } from './invitation-state.mjs';
 import { SECURITY_HEADERS } from '../config/security-headers.mjs';
 import { eventExpiry, editable } from './access.mjs';
 import { initAuth, accountFor, mountAuth } from './auth.mjs';
+import { mountAi } from './ai.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicRoot = path.join(root, 'frontend', 'public');
@@ -111,6 +112,7 @@ for (const [route, maximum, message] of [
   next();
 });
 mountAuth(app,db,production);
+mountAi(app,limited);
 
 
 function owned(req, res) {

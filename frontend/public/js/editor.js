@@ -1201,6 +1201,31 @@
       refresh();
     },
     sync: function () { buildSidebar(); },
+    /* Fields the AI assistant may write: text, dates and photos, never links or social handles. */
+    fields: function () {
+      var ly = layout(), out = [];
+      function add(f, path, value) {
+        var type = f.type || 'text';
+        if (!f.k || f.k.indexOf('.') >= 0 || /Url$/.test(f.k) || ['text', 'textarea', 'date', 'photo'].indexOf(type) < 0) return;
+        out.push({ path: path, type: type, label: f.label, value: value == null ? '' : String(value) });
+      }
+      (ly.basics || []).forEach(function (f) { if (!(access && f.k === 'date')) add(f, 'basics.' + f.k, state.basics[f.k]); });
+      state.order.forEach(function (sid) {
+        var meta = ly.sections.find(function (s) { return s.id === sid; }), sec = state.sections[sid];
+        if (!meta || !sec || sec.on === false) return;
+        (meta.fields || []).forEach(function (f) { add(f, 'sections.' + sid + '.' + f.k, sec[f.k]); });
+        if (meta.list && Array.isArray(sec[meta.list.k])) sec[meta.list.k].forEach(function (item, i) {
+          (meta.list.fields || []).forEach(function (f) { add(f, 'sections.' + sid + '.' + meta.list.k + '.' + i + '.' + f.k, item[f.k]); });
+        });
+      });
+      return out;
+    },
+    /* Applies many AI-written values as one change (one undo step). */
+    fill: function (values) {
+      if (!accessAllowed()) return;
+      Object.keys(values).forEach(function (path) { if (!(access && path === 'basics.date')) setVal(state, path, values[path]); });
+      buildSidebar(); refresh();
+    },
     theme: function (key, value) { if (!accessAllowed()) return; state.theme = state.theme || {}; state.theme[key] = value; if(key==='background'||key==='text')Object.keys(state.sections).forEach(function(id){delete state.sections[id][key==='background'?'bg':'textColor'];});refresh(); },
     link: function (path, value) { if (!this.canEdit(path)) return; state.elementLinks = state.elementLinks || {}; state.elementLinks[path] = value; refresh(); },
     section: function (id, action) {

@@ -1,7 +1,7 @@
 (function () {
   'use strict';
-  async function request(url, method, body) {
-    var controller = new AbortController(), timer = setTimeout(function(){controller.abort();}, 30000), r;
+  async function request(url, method, body, timeout) {
+    var controller = new AbortController(), timer = setTimeout(function(){controller.abort();}, timeout || 30000), r;
     try { r = await fetch('/api' + url, { method: method || 'GET', credentials:'same-origin', signal:controller.signal, headers: {'Content-Type':'application/json'}, body:body ? JSON.stringify(body) : undefined }); }
     catch (error) { throw new Error(error.name === 'AbortError' ? 'The request took too long. Please try again.' : 'Unable to connect. Check your connection and try again.'); }
     finally { clearTimeout(timer); }
