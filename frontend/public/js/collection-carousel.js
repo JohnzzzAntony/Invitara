@@ -1,39 +1,89 @@
-/* Homepage template carousel: centered Swiper coverflow inspired by Skiper UI Carousel_001.
- * shop.js owns the cards inside #collection-grid; this file only presents them as slides. */
+/* Homepage template gallery: a CSS 3D cylinder that slowly turns, with floating side cards, glows and orbit rings.
+ * shop.js owns the cards inside #collection-grid; this file only arranges them on the ring and drives the rotation. */
 (function(){
  'use strict';
- if(document.body.dataset.page!=='home'||!window.Swiper)return;
- var wrapper=document.getElementById('collection-grid');if(!wrapper)return;
- var reduced=matchMedia('(prefers-reduced-motion: reduce)');
- var root=document.createElement('div');root.className='swiper collection-carousel';root.setAttribute('role','region');root.setAttribute('aria-roledescription','carousel');root.setAttribute('aria-label','Invitation templates');
- wrapper.before(root);root.append(wrapper);wrapper.classList.add('swiper-wrapper');
+ if(document.body.dataset.page!=='home')return;
+ var ring=document.getElementById('collection-grid');if(!ring)return;
+ var reduced=matchMedia('(prefers-reduced-motion: reduce)'),DURATION=34,MIN_FACES=6,TILT=-7;
+
+ var root=document.createElement('div');root.className='editorial-gallery';root.setAttribute('role','region');root.setAttribute('aria-roledescription','carousel');root.setAttribute('aria-label','Invitation templates');
+ root.innerHTML='<div class="eg-backdrop" aria-hidden="true"><span class="eg-glow"></span><span class="eg-glow eg-glow-two"></span><span class="eg-sweep"></span></div><div class="eg-stage"><div class="eg-side eg-left" aria-hidden="true"></div><div class="eg-viewport"></div><div class="eg-side eg-right" aria-hidden="true"></div><span class="eg-orbit" aria-hidden="true"></span><span class="eg-orbit eg-orbit-two" aria-hidden="true"></span></div>';
+ ring.before(root);root.querySelector('.eg-viewport').append(ring);ring.classList.add('eg-ring');
+ var sides=root.querySelectorAll('.eg-side');
+
  var controls=document.createElement('div');controls.className='carousel-controls';
- controls.innerHTML='<button type="button" class="carousel-arrow" data-dir="prev" aria-label="Previous template"><span aria-hidden="true">←</span></button><div class="carousel-pagination" aria-label="Choose template"></div><button type="button" class="carousel-arrow" data-dir="next" aria-label="Next template"><span aria-hidden="true">→</span></button><button type="button" class="carousel-autoplay" aria-pressed="false"></button>';
+ controls.innerHTML='<button type="button" class="carousel-arrow" data-dir="-1" aria-label="Previous template"><span aria-hidden="true">←</span></button><button type="button" class="carousel-arrow" data-dir="1" aria-label="Next template"><span aria-hidden="true">→</span></button><button type="button" class="carousel-autoplay" aria-pressed="false"></button>';
  root.after(controls);
- function tag(){Array.from(wrapper.children).forEach(function(card){card.classList.add('swiper-slide');});}
- tag();
- var swiper=new Swiper(root,{
-  effect:'coverflow',grabCursor:true,centeredSlides:true,slidesPerView:2.43,spaceBetween:40,loop:true,speed:750,
-  breakpoints:{0:{slidesPerView:1.18,spaceBetween:18},600:{slidesPerView:1.65,spaceBetween:26},900:{slidesPerView:2.43,spaceBetween:40}},
-  coverflowEffect:{rotate:0,stretch:0,depth:100,modifier:2.5,slideShadows:false},
-  keyboard:{enabled:true,onlyInViewport:true},
-  navigation:{prevEl:controls.querySelector('[data-dir=prev]'),nextEl:controls.querySelector('[data-dir=next]')},
-  autoplay:reduced.matches?false:{delay:4500,pauseOnMouseEnter:true,disableOnInteraction:false},
-  a11y:{enabled:true,prevSlideMessage:'Previous template',nextSlideMessage:'Next template',slideLabelMessage:'Template {{index}} of {{slidesLength}}'},
-  pagination:{el:controls.querySelector('.carousel-pagination'),clickable:true,bulletClass:'carousel-dot',bulletActiveClass:'is-active',renderBullet:function(index,className){return '<button type="button" class="'+className+'" aria-label="Go to template '+(index+1)+'"></button>';}}
- });
- function active(){Array.from(wrapper.children).forEach(function(card,index){var selected=card.classList.contains('swiper-slide-active');card.classList.toggle('is-carousel-active',selected);card.setAttribute('aria-label','Template '+(index+1)+' of '+wrapper.children.length);});}
- swiper.on('slideChangeTransitionStart',active);swiper.on('transitionEnd',active);active();
- /* Autoplay is user-controllable (WCAG 2.2.2): visible pause button, paused while focus is inside, off for reduced motion. */
- var toggle=controls.querySelector('.carousel-autoplay'),userPaused=false;
- function syncToggle(){var running=!userPaused;toggle.setAttribute('aria-pressed',String(!running));toggle.innerHTML=running?'<span aria-hidden="true">❚❚</span> Pause':'<span aria-hidden="true">▶</span> Play';toggle.hidden=reduced.matches;}
- toggle.addEventListener('click',function(){userPaused=!userPaused;if(userPaused)swiper.autoplay.stop();else swiper.autoplay.start();syncToggle();});
- root.addEventListener('focusin',function(){if(swiper.autoplay.running)swiper.autoplay.pause();});
- root.addEventListener('focusout',function(e){if(!root.contains(e.relatedTarget)&&!userPaused&&!reduced.matches)swiper.autoplay.resume();});
- var seen=new IntersectionObserver(function(entries){if(userPaused||reduced.matches)return;if(entries[0].isIntersecting)swiper.autoplay.start();else swiper.autoplay.stop();});seen.observe(root);
- syncToggle();
- reduced.addEventListener('change',function(){swiper.params.speed=reduced.matches?0:750;if(reduced.matches)swiper.autoplay.stop();else if(!userPaused)swiper.autoplay.start();syncToggle();});
- /* Filtering, sorting and search re-render the cards, so re-tag them and start from the first. */
- var observer=new MutationObserver(function(){tag();swiper.update();swiper.slideTo(0,0);active();});observer.observe(wrapper,{childList:true});
- addEventListener('pagehide',function(){observer.disconnect();seen.disconnect();swiper.destroy(true,true);root.remove();controls.remove();wrapper.classList.remove('swiper-wrapper');});
+ var toggle=controls.querySelector('.carousel-autoplay');
+
+ var angle=0,target=null,step=60,last=0,frame=0,hover=false,focus=false,userPaused=false,visible=false;
+ function cards(){return Array.from(ring.children);}
+ function spinning(){return !reduced.matches&&!userPaused&&!hover&&!focus&&cards().length>1;}
+
+ function layout(){
+  var list=cards(),faces=Math.max(list.length,MIN_FACES),width=ring.offsetWidth||280;
+  step=360/faces;
+  var radius=Math.round(width/(2*Math.tan(Math.PI/faces))+width*.12);
+  list.forEach(function(card,i){card.style.transform='translate(-50%,-50%) rotateY('+(i*step)+'deg) translateZ('+radius+'px)';});
+  ring.style.setProperty('--eg-radius',radius+'px');
+  scaleFloats();
+ }
+ /* Side cards are static clones of the first six previews, rendered at panel size and scaled down. */
+ function floats(){
+  var list=cards().slice(0,6);
+  sides.forEach(function(side,s){
+   side.replaceChildren();
+   list.slice(s*3,s*3+3).forEach(function(card,i){
+    var art=card.querySelector('.collection-art');if(!art)return;
+    var box=document.createElement('div');box.className='eg-float eg-float-'+(i+1);
+    var inner=art.cloneNode(true);inner.classList.add('eg-float-art');inner.querySelectorAll('a,button').forEach(function(n){n.remove();});
+    box.append(inner);side.append(box);
+   });
+  });
+  scaleFloats();
+ }
+ function scaleFloats(){
+  var size=ring.offsetWidth||280;
+  root.querySelectorAll('.eg-float').forEach(function(box){var inner=box.firstElementChild;inner.style.width=size+'px';inner.style.transform='scale('+(box.clientWidth/size)+')';});
+ }
+
+ /* Rapid clicks step from where the ring is heading, not where it is mid-turn. */
+ function heading(){return target===null?angle:target;}
+ function nearest(index){var from=heading(),delta=((-index*step-from)%360+540)%360-180;return from+delta;}
+ function frontIndex(at){var n=360/step;return ((Math.round(-(at===undefined?angle:at)/step)%n)+n)%n;}
+ function go(index){target=nearest(index);if(reduced.matches){angle=target;target=null;}start();}
+ function step1(dir){var n=cards().length;if(n)go((frontIndex(heading())+dir+n)%n);}
+ function paint(){
+  ring.style.transform='rotateX('+TILT+'deg) rotateY('+angle+'deg)';
+  var front=frontIndex();cards().forEach(function(card,i){card.classList.toggle('is-front',i===front);});
+ }
+ function tick(now){
+  frame=0;var dt=last?Math.min(.1,(now-last)/1000):0;last=now;
+  if(target!==null){angle+=(target-angle)*Math.min(1,dt*6);if(Math.abs(target-angle)<.05){angle=target;target=null;}}
+  else if(spinning())angle-=dt*360/DURATION;
+  paint();
+  if(visible&&!document.hidden&&(target!==null||spinning()))frame=requestAnimationFrame(tick);else last=0;
+ }
+ function start(){if(!frame){last=0;frame=requestAnimationFrame(tick);}}
+
+ controls.querySelectorAll('[data-dir]').forEach(function(btn){btn.addEventListener('click',function(){step1(Number(btn.dataset.dir));});});
+ /* Autoplay is user-controllable (WCAG 2.2.2): visible pause button, paused on hover and while focus is inside, off for reduced motion. */
+ function syncToggle(){toggle.setAttribute('aria-pressed',String(userPaused));toggle.innerHTML=userPaused?'<span aria-hidden="true">▶</span> Play':'<span aria-hidden="true">❚❚</span> Pause';toggle.hidden=reduced.matches;}
+ toggle.addEventListener('click',function(){userPaused=!userPaused;syncToggle();start();});
+ root.addEventListener('pointerenter',function(){hover=true;});
+ root.addEventListener('pointerleave',function(){hover=false;start();});
+ /* Keyboard users: bring the focused card to the front so it is never on the far side of the ring. */
+ root.addEventListener('focusin',function(e){focus=true;var card=e.target.closest('.collection-card');if(card&&card.parentElement===ring)go(cards().indexOf(card));});
+ root.addEventListener('focusout',function(e){if(!root.contains(e.relatedTarget)){focus=false;start();}});
+ root.addEventListener('keydown',function(e){if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();step1(e.key==='ArrowRight'?1:-1);}});
+ var seen=new IntersectionObserver(function(entries){visible=entries[0].isIntersecting;if(visible)start();});seen.observe(root);
+ document.addEventListener('visibilitychange',function(){if(!document.hidden)start();});
+ reduced.addEventListener('change',function(){syncToggle();start();});
+ var resize=new ResizeObserver(layout);resize.observe(ring);resize.observe(root);
+
+ /* Filtering, sorting and search re-render the cards: re-arrange them and face the first one. */
+ function refresh(){angle=0;target=null;layout();paint();requestAnimationFrame(function(){requestAnimationFrame(floats);});start();}
+ var observer=new MutationObserver(refresh);observer.observe(ring,{childList:true});
+ refresh();syncToggle();
+ addEventListener('pagehide',function(){cancelAnimationFrame(frame);observer.disconnect();seen.disconnect();resize.disconnect();});
 })();

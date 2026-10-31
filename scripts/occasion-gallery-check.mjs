@@ -12,8 +12,8 @@ try{
  const a=await shift();await page.waitForTimeout(600);assert.ok(await shift()<a,'marquee drifts');
  await page.getByRole('button',{name:'Pause motion'}).click();const paused=await shift();await page.mouse.move(0,0);await page.waitForTimeout(500);assert.equal(await shift(),paused,'pause button stops the drift');
  await page.getByRole('button',{name:'Play motion'}).click();
- const carousel=page.locator('.collection-carousel');await carousel.scrollIntoViewIfNeeded();
- const active=()=>page.locator('.collection-card.swiper-slide-active').getAttribute('data-swiper-slide-index');
+ const carousel=page.locator('.editorial-gallery');await carousel.scrollIntoViewIfNeeded();
+ const active=()=>page.locator('#collection-grid > .collection-card').evaluateAll(cards=>cards.findIndex(c=>c.classList.contains('is-front')));
  const first=await active();await page.getByRole('button',{name:'Next template'}).click();await page.waitForTimeout(900);assert.notEqual(await active(),first,'next arrow advances');
  await page.getByRole('button',{name:'Pause',exact:true}).click();assert.equal(await page.locator('.carousel-autoplay').getAttribute('aria-pressed'),'true');
  for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:900});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'overflow '+width);}

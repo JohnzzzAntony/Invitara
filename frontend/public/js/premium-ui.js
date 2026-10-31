@@ -26,7 +26,7 @@
   ['blur-rise','.pricing-hero,.discovery-heading,.account-panel'],
   ['curtain','.section-intro,.home-discovery>h2,.studio-steps>h2,.launch-faq>h2,.pricing-section-head,.premium-intro,.studio-end>h2,.legal-page h1'],
   ['cascade-x','.step'],
-  ['zoom-wipe','.launch-pricing>div,.collection-carousel,.pricing-card'],
+  ['zoom-wipe','.launch-pricing>div,.editorial-gallery,.pricing-card'],
   ['slide-left','.launch-faq details,.seo-faq details'],
   ['tilt-up','.feature-strip article,.editorial-grid>div,.invitation-explainer>div,.pricing-included,.occasion-guide'],
   ['drop','.collection-tools,.collection-selector,.carousel-controls'],
@@ -37,7 +37,7 @@
  function reveal(node,name){if(node.classList.contains('ui-reveal'))return;node.classList.add('ui-reveal');node.dataset.motion=name;observer.observe(node);}
  GROUPS.forEach(function(group){document.querySelectorAll(group[1]).forEach(function(node){reveal(node,group[0]);});});
  // Template cards render after data loads; the homepage carousel reveals as one piece, the catalogue reveals card by card.
- var grid=document.getElementById('collection-grid');function revealCards(){if(grid.closest('.collection-carousel'))return;Array.from(grid.children).forEach(function(card,i){if(card.classList.contains('ui-reveal'))return;card.style.setProperty('--reveal-delay',(i%3)*90+'ms');reveal(card,'scale-in');});}if(grid){revealCards();new MutationObserver(revealCards).observe(grid,{childList:true});}
+ var grid=document.getElementById('collection-grid');function revealCards(){if(grid.closest('.editorial-gallery'))return;Array.from(grid.children).forEach(function(card,i){if(card.classList.contains('ui-reveal'))return;card.style.setProperty('--reveal-delay',(i%3)*90+'ms');reveal(card,'scale-in');});}if(grid){revealCards();new MutationObserver(revealCards).observe(grid,{childList:true});}
  document.querySelectorAll('.experience-card').forEach(function(card){var pending=0,x=0,y=0;card.addEventListener('pointermove',function(e){if(reduced.matches||!fine.matches)return;var rect=card.getBoundingClientRect();x=e.clientX-rect.left;y=e.clientY-rect.top;if(!pending)pending=requestAnimationFrame(function(){pending=0;card.style.setProperty('--pointer-x',x+'px');card.style.setProperty('--pointer-y',y+'px');});});});
  document.querySelectorAll('.launch-faq details').forEach(function(details){var summary=details.querySelector('summary'),active;
  summary.addEventListener('click',function(e){if(reduced.matches)return;e.preventDefault();if(active){active.cancel();active=null;}var start=details.getBoundingClientRect().height,closing=details.open;if(!closing)details.open=true;var end=closing?summary.getBoundingClientRect().height+2:details.getBoundingClientRect().height;details.style.overflow='hidden';active=animate(details,[{height:start+'px'},{height:end+'px'}],{duration:320,easing:'cubic-bezier(.22,1,.36,1)'});if(!active){details.open=!closing;details.style.overflow='';return;}active.addEventListener('finish',function(){details.open=!closing;details.style.overflow='';active=null;});active.addEventListener('cancel',function(){details.style.overflow='';});});
