@@ -75,7 +75,7 @@ for (const [file, id, label] of SINGLES) {
   rows.push(`    { id: '${id}', src: 'mu/images/${file}', label: '${label}' },`);
 }
 
-/* Invitara's own occasion photography stays available for the non-wedding
+/* Respondr's own occasion photography stays available for the non-wedding
    themes, where the template's imagery would read as a wedding. */
 const OWN = [
   ['couple', 'ws-couple.jpg', 'Couple portrait'],
@@ -99,7 +99,7 @@ const OWN = [
   ['gala', 'ev-gala.jpg', 'Gala ballroom'],
   ['star', 'ev-star.jpg', 'Star party']
 ];
-rows.push('    /* Invitara occasion photography — frontend/public/assets. */');
+rows.push('    /* Respondr occasion photography — frontend/public/assets. */');
 OWN.forEach(([id, file, label], i) => {
   const last = i === OWN.length - 1;
   rows.push(`    { id: '${id}', src: 'assets/${file}', label: '${label}' }${last ? '' : ','}`);

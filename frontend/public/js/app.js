@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Invitara — site interactions
+   Respondr — site interactions
    Vanilla JS, no dependencies.
    ========================================================================== */
 (function () {

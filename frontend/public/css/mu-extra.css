@@ -280,7 +280,7 @@
   text-transform: uppercase; color: var(--ws-muted);
 }
 
-/* Countdown band — an Invitara section drawn with the template's tokens. */
+/* Countdown band — an Respondr section drawn with the template's tokens. */
 .ws .mu-count-band {
   background: var(--ws-soft, #e6dcd0);
   text-align: center;

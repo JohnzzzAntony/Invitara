@@ -53,17 +53,39 @@ img:not([src$=".svg"]):not([src*="logo"]), video, picture img {
 .discovery-sidebar[popover] fieldset button { white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) { .discovery-sidebar[popover] { transition: none; } }
 
-/* Single brand colour #443B38: every brand token points at it; neutrals stay neutral. */
+/* Single brand colour #B96955: every brand token derives from it; neutrals stay neutral.
+   #B96955 is 4.0:1 on white, so it carries logo, icons, borders, large headings and decoration.
+   Small text, and fills behind white labels, use --brand-strong (5.6:1 on white, >= 4.7:1 on the cream surfaces) for WCAG AA. */
 :root {
-  --brand: #443B38;
-  --lux-ink: var(--brand); --lux-accent: var(--brand);
-  --studio-ink: var(--brand); --olive: var(--brand); --olive-deep: var(--brand); --gold: var(--brand);
-  --cinema-paper: var(--brand); --cinema-accent: var(--brand); --cinema-muted: #6f6663; --studio-muted: #6f6663;
+  --brand: #B96955; --brand-rgb: 185, 105, 85;
+  --brand-strong: #9E5240; --brand-hover: #874434; --brand-deep: #6B3529;
+  --brand-tint: #F6ECE8; --brand-soft: rgba(var(--brand-rgb), .14);
+  --lux-ink: var(--brand-strong); --lux-accent: var(--brand);
+  --studio-ink: var(--brand-strong); --olive: var(--brand-strong); --olive-deep: var(--brand-strong); --gold: var(--brand);
+  --cinema-paper: var(--brand-strong); --cinema-accent: var(--brand); --cinema-muted: #6f6663; --studio-muted: #6f6663;
+  --primary: var(--brand-strong); --teal: var(--brand-strong); --teal-dark: var(--brand-hover); --teal-deep: var(--brand-deep); --teal-tint: var(--brand-tint);
+  --action: var(--brand-strong); --action-hover: var(--brand-hover); --action-text: #fff;
 }
-::selection, body.studio ::selection { background: var(--brand); color: #fff; }
+.editor-page { --primary: var(--brand-strong); --studio-ink: var(--brand-strong); }
+:focus-visible { outline-color: var(--brand); }
+::selection, body.studio ::selection { background: var(--brand-strong); color: #fff; }
 .ui-scroll-progress { background: var(--brand) !important; }
 .occasion-icon { color: var(--brand) !important; }
-[data-page=home] .carousel-pagination .carousel-dot { background: rgba(68, 59, 56, .22); }
+/* Large display headings take the brand colour itself (3:1 is the AA floor for large text). */
+.studio :is(h1, h2) { color: var(--brand); }
+.studio footer a:not([class]) { color: inherit; }
+/* Logos are exempt from contrast minimums (WCAG 1.4.3), so the wordmark shows the true brand colour. */
+.studio-logo, .studio .studio-logo { color: var(--brand) !important; }
+/* Editor top bar uses the same wordmark as the site header (it used a lighter, lowercase variant). */
+.editor-page .ed-bar .studio-logo { display: inline-flex; flex: none; align-items: center; min-height: 44px; font-size: 22px !important; font-weight: 500 !important; line-height: 1 !important; letter-spacing: .22em !important; text-transform: uppercase; text-decoration: none; }
+.editor-page .ed-bar .studio-logo::before { content: none !important; }
+@media (max-width: 767px) { .editor-page .ed-bar .studio-logo { font-size: 16px !important; letter-spacing: .18em !important; } }
+[data-page=home] .carousel-pagination .carousel-dot { background: rgba(var(--brand-rgb), .3); }
+[data-page=home] .carousel-pagination .carousel-dot:is(.is-active, [aria-current="true"]) { background: var(--brand); }
+
+/* Primary actions: AA fill at rest, darker on hover, deepest while pressed. */
+.studio-links .studio-pill:hover, .studio-button:not(.light):not(.lime):hover { background: var(--brand-hover) !important; border-color: var(--brand-hover) !important; box-shadow: 0 12px 24px -16px rgba(var(--brand-rgb), .6); }
+.studio-links .studio-pill:active, .studio-button:not(.light):not(.lime):active { background: var(--brand-deep) !important; border-color: var(--brand-deep) !important; }
 
 /* Motion: short, purposeful feedback on interactive elements (100–300ms, ease-out). */
 .studio a, .studio button, .studio input, .studio select, .studio textarea {
@@ -72,7 +94,7 @@ img:not([src$=".svg"]):not([src*="logo"]), video, picture img {
 .studio-button:hover, .studio-pill:hover, .filter-toggle:hover { transform: translateY(-1px); }
 .studio-button:active, .studio-pill:active, .filter-toggle:active { transform: translateY(0) scale(.98); }
 .collection-card, .occasion-grid a, .pricing-card { transition: transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s ease-out; }
-.collection-card:hover, .occasion-grid a:hover, .pricing-card:hover { transform: translateY(-4px); box-shadow: 0 14px 30px -18px rgba(68, 59, 56, .45); }
+.collection-card:hover, .occasion-grid a:hover, .pricing-card:hover { transform: translateY(-4px); box-shadow: 0 14px 30px -18px rgba(var(--brand-rgb), .45); }
 .collection-card img, .occasion-grid a img { transition: transform .6s cubic-bezier(.22,1,.36,1); }
 .collection-card:hover img, .occasion-grid a:hover img { transform: scale(1.03); }
 @media (prefers-reduced-motion: reduce) {
@@ -83,8 +105,8 @@ img:not([src$=".svg"]):not([src*="logo"]), video, picture img {
 /* Selected filters and focused fields in the brand colour (they were green). */
 .studio .collection-selector button[aria-pressed="true"],
 .studio .discovery-sidebar button[aria-pressed="true"],
-.studio .studio-filter[aria-pressed="true"] { background: var(--brand) !important; color: #fff !important; border-color: var(--brand) !important; }
-.studio :is(.collection-tools input, .collection-tools select, .studio-form input, .studio-form select, .studio-form textarea):focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(68, 59, 56, .12); }
+.studio .studio-filter[aria-pressed="true"] { background: var(--brand-strong) !important; color: #fff !important; border-color: var(--brand-strong) !important; }
+.studio :is(.collection-tools input, .collection-tools select, .studio-form input, .studio-form select, .studio-form textarea):focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(var(--brand-rgb), .18); }
 
 /* Template showroom: bar and footer stay fixed; only the theme scrolls between them, so nothing covers it. */
 .studio .premium-showroom { width: 100vw; max-width: 100vw; height: 100svh; max-height: 100svh; margin: 0; padding: 0; border: 0; }
@@ -114,14 +136,45 @@ img:not([src$=".svg"]):not([src*="logo"]), video, picture img {
 /* Template-fixed bottom bars sit above the preview footer instead of under it. */
 .premium-showroom .hw-nav { bottom: calc(49px + 14px); }
 /* Card "experience" arrow was #222 on near-black; brand square with white arrow. */
-.studio .card-experience { background: var(--brand) !important; color: #fff !important; }
-.studio .card-experience:hover { background: #2e2725 !important; }
+.studio .card-experience { background: var(--brand-strong) !important; color: #fff !important; }
+.studio .card-experience:hover { background: var(--brand-hover) !important; }
 /* UI/UX floor: readable sizes, AA contrast, comfortable measure, 44px tap areas. */
 .studio :is(.occasion-note, .footer-heading, .discovery-sidebar legend, .collection-selector legend, .step > span) { font-size: 12px !important; }
-.studio .experience-price-meta b { color: var(--brand) !important; }
+.studio .experience-price-meta b { color: var(--brand-strong) !important; }
 .studio main p { max-width: 72ch; }
 .studio .carousel-dot { position: relative; }
 .studio .carousel-dot::after { content: ''; position: absolute; inset: -18px -6px; }
 .studio .detail-hint { margin-inline: auto; color: var(--studio-muted) !important; }
 /* 404: the primary path forward and a way home, side by side (H3 user control). */
 .error-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+/* Editor chrome inside the live preview (section tools) in the brand colour, not the old green. */
+.section-hover-tools button { border-color: rgba(var(--brand-rgb), .45) !important; color: var(--brand-strong) !important; }
+/* Full-bleed home bands keep the header's 20px mobile gutter (they used 18px, 2px off the logo line). */
+@media (max-width: 767px) {
+  [data-page=home] :is(.home-discovery, .collection-section, .studio-steps), [data-page=collection] .collection-section { padding-inline: 20px; }
+}
+/* Catalogue grid (create + occasion pages): 601px-tall cards in three columns made the page 2,500px+ at desktop
+   and a single 7,000px column on phones. Smaller cards show more designs per screen; filters stay the way to narrow. */
+.studio .discovery .collection-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 32px 20px !important; }
+.studio .discovery .collection-card-top h3 { font-size: 22px !important; line-height: 1.15; }
+@media (max-width: 1099px) { .studio .discovery .collection-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; } }
+@media (max-width: 767px) {
+  .studio .discovery .collection-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 24px 12px !important; }
+  .studio .discovery .discovery-results { padding-inline: 16px; }
+  .studio .discovery .collection-card-top { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .studio .discovery .collection-card-top h3 { min-width: 0; font-size: 18px !important; line-height: 1.2; overflow-wrap: anywhere; }
+  .studio .discovery .collection-card .card-bottom { flex-direction: column; align-items: stretch; gap: 8px; }
+  .studio .discovery .collection-card .card-bottom > * { justify-content: center; text-align: center; }
+}
+/* Phone card carousels (js/card-carousel.js): Swiper core layout plus the same 44px arrows and dots as the home carousel. */
+.card-carousel { position: relative; overflow: hidden; }
+.card-carousel .swiper-wrapper { display: flex !important; gap: 0 !important; grid-template-columns: none !important; }
+.card-carousel .swiper-slide { flex-shrink: 0; height: auto; }
+.card-carousel-controls { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 16px; }
+.card-carousel-controls .carousel-arrow { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--studio-line, #e2e4df); background: transparent; color: var(--brand); font-size: 18px; cursor: pointer; }
+.card-carousel-controls .carousel-arrow:hover { background: var(--brand); border-color: var(--brand); color: #fff; }
+.card-carousel-controls .carousel-arrow.swiper-button-disabled { opacity: .35; cursor: default; }
+.card-carousel-controls .carousel-pagination { display: flex; align-items: center; gap: 8px; }
+.card-carousel-controls .carousel-dot { position: relative; width: 8px; height: 8px; padding: 0; border: 0; border-radius: 50%; background: rgba(var(--brand-rgb), .3); cursor: pointer; transition: width .3s, background .3s; }
+.card-carousel-controls .carousel-dot::after { content: ''; position: absolute; inset: -18px -6px; }
+.card-carousel-controls .carousel-dot.is-active { width: 24px; border-radius: 10px; background: var(--brand); }

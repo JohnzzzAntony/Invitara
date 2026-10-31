@@ -28,7 +28,7 @@ test('production boot serves built assets with security headers and secure cooki
     for(const url of ['/','/vendor/editions/editions-motion.js','/vendor/gsap.min.js'])assert.equal((await fetch(endpoint+url)).status,200);
     for(const [from,to] of [['/wedding-invitations.html','/wedding-invitations'],['/baby-shower-invitations.html','/baby-shower-invitations'],['/create.html?occasion=eid','/eid-invitations'],['/plan.html','/pricing.html']]){const r=await fetch(endpoint+from,{redirect:'manual'});assert.equal(r.status,301);assert.equal(r.headers.get('location'),to);}
     const landing=await (await fetch(endpoint+'/wedding-invitations')).text();
-    assert.match(landing,/<title>Digital Wedding Invitations with Online RSVP \| Invitara<\/title>/);assert.match(landing,/<link rel="canonical" href="[^"]*\/wedding-invitations">/);assert.match(landing,/<h1 id="collection-title"[^>]*>Digital wedding invitations<\/h1>/);
+    assert.match(landing,/<title>Digital Wedding Invitations with Online RSVP \| Respondr<\/title>/);assert.match(landing,/<link rel="canonical" href="[^"]*\/wedding-invitations">/);assert.match(landing,/<h1 id="collection-title"[^>]*>Digital wedding invitations<\/h1>/);
     const graph=JSON.parse(/<script type="application\/ld\+json">(.*?)<\/script>/.exec(landing)[1])['@graph'];
     assert.deepEqual(graph.map(n=>n['@type']),['Organization','WebSite','CollectionPage','BreadcrumbList','FAQPage']);
     const design=await (await fetch(endpoint+'/design.html?id=edition-vow')).text();
@@ -38,7 +38,7 @@ test('production boot serves built assets with security headers and secure cooki
     assert.equal(faqs.length,(home.match(/<details>/g)||[]).length,'FAQ markup mirrors visible questions');
     const sitemap=await (await fetch(endpoint+'/sitemap.xml')).text();
     for(const path of ['/wedding-invitations','/design.html?id=edition-vow','/pricing.html'])assert.ok(sitemap.includes(path),path);
-    assert.match(await (await fetch(endpoint+'/llms.txt')).text(),/^# Invitara/);
+    assert.match(await (await fetch(endpoint+'/llms.txt')).text(),/^# Respondr/);
     assert.equal((await fetch(endpoint+'/not-an-occasion')).status,404);
     for(const url of ['/.env','/backend/index.mjs','/server/index.mjs','/frontend/motion/editions-motion.js','/frontend/README.md','/archive/atelier-2026-10-07/README.md','/data/invitara.sqlite','/node_modules/express/package.json'])assert.equal((await fetch(endpoint+url)).status,404);
     assert.equal((await fetch(endpoint+'/api/auth/login',{method:'POST',headers:{Origin:'https://untrusted.example','Content-Type':'application/json'},body:'{}'})).status,403);

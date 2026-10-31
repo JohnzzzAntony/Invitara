@@ -24,7 +24,7 @@
 }
 [data-page=home] .occasion-marquee .occasion-photo-card:focus-visible{outline:3px solid #fff;outline-offset:-6px}
 
-.marquee-toggle{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin:4px 0 0;padding:0 16px;border:1px solid var(--studio-line,#e2e4df);background:transparent;color:var(--brand,#443b38);font-size:13px;font-weight:500;cursor:pointer}
+.marquee-toggle{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin:4px 0 0;padding:0 16px;border:1px solid var(--studio-line,#e2e4df);background:transparent;color:var(--brand-strong,#9e5240);font-size:13px;font-weight:500;cursor:pointer}
 .marquee-toggle span{font-size:10px;letter-spacing:-.1em}
 .marquee-toggle:hover{border-color:currentColor}
 
@@ -41,9 +41,9 @@
 
 /* Template carousel controls (js/collection-carousel.js): 44px arrows and an autoplay toggle around the dots. */
 [data-page=home] .carousel-controls{gap:12px;flex-wrap:wrap}
-.carousel-arrow{display:grid;place-items:center;width:44px;height:44px;padding:0;border:1px solid var(--studio-line,#e2e4df);background:transparent;color:var(--brand,#443b38);font-size:18px;cursor:pointer}
-.carousel-arrow:hover{background:var(--brand,#443b38);border-color:var(--brand,#443b38);color:#fff}
+.carousel-arrow{display:grid;place-items:center;width:44px;height:44px;padding:0;border:1px solid var(--studio-line,#e2e4df);background:transparent;color:var(--brand,#b96955);font-size:18px;cursor:pointer}
+.carousel-arrow:hover{background:var(--brand,#b96955);border-color:var(--brand,#b96955);color:#fff}
 .carousel-arrow.swiper-button-disabled{opacity:.35;cursor:default}
-.carousel-autoplay{min-height:44px;margin-left:8px;padding:0 16px;border:1px solid var(--studio-line,#e2e4df);background:transparent;color:var(--brand,#443b38);font-size:13px;font-weight:500;cursor:pointer}
+.carousel-autoplay{min-height:44px;margin-left:8px;padding:0 16px;border:1px solid var(--studio-line,#e2e4df);background:transparent;color:var(--brand-strong,#9e5240);font-size:13px;font-weight:500;cursor:pointer}
 .carousel-autoplay:hover{border-color:currentColor}
 .carousel-autoplay span{font-size:10px;margin-right:4px;letter-spacing:-.1em}

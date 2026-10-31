@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Invitara — core engine v4: multi-layout template catalog
+   Respondr — core engine v4: multi-layout template catalog
    10 layouts (poetic, herald, atrium, editorial, calm, terra, crescent,
    heritage, mandala, serene) x 13 premium themes, spread across nine event
    types. Each layout is a port of one Muhibbi invitation home page; they
@@ -216,7 +216,7 @@
     { id: 'mu-cta', src: 'mu/images/cta.jpg', label: 'Invitation band' },
     { id: 'mu-contact', src: 'mu/images/contact-bg.jpg', label: 'Contact backdrop' },
     { id: 'mu-soft', src: 'mu/images/pricing/bg.jpg', label: 'Soft backdrop' },
-    /* Invitara occasion photography — public/assets. */
+    /* Respondr occasion photography — public/assets. */
     { id: 'couple', src: 'assets/ws-couple.jpg', label: 'Couple portrait' },
     { id: 'cafe', src: 'assets/ws-cafe.jpg', label: 'First meeting' },
     { id: 'proposal', src: 'assets/ws-proposal.jpg', label: 'The proposal' },

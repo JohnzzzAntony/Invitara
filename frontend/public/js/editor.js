@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Invitara — event website builder (v4, dynamic sidebar)
+   Respondr — event website builder (v4, dynamic sidebar)
    The sidebar is generated 100% from the active layout's field specs
    (docs/LAYOUT-SPEC.md): "Basics" from layout.basics and one accordion per
    section in state.order from layout.sections — so every field of every

@@ -1,4 +1,4 @@
-/* Original Invitara UI treatments inspired by the public Skiper UI demos.
+/* Original Respondr UI treatments inspired by the public Skiper UI demos.
    Scoped to application chrome; invitation artwork retains its own design. */
 body.studio{--ui-ease:cubic-bezier(.22,1,.36,1);--ui-shadow:0 24px 70px -40px #302a2240}
 .studio-header{transition:box-shadow .35s,background .35s;backdrop-filter:blur(18px)}

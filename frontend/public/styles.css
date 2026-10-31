@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Invitara — minimalist marketing site
+   Respondr — minimalist marketing site
    Pure CSS, no frameworks. Teal + white + serif headings.
    ========================================================================== */
 
@@ -12,9 +12,9 @@
    cannot move any layout. (--teal is therefore the brand accent, whatever
    colour that happens to be.) */
 :root {
-  --teal:        #652901;   /* brand accent — links, active states */
-  --teal-dark:   #4e1f01;   /* accent hover */
-  --teal-deep:   #3b1801;
+  --teal:        #9E5240;   /* brand #B96955, AA text shade — links, active states */
+  --teal-dark:   #874434;   /* accent hover */
+  --teal-deep:   #6B3529;
   --teal-tint:   #faf7f2;   /* warm cream wash */
   --ink:         #171717;   /* headings & primary text */
   --body:        #404040;

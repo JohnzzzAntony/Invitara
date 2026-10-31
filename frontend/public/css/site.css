@@ -1,4 +1,4 @@
-/* Invitara site system: shared header, typography, buttons and footer for every marketing page,
+/* Respondr site system: shared header, typography, buttons and footer for every marketing page,
    mobile first, with 44px tap targets and a 12px text floor.
    Loaded last so it wins over the earlier style layers. */
 
@@ -8,7 +8,7 @@
   --olive: #5b6a39;
   --olive-deep: #4a5730;
   --gold: #b3955d;
-  --studio-ink: #2a2e25;
+  --studio-ink: #9E5240;
   --studio-muted: #6c6a5f;
   --studio-paper: #f8f5ef;
   --studio-line: #e5dfd2;

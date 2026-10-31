@@ -1,4 +1,4 @@
-# Invitara — interactive invitation platform
+# Respondr — interactive invitation platform
 
 Production application: Node 24, Express, SQLite, Stripe Checkout and locally bundled Anime.js, Motion, Three.js and GSAP. Browser animation sources are compiled by esbuild. The production server serves `frontend/public/` and enforces purchases and event expiry.
 

@@ -1,4 +1,4 @@
-/* Invitara: event-date checkout via hosted Stripe. Payment confirmation is server-owned. */
+/* Respondr: event-date checkout via hosted Stripe. Payment confirmation is server-owned. */
 (async function () {
   'use strict';
 

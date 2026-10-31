@@ -11,7 +11,7 @@
   --button-height: 48px;
   --studio-paper: #f7f5ef;
   --studio-bg: var(--studio-paper);
-  --studio-ink: #293b32;
+  --studio-ink: var(--brand-strong,#9e5240);
   --studio-muted: #626b61;
   --studio-line: #d9ddd1;
   --studio-accent: #dce7b9;
@@ -20,7 +20,7 @@
   --olive: #596c43;
   --text-on-dark: #f7f5ef;
   --text-on-dark-muted: #d2dac7;
-  --shadow-soft: 0 12px 32px #293b320d;
+  --shadow-soft: 0 12px 32px rgba(var(--brand-rgb,185,105,85),.05);
   --transition-fast: 180ms ease;
 }
 html { scroll-behavior: smooth; scroll-padding-top: 100px; }
