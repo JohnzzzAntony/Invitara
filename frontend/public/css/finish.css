@@ -76,10 +76,20 @@ img:not([src$=".svg"]):not([src*="logo"]), video, picture img {
 .studio footer a:not([class]) { color: inherit; }
 /* Logos are exempt from contrast minimums (WCAG 1.4.3), so the wordmark shows the true brand colour. */
 .studio-logo, .studio .studio-logo { color: var(--brand) !important; }
-/* Editor top bar uses the same wordmark as the site header (it used a lighter, lowercase variant). */
-.editor-page .ed-bar .studio-logo { display: inline-flex; flex: none; align-items: center; min-height: 44px; font-size: 22px !important; font-weight: 500 !important; line-height: 1 !important; letter-spacing: .22em !important; text-transform: uppercase; text-decoration: none; }
-.editor-page .ed-bar .studio-logo::before { content: none !important; }
-@media (max-width: 767px) { .editor-page .ed-bar .studio-logo { font-size: 16px !important; letter-spacing: .18em !important; } }
+/* Respondr logo: copper R mark | RESPONDR (header, editor); mark stacked over the word in the footer. */
+.studio-logo, .editor-page .ed-bar .studio-logo { display: inline-flex; flex: none; align-items: center; gap: 14px; min-height: 44px; font: 600 18px/1 'Inter Tight', Arial, sans-serif !important; letter-spacing: .26em !important; text-transform: uppercase; text-decoration: none; }
+.studio-logo::before { content: none !important; }
+.studio-logo .logo-mark { display: block; width: auto; height: 34px; }
+.studio-logo .logo-word { display: flex; align-items: center; min-height: 34px; padding-left: 14px; border-left: 1.5px solid currentColor; margin-right: -.26em; }
+.studio-footer .studio-logo { flex-direction: column; gap: 10px; font-size: 16px !important; }
+.studio-footer .studio-logo .logo-mark { height: 46px; }
+.studio-footer .studio-logo .logo-word { min-height: 0; padding-left: 0; border-left: 0; }
+@media (max-width: 767px) {
+  .studio-logo, .editor-page .ed-bar .studio-logo { gap: 10px; font-size: 14px !important; letter-spacing: .2em !important; }
+  .studio-logo .logo-mark { height: 28px; }
+  .studio-logo .logo-word { min-height: 28px; padding-left: 10px; }
+  .editor-page .ed-bar .studio-logo .logo-word { display: none; }
+}
 [data-page=home] .carousel-pagination .carousel-dot { background: rgba(var(--brand-rgb), .3); }
 [data-page=home] .carousel-pagination .carousel-dot:is(.is-active, [aria-current="true"]) { background: var(--brand); }
 
