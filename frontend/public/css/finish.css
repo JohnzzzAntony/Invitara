@@ -178,3 +178,13 @@ img:not([src$=".svg"]):not([src*="logo"]), video, picture img {
 .card-carousel-controls .carousel-dot { position: relative; width: 8px; height: 8px; padding: 0; border: 0; border-radius: 50%; background: rgba(var(--brand-rgb), .3); cursor: pointer; transition: width .3s, background .3s; }
 .card-carousel-controls .carousel-dot::after { content: ''; position: absolute; inset: -18px -6px; }
 .card-carousel-controls .carousel-dot.is-active { width: 24px; border-radius: 10px; background: var(--brand); }
+/* How it works: the three steps sit on one row at every width; phones swipe the row (scroll-snap) instead of stacking 700px of cards. */
+[data-page=home] .step-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 24px !important; }
+[data-page=home] .step { padding-block: 20px; }
+[data-page=home] .step h3 { font-size: clamp(20px, 2.2vw, 26px) !important; margin: 14px 0 8px !important; }
+[data-page=home] .step p { font-size: 14px; line-height: 1.6; }
+@media (max-width: 767px) {
+  [data-page=home] .step-grid { grid-template-columns: none !important; grid-auto-flow: column; grid-auto-columns: 80%; gap: 16px !important; padding-top: 6px; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; }
+  [data-page=home] .step { scroll-snap-align: start; }
+  [data-page=home] .step::before { left: 0; } /* the -5px offset was clipped by the scroller */
+}
