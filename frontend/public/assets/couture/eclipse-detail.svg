@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1100" width="900" height="1100">
+<title>AUREL One detail — illustrative artwork</title>
+<defs>
+<linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#121722"/><stop offset="1" stop-color="#06080d"/></linearGradient>
+<radialGradient id="glow" cx="62%" cy="40%" r="55%"><stop offset="0" stop-color="#e8c48e" stop-opacity=".5"/><stop offset=".5" stop-color="#e8c48e" stop-opacity=".08"/><stop offset="1" stop-color="#e8c48e" stop-opacity="0"/></radialGradient>
+<linearGradient id="s" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2a3142"/><stop offset=".5" stop-color="#596178"/><stop offset="1" stop-color="#151a26"/></linearGradient>
+</defs>
+<rect width="900" height="1100" fill="url(#g)"/>
+<rect width="900" height="1100" fill="url(#glow)"/>
+<g fill="none" stroke="#e8c48e" stroke-opacity=".22"><circle cx="560" cy="440" r="260"/><circle cx="560" cy="440" r="330"/><circle cx="560" cy="440" r="400"/></g>
+<path d="M110 1100C190 760 360 560 560 560s300 180 340 540Z" fill="url(#s)"/>
+<path d="M190 900C280 700 410 610 560 610" fill="none" stroke="#fff1d6" stroke-width="3" stroke-opacity=".7"/>
+<circle cx="560" cy="440" r="8" fill="#fff1d6"/>
+</svg>

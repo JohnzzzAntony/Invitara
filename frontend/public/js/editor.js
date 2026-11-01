@@ -1184,6 +1184,30 @@
     } catch(err) { banner.classList.add('error'); banner.textContent = err.message; document.querySelector('.ed-canvas-wrap').prepend(banner); document.getElementById('full-preview-btn').disabled = true; document.getElementById('save-btn').disabled = true; document.getElementById('publish-btn').disabled = true; return; }
   }
   loadState();
+  function setTheme(key, value) {
+    state.theme = state.theme || {}; state.theme[key] = value;
+    if (key === 'background' || key === 'text') Object.keys(state.sections).forEach(function (id) { delete state.sections[id][key === 'background' ? 'bg' : 'textColor']; });
+  }
+  /* Section toolbar actions, shared by the canvas tools and the AI assistant; callers re-render. */
+  function sectionAction(id, action) {
+    var index = state.order.indexOf(id), next = index + (action === 'up' ? -1 : 1);
+    if (action === 'show') { if (index < 0) state.order.push(id); state.sections[id].on = true; }
+    else if (index < 0) return;
+    else if (action === 'hide') state.sections[id].on = false;
+    else if (action === 'delete') { if (['hero','rsvp','contact'].includes(id)) return; state.order.splice(index, 1); }
+    else if (action === 'duplicate') {
+      var type = (state.sectionTypes || {})[id] || id;
+      if (['hero','rsvp','contact','date'].includes(type)) return;
+      state.sectionTypes = state.sectionTypes || {};
+      if (Object.keys(state.sectionTypes).length >= 20) { toast('Use at most 20 additional sections.'); return; }
+      var n = 1; while (state.sections[type + 'Copy' + n]) n++;
+      var key = type + 'Copy' + n;
+      state.sectionTypes[key] = type; state.sections[key] = JSON.parse(JSON.stringify(state.sections[id]));
+      state.order.splice(index + 1, 0, key);
+      Object.keys(state.elementStyles || {}).filter(function (path) { return path === 'sections.'+id || path.startsWith('sections.'+id+'.'); }).forEach(function (path) { state.elementStyles[path.replace('sections.'+id,'sections.'+key)] = Object.assign({}, state.elementStyles[path]); });
+    }
+    else if (next >= 0 && next < state.order.length) { state.order.splice(index, 1); state.order.splice(next, 0, id); }
+  }
   window.EVER_EDITOR = {
     getState: function () { return state; },
     canEdit: function (path) { return accessAllowed() && !(access && path === 'basics.date'); },
@@ -1201,12 +1225,12 @@
       refresh();
     },
     sync: function () { buildSidebar(); },
-    /* Fields the AI assistant may write: text, dates and photos, never links or social handles. */
+    /* Fields the AI assistant may write: text, dates, photos and colours, never links or social handles. */
     fields: function () {
       var ly = layout(), out = [];
       function add(f, path, value) {
         var type = f.type || 'text';
-        if (!f.k || f.k.indexOf('.') >= 0 || /Url$/.test(f.k) || ['text', 'textarea', 'date', 'photo'].indexOf(type) < 0) return;
+        if (!f.k || f.k.indexOf('.') >= 0 || /Url$/.test(f.k) || ['text', 'textarea', 'date', 'photo', 'color'].indexOf(type) < 0) return;
         out.push({ path: path, type: type, label: f.label, value: value == null ? '' : String(value) });
       }
       (ly.basics || []).forEach(function (f) { if (!(access && f.k === 'date')) add(f, 'basics.' + f.k, state.basics[f.k]); });
@@ -1226,26 +1250,50 @@
       Object.keys(values).forEach(function (path) { if (!(access && path === 'basics.date')) setVal(state, path, values[path]); });
       buildSidebar(); refresh();
     },
-    theme: function (key, value) { if (!accessAllowed()) return; state.theme = state.theme || {}; state.theme[key] = value; if(key==='background'||key==='text')Object.keys(state.sections).forEach(function(id){delete state.sections[id][key==='background'?'bg':'textColor'];});refresh(); },
+    theme: function (key, value) { if (!accessAllowed()) return; setTheme(key, value); refresh(); },
     link: function (path, value) { if (!this.canEdit(path)) return; state.elementLinks = state.elementLinks || {}; state.elementLinks[path] = value; refresh(); },
     section: function (id, action) {
       if (!accessAllowed() || !state.sections[id]) return;
-      var index = state.order.indexOf(id), next = index + (action === 'up' ? -1 : 1);
-      if (action === 'hide') state.sections[id].on = false;
-      else if (action === 'delete') { if (['hero','rsvp','contact'].includes(id)) return; state.order.splice(index, 1); }
-      else if (action === 'duplicate') {
-        var type = (state.sectionTypes || {})[id] || id;
-        if (['hero','rsvp','contact','date'].includes(type)) return;
-        state.sectionTypes = state.sectionTypes || {};
-        if (Object.keys(state.sectionTypes).length >= 20) { toast('Use at most 20 additional sections.'); return; }
-        var n = 1; while (state.sections[type + 'Copy' + n]) n++;
-        var key = type + 'Copy' + n;
-        state.sectionTypes[key] = type; state.sections[key] = JSON.parse(JSON.stringify(state.sections[id]));
-        state.order.splice(index + 1, 0, key);
-        Object.keys(state.elementStyles || {}).filter(function (path) { return path === 'sections.'+id || path.startsWith('sections.'+id+'.'); }).forEach(function (path) { state.elementStyles[path.replace('sections.'+id,'sections.'+key)] = Object.assign({}, state.elementStyles[path]); });
-      }
-      else if (next >= 0 && next < state.order.length) { state.order.splice(index, 1); state.order.splice(next, 0, id); }
+      sectionAction(id, action);
       buildSidebar(); refresh();
+    },
+    /* The AI assistant's view of the invitation (see backend/ai.mjs readContext). */
+    context: function () {
+      var ly = layout(), selected = document.querySelector('#canvas .is-selected[data-field]');
+      var sections = state.order.concat(ly.sections.map(function (s) { return s.id; }).filter(function (id) { return state.order.indexOf(id) < 0; })).map(function (id) {
+        var meta = ly.sections.find(function (s) { return s.id === id; }), sec = state.sections[id] || {}, out = { id: id, label: meta ? meta.label : id, on: state.order.indexOf(id) >= 0 && sec.on !== false };
+        if (meta && meta.list) out.list = { key: meta.list.k, label: meta.list.label, count: Array.isArray(sec[meta.list.k]) ? sec[meta.list.k].length : 0, fields: (meta.list.fields || []).filter(function (f) { return f.k; }).map(function (f) { return { k: f.k, type: f.type || 'text', label: f.label }; }) };
+        return out;
+      });
+      return {
+        fields: this.fields().map(function (f) { return f.type === 'photo' ? { path: f.path, type: f.type, label: f.label, filled: !!f.value } : f; }),
+        sections: sections.filter(function (s) { return /^[a-zA-Z0-9]{1,40}$/.test(s.id); }),
+        theme: state.theme || {},
+        themeSupported: state.layoutId === 'platform',
+        design: { nameFont: state.nameFont || '', bodyFont: state.bodyFont || '', accent: state.accent || '', btnShape: state.btnShape || '', spacing: state.spacing || '' },
+        options: { nameFont: [''].concat(Object.keys(window.EVER_NAME_FONTS)), bodyFont: Object.keys(window.EVER_BODY_FONTS), accent: accentList().map(function (a) { return a.id; }), btnShape: ['pill', 'soft', 'square'], spacing: ['cozy', 'normal', 'airy'] },
+        selected: selected ? selected.dataset.field : ''
+      };
+    },
+    /* Applies the assistant's checked operations as one change: one render, one undo step. */
+    apply: function (ops) {
+      if (!accessAllowed()) return;
+      var ly = layout();
+      ops.forEach(function (op) {
+        if (op.type === 'text' || op.type === 'photo') { if (!(access && op.path === 'basics.date')) setVal(state, op.path, op.value); }
+        else if (op.type === 'style') { state.elementStyles = state.elementStyles || {}; state.elementStyles[op.path] = state.elementStyles[op.path] || {}; state.elementStyles[op.path][op.property] = op.value; }
+        else if (op.type === 'theme') setTheme(op.key, op.value);
+        else if (op.type === 'design') state[op.key] = op.value;
+        else if (op.type === 'section' && state.sections[op.id]) sectionAction(op.id, op.action);
+        else if (op.type === 'item') {
+          var meta = ly.sections.find(function (s) { return s.id === op.section; }), sec = state.sections[op.section];
+          if (!meta || !meta.list || !sec) return;
+          var arr = sec[meta.list.k] = Array.isArray(sec[meta.list.k]) ? sec[meta.list.k] : [];
+          if (op.action === 'add') arr.push((meta.list.blank || function () { return {}; })());
+          else arr.splice(op.index, 1);
+        }
+      });
+      buildSidebar(); buildDesign(); refresh();
     },
     undo: function () { travel(-1); }, redo: function () { travel(1); },
     preview: function () { render(); },

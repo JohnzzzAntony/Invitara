@@ -1,12 +1,14 @@
 // AI assistant for the editor. Proxies NVIDIA's API Catalog so the key never reaches the browser.
-// The client sends the active layout's field list; only those paths come back, as plain strings.
+// The client sends the editor's state; the model replies with edit operations, and only operations
+// on that state's fields and sections, with values the save endpoint accepts, come back.
 import { validatePhoto } from './photo.mjs';
+import { STYLE_CHOICES, STYLE_RANGES, THEME_COLORS, THEME_CHOICES, validStyle, validTheme } from './invitation-state.mjs';
 
 const CHAT_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
 const CHAT_MODEL = 'nvidia/nemotron-3.5-super-vl-120b-a12b';
 const IMAGE_URL = 'https://ai.api.nvidia.com/v1/genai/black-forest-labs/flux.1-schnell';
 const PATH = /^(basics\.[a-zA-Z]+|sections\.[a-zA-Z0-9]+\.(?:[a-zA-Z]+|[a-zA-Z]+\.\d{1,2}\.[a-zA-Z]+))$/;
-const TYPES = ['text', 'textarea', 'date', 'photo'];
+const TYPES = ['text', 'textarea', 'date', 'photo', 'color'];
 
 class AiError extends Error { constructor(status, message) { super(message); this.status = status; } }
 
@@ -25,60 +27,138 @@ function readFields(input) {
   if (!Array.isArray(input) || !input.length || input.length > 250) throw new AiError(400, 'This template has no editable fields.');
   return input.map(f => {
     if (!f || typeof f.path !== 'string' || !PATH.test(f.path) || !TYPES.includes(f.type) || typeof f.label !== 'string' || f.label.length > 120 || (f.value != null && typeof f.value !== 'string')) throw new AiError(400, 'Invalid template fields.');
-    return { path: f.path, type: f.type, label: f.label, value: f.type === 'photo' ? undefined : String(f.value || '').slice(0, 600) };
+    return f.type === 'photo' ? { path: f.path, type: f.type, label: f.label, filled: !!f.filled } : { path: f.path, type: f.type, label: f.label, value: String(f.value || '').slice(0, 600) };
   });
 }
 
 function parseJson(text) {
-  const start = String(text).indexOf('{'), end = String(text).lastIndexOf('}');
+  text = String(text).replace(/<think>[\s\S]*?<\/think>/g, '');
+  const start = text.indexOf('{'), end = text.lastIndexOf('}');
   try { return JSON.parse(text.slice(start, end + 1)); } catch { throw new AiError(502, 'The AI returned an unreadable draft. Please try again.'); }
 }
 
-export async function writeInvitation(body, key) {
-  const fields = readFields(body.fields);
-  const details = typeof body.details === 'string' ? body.details.trim().slice(0, 4000) : '';
-  const tone = typeof body.tone === 'string' ? body.tone.slice(0, 40) : 'Elegant';
-  const photos = Array.isArray(body.photos) ? body.photos.slice(0, 6) : [];
+function readPhotos(input) {
+  const photos = Array.isArray(input) ? input.slice(0, 6) : [];
   for (const p of photos) {
     let valid = typeof p === 'string' && p.startsWith('data:') && p.length <= 400000;
     try { if (valid) validatePhoto(p); } catch { valid = false; }
     if (!valid) throw new AiError(400, 'Use JPEG, PNG or WebP photos.');
   }
-  if (!details) throw new AiError(400, 'Add a few details about your event first.');
+  return photos;
+}
 
-  const text = fields.filter(f => f.type !== 'photo'), slots = fields.filter(f => f.type === 'photo');
-  const prompt = [
-    'You write the copy for a digital event invitation website. Fill every field below for this event.',
-    'Tone: ' + tone + '.',
-    'Event details from the host:\n' + details,
-    'Text fields (path | label | current placeholder text):\n' + text.map(f => f.path + ' | ' + f.label + ' | ' + f.value).join('\n'),
-    slots.length ? 'Photo slots (path | label):\n' + slots.map(f => f.path + ' | ' + f.label).join('\n') : '',
-    photos.length ? 'The host attached ' + photos.length + ' photos, numbered 0 to ' + (photos.length - 1) + ' in the order shown. Put the best ones in the most prominent slots.' : '',
-    'Rules: use the host\'s names, places and times exactly. Keep each value about as long as its placeholder. Dates use YYYY-MM-DD. Never invent phone numbers, emails or links: use an empty string if the host gave none. Write in the language of the event details.',
-    'Reply with JSON only, shaped {"fields":{"<text path>":"<text>"},"photos":{"<photo path>":<photo number>},"imagePrompts":{"<photo path without a host photo>":"<short photographic scene description, no people\'s faces, no text>"}}.'
+const ID = /^[a-zA-Z0-9]{1,40}$/;
+const SECTION_ACTIONS = ['up', 'down', 'hide', 'show', 'delete', 'duplicate'];
+const DESIGN_KEYS = ['nameFont', 'bodyFont', 'accent', 'btnShape', 'spacing'];
+const short = (v, n) => typeof v === 'string' ? v.slice(0, n) : '';
+
+/* The editor's current state as the model sees it: fields with values, sections (with list
+   item counts), theme, design choices and their allowed values, and the selected element. */
+function readContext(c) {
+  if (!c || typeof c !== 'object') throw new AiError(400, 'Invalid editor state.');
+  const fields = readFields(c.fields);
+  if (!Array.isArray(c.sections) || c.sections.length > 60) throw new AiError(400, 'Invalid sections.');
+  const sections = c.sections.map(s => {
+    if (!s || !ID.test(s.id)) throw new AiError(400, 'Invalid sections.');
+    const out = { id: s.id, label: short(s.label, 120), on: s.on !== false };
+    const l = s.list;
+    if (l && ID.test(l.key) && Number.isInteger(l.count) && l.count >= 0 && l.count <= 100 && Array.isArray(l.fields)) {
+      out.list = { key: l.key, label: short(l.label, 60), count: l.count, fields: l.fields.filter(f => f && ID.test(f.k) && TYPES.includes(f.type)).slice(0, 20).map(f => ({ k: f.k, type: f.type, label: short(f.label, 60) })) };
+    }
+    return out;
+  });
+  const options = {}, design = {}, theme = {};
+  for (const k of DESIGN_KEYS) {
+    options[k] = Array.isArray(c.options?.[k]) ? c.options[k].filter(v => typeof v === 'string' && v.length <= 40).slice(0, 30) : [];
+    design[k] = short(c.design?.[k], 40);
+  }
+  for (const [k, v] of Object.entries(c.theme && typeof c.theme === 'object' ? c.theme : {})) if (validTheme(k, v)) theme[k] = v;
+  return { fields, sections, options, design, theme, themeSupported: c.themeSupported === true, selected: short(c.selected, 200) };
+}
+
+/* Keeps only operations the editor can apply and the save endpoint will accept. */
+function checkOps(ops, ctx, photoCount) {
+  const field = new Map(ctx.fields.map(f => [f.path, f])), section = new Map(ctx.sections.map(s => [s.id, s]));
+  const added = {};
+  for (const op of ops) if (op?.type === 'item' && op.action === 'add' && section.get(op.section)?.list) added[op.section] = (added[op.section] || 0) + 1;
+  /* Text and photo fields, including list items the same reply adds. */
+  const fieldAt = path => {
+    if (field.has(path)) return field.get(path);
+    const m = /^sections\.([a-zA-Z0-9]+)\.([a-zA-Z0-9]+)\.(\d{1,3})\.([a-zA-Z0-9]+)$/.exec(String(path)), list = m && section.get(m[1])?.list;
+    if (!list || list.key !== m[2] || +m[3] >= list.count + (added[m[1]] || 0)) return null;
+    return list.fields.find(f => f.k === m[4]) || null;
+  };
+  const out = [];
+  for (const op of ops.slice(0, 300)) {
+    if (!op || typeof op !== 'object') continue;
+    const f = fieldAt(op.path);
+    if (op.type === 'text' && f && f.type !== 'photo' && typeof op.value === 'string') {
+      if (f.type === 'date') { if (/^\d{4}-\d{2}-\d{2}$/.test(op.value)) out.push({ type: 'text', path: op.path, value: op.value }); }
+      else if (f.type === 'color') { if (/^(#[a-f0-9]{6})?$/i.test(op.value)) out.push({ type: 'text', path: op.path, value: op.value }); }
+      else out.push({ type: 'text', path: op.path, value: op.value.slice(0, f.type === 'textarea' ? 2000 : 240) });
+    } else if (op.type === 'photo' && f?.type === 'photo' && Number.isInteger(op.photo) && op.photo >= 0 && op.photo < photoCount) {
+      out.push({ type: 'photo', path: op.path, photo: op.photo });
+    } else if (op.type === 'image' && f?.type === 'photo' && typeof op.prompt === 'string' && op.prompt.trim()) {
+      out.push({ type: 'image', path: op.path, prompt: op.prompt.trim().slice(0, 400) });
+    } else if (op.type === 'style' && (f || /^sections\.([a-zA-Z0-9]+)$/.test(op.path) && section.has(op.path.slice(9))) && validStyle(op.property, op.value)) {
+      out.push({ type: 'style', path: op.path, property: op.property, value: op.value });
+    } else if (op.type === 'theme' && ctx.themeSupported && validTheme(op.key, op.value)) {
+      out.push({ type: 'theme', key: op.key, value: op.value });
+    } else if (op.type === 'design' && DESIGN_KEYS.includes(op.key) && typeof op.value === 'string' && (ctx.options[op.key].includes(op.value) || op.key === 'accent' && /^#[a-f0-9]{6}$/i.test(op.value))) {
+      out.push({ type: 'design', key: op.key, value: op.value });
+    } else if (op.type === 'section' && section.has(op.id) && SECTION_ACTIONS.includes(op.action)) {
+      out.push({ type: 'section', id: op.id, action: op.action });
+    } else if (op.type === 'item' && section.get(op.section)?.list && (op.action === 'add' || op.action === 'remove' && Number.isInteger(op.index) && op.index >= 0 && op.index < section.get(op.section).list.count)) {
+      out.push(op.action === 'add' ? { type: 'item', section: op.section, action: 'add' } : { type: 'item', section: op.section, action: 'remove', index: op.index });
+    }
+  }
+  return out;
+}
+
+const EDIT_GUIDE = [
+  'You are the design and copy assistant inside a digital invitation website editor. The host tells you what they want; you make it happen by returning edit operations that the editor applies immediately.',
+  'Think it through first: work out exactly what the host is asking, which fields, sections and styles are involved, and the complete set of operations needed. Do every part of the request, not just the first part. When the host asks for something broad ("make it luxurious", "write everything", "redesign it"), make a coherent, complete set of changes across text, theme, typography and sections.',
+  'Operations (JSON objects):',
+  '{"type":"text","path":"<field path>","value":"<new text>"}: text, textarea, date and color fields (dates as YYYY-MM-DD; colors as #rrggbb, or "" for the design default). New list items are addressed sections.<id>.<list key>.<index>.<field>.',
+  '{"type":"photo","path":"<photo field path>","photo":<number of a photo the host attached>}',
+  '{"type":"image","path":"<photo field path>","prompt":"<photographic scene description; no faces of real people, no text>"}: creates a new image with AI.',
+  '{"type":"style","path":"<field path or sections.<id> for a whole section>","property":"<property>","value":"<value>"}. Choices: ' + JSON.stringify(STYLE_CHOICES) + '. Numeric ranges [min,max,unit]: ' + JSON.stringify(STYLE_RANGES) + '. Also color and backgroundColor as #rrggbb, objectPosition as "x% y%", filter one of none, grayscale(1), sepia(.4), brightness(.65).',
+  '{"type":"theme","key":"<key>","value":"<value>"}: whole-site theme. Colors (#rrggbb): ' + THEME_COLORS.join(', ') + '. Choices: ' + JSON.stringify(THEME_CHOICES) + '.',
+  '{"type":"design","key":"nameFont|bodyFont|accent|btnShape|spacing","value":"<one of the allowed options listed with the invitation; accent may also be #rrggbb>"}',
+  '{"type":"section","id":"<section id>","action":"up|down|hide|show|delete|duplicate"}',
+  '{"type":"item","section":"<section id with a list>","action":"add"} or {"type":"item","section":"<id>","action":"remove","index":<n>}',
+  'Rules: only use paths, section ids and values that exist in the invitation below. Keep the host\'s names, dates, places and facts exactly; never invent phone numbers, emails or links. Keep text about as long as the design expects unless asked otherwise. Keep colors readable: text must contrast with its background. Whenever you change a section\'s background color, also set that section\'s text color with {"type":"style","path":"sections.<id>","property":"color","value":"#rrggbb"}; it applies to all text in the section. "This", "it" or "the selected element" means the selected element when one is given. Write in the language the host uses.',
+  'Reply with JSON only: {"reply":"<one or two friendly sentences telling the host what you changed, or a question if the request is unclear>","ops":[...]}. If nothing should change, return an empty ops list and explain why in reply.'
+].join('\n\n');
+
+export async function editInvitation(body, key) {
+  const message = typeof body.message === 'string' ? body.message.trim().slice(0, 4000) : '';
+  if (!message) throw new AiError(400, 'Tell the assistant what to change.');
+  const ctx = readContext(body.context), photos = readPhotos(body.photos);
+  const history = (Array.isArray(body.history) ? body.history.slice(-8) : [])
+    .filter(m => m && ['user', 'assistant'].includes(m.role) && typeof m.text === 'string')
+    .map(m => ({ role: m.role, content: m.text.slice(0, 2000) }));
+  const state = [
+    'Current invitation:',
+    'Fields (path | type | label | current value):\n' + ctx.fields.map(f => f.path + ' | ' + f.type + ' | ' + f.label + ' | ' + (f.type === 'photo' ? (f.filled ? '[photo set]' : '[empty]') : f.value)).join('\n'),
+    'Sections in page order:\n' + ctx.sections.map(s => s.id + ' | ' + s.label + (s.on ? '' : ' (hidden)') + (s.list ? ' | list "' + s.list.key + '" with ' + s.list.count + ' items, item fields: ' + s.list.fields.map(f => f.k + ' (' + f.type + ')').join(', ') : '')).join('\n'),
+    ctx.themeSupported ? 'Theme now: ' + JSON.stringify(ctx.theme) : 'This design does not use theme operations. Change colors with the color fields (such as section backgrounds), the accent design option and text color styles instead.',
+    'Design now: ' + JSON.stringify(ctx.design) + '. Allowed design options: ' + JSON.stringify(ctx.options),
+    ctx.selected ? 'Selected element: ' + ctx.selected : 'No element is selected.',
+    photos.length ? 'The host attached ' + photos.length + ' photos, numbered 0 to ' + (photos.length - 1) + ' in the order shown.' : '',
+    'Host\'s request:\n' + message
   ].filter(Boolean).join('\n\n');
 
   const data = await nvidia(CHAT_URL, {
     model: CHAT_MODEL,
-    messages: [{ role: 'user', content: [{ type: 'text', text: prompt }, ...photos.map(url => ({ type: 'image_url', image_url: { url } }))] }],
-    temperature: 0.7, top_p: 0.95, max_tokens: 8192,
-    chat_template_kwargs: { enable_thinking: false }
+    messages: [{ role: 'system', content: EDIT_GUIDE }, ...history, { role: 'user', content: [{ type: 'text', text: state }, ...photos.map(url => ({ type: 'image_url', image_url: { url } }))] }],
+    temperature: 0.6, top_p: 0.95, max_tokens: 16384,
+    chat_template_kwargs: { enable_thinking: true }
   }, key);
   const out = parseJson(data.choices?.[0]?.message?.content || '');
-
-  const result = { fields: {}, photos: {}, imagePrompts: {} };
-  for (const f of text) {
-    const v = out.fields?.[f.path];
-    if (typeof v !== 'string') continue;
-    if (f.type === 'date') { if (/^\d{4}-\d{2}-\d{2}$/.test(v)) result.fields[f.path] = v; }
-    else result.fields[f.path] = v.slice(0, f.type === 'textarea' ? 2000 : 240);
-  }
-  for (const f of slots) {
-    const n = out.photos?.[f.path], p = out.imagePrompts?.[f.path];
-    if (Number.isInteger(n) && n >= 0 && n < photos.length) result.photos[f.path] = n;
-    else if (typeof p === 'string' && p.trim()) result.imagePrompts[f.path] = p.trim().slice(0, 400);
-  }
-  return result;
+  const ops = checkOps(Array.isArray(out.ops) ? out.ops : [], ctx, photos.length);
+  const reply = typeof out.reply === 'string' && out.reply.trim() ? out.reply.trim().slice(0, 1000) : ops.length ? 'Done.' : 'I could not find anything to change for that request.';
+  return { reply, ops };
 }
 
 export async function createImage(body, key) {
@@ -104,6 +184,6 @@ export function mountAi(app, limited) {
       res.status(e.status).json({ error: e.message });
     }
   };
-  app.post('/api/ai/invitation', route(writeInvitation));
   app.post('/api/ai/image', route(createImage));
+  app.post('/api/ai/edit', route(editInvitation));
 }

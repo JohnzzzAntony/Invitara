@@ -23,7 +23,8 @@
     "test:book": "node scripts/book-check.mjs",
     "test:premium": "node scripts/premium-check.mjs",
     "test:editions": "node scripts/editions-check.mjs",
-    "lint": "eslint . --max-warnings=0"
+    "lint": "eslint . --max-warnings=0",
+    "test:couture": "node scripts/couture-check.mjs"
   },
   "dependencies": {
     "express": "5.1.0",

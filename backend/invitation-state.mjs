@@ -1,5 +1,21 @@
 import { validatePhoto } from './photo.mjs';
 
+// Allowed element styles and theme options, shared by saving and the AI editor (backend/ai.mjs).
+export const STYLE_CHOICES={fontFamily:['','Cormorant Garamond','Playfair Display','DM Sans','Jost','Cinzel','Great Vibes'],fontWeight:['400','500','600','700'],fontStyle:['normal','italic'],textAlign:['left','center','right'],objectFit:['cover','contain'],objectPosition:['center','top','bottom','left','right']};
+export const STYLE_RANGES={fontSize:[10,180,'px'],letterSpacing:[-3,15,'px'],lineHeight:[.8,3,''],borderRadius:[0,150,'px'],padding:[0,160,'px'],minHeight:[0,1400,'px'],opacity:[.1,1,'']};
+export const THEME_COLORS=['primary','secondary','accent','background','text','muted','border','button'];
+export const THEME_CHOICES={headingSize:['40px','54px','72px'],bodySize:['14px','16px','18px'],sectionSpacing:['40px','70px','100px'],containerWidth:['700px','1100px','1400px'],radius:['0px','4px','24px'],alignment:['left','center','right'],lineHeight:['1.4','1.7','2'],letterSpacing:['0px','1px','2px'],shadow:['none','0 8px 24px #203e361a','0 12px 38px #203e3633'],accentFont:['Cormorant Garamond','Playfair Display','Great Vibes','Cinzel','Jost'],motion:['full','gentle','none'],imageTreatment:['natural','mono','warm'],decoration:['template','botanical','ornate','minimal'],overlay:['.2','.45','.7'],headingWeight:['400','500','600','700']};
+export function validStyle(property,value){
+ if(typeof value!=='string'||value.length>100)return false;
+ if(property==='objectPosition'&&/^\d{1,3}% \d{1,3}%$/.test(value))return value.split(' ').every(n=>parseInt(n,10)<=100);
+ if(STYLE_CHOICES[property])return STYLE_CHOICES[property].includes(value);
+ if(property==='filter')return ['none','grayscale(1)','sepia(.4)','brightness(.65)'].includes(value);
+ if(['color','backgroundColor'].includes(property))return /^#[a-f0-9]{6}$/i.test(value);
+ if(STYLE_RANGES[property]){const [min,max,unit]=STYLE_RANGES[property];const pattern=unit?/^-?\d+(?:\.\d+)?px$/:/^\d+(?:\.\d+)?$/;const n=parseFloat(value);return pattern.test(value)&&n>=min&&n<=max;}
+ return false;
+}
+export function validTheme(key,value){return typeof value==='string'&&(THEME_COLORS.includes(key)?/^#[a-f0-9]{6}$/i.test(value):!!THEME_CHOICES[key]?.includes(value));}
+
 export function invitationState(catalog,input,themeId,eventDate){
  const result=catalog.EVER_siteDefaults(themeId),baseLayout=catalog.EVER_findLayout(result.layoutId),layout={...baseLayout,sections:[...baseLayout.sections]};
  if(!input||typeof input!=='object'||Array.isArray(input))throw new Error('Invalid invitation content.');
@@ -22,30 +38,19 @@ export function invitationState(catalog,input,themeId,eventDate){
   if(!input.elementStyles||typeof input.elementStyles!=='object'||Array.isArray(input.elementStyles)||Object.keys(input.elementStyles).length>500)throw new Error('Invalid element styles.');
   const paths=new Set(layout.basics.map(f=>'basics.'+f.k));
   for(const section of layout.sections){paths.add('sections.'+section.id);for(const field of section.fields)paths.add('sections.'+section.id+'.'+field.k);if(section.list)for(let i=0;i<(result.sections[section.id][section.list.k]||[]).length;i++)for(const field of section.list.fields)paths.add('sections.'+section.id+'.'+section.list.k+'.'+i+'.'+field.k);}
-  const choices={fontFamily:['','Cormorant Garamond','Playfair Display','DM Sans','Jost','Cinzel','Great Vibes'],fontWeight:['400','500','600','700'],fontStyle:['normal','italic'],textAlign:['left','center','right'],objectFit:['cover','contain'],objectPosition:['center','top','bottom','left','right']};
-  const ranges={fontSize:[10,180,'px'],letterSpacing:[-3,15,'px'],lineHeight:[.8,3,''],borderRadius:[0,150,'px'],padding:[0,160,'px'],minHeight:[0,1400,'px'],opacity:[.1,1,'']};
   result.elementStyles={};
   for(const [key,styles] of Object.entries(input.elementStyles)){
    if(!paths.has(key)||!styles||typeof styles!=='object'||Array.isArray(styles))throw new Error('Invalid styled element.');
    const safe={};
    for(const [property,value] of Object.entries(styles)){
-    if(typeof value!=='string'||value.length>100)throw new Error('Invalid element style.');
-    let valid=false;
-    if(choices[property])valid=choices[property].includes(value);
-    if(property==='objectPosition'&&/^\d{1,3}% \d{1,3}%$/.test(value))valid=value.split(' ').every(n=>parseInt(n,10)<=100);
-    if(property==='filter')valid=['none','grayscale(1)','sepia(.4)','brightness(.65)'].includes(value);
-    if(['color','backgroundColor'].includes(property))valid=/^#[a-f0-9]{6}$/i.test(value);
-    if(ranges[property]){const [min,max,unit]=ranges[property];const pattern=unit?/^-?\d+(?:\.\d+)?px$/:/^\d+(?:\.\d+)?$/;const n=parseFloat(value);valid=pattern.test(value)&&n>=min&&n<=max;}
-    if(!valid)throw new Error('Invalid element style.');safe[property]=value;
+    if(!validStyle(property,value))throw new Error('Invalid element style.');safe[property]=value;
    }
    result.elementStyles[key]=safe;
   }
  }
  if(input.theme!==undefined){
   if(!input.theme||typeof input.theme!=='object'||Array.isArray(input.theme))throw new Error('Invalid theme.');result.theme={};
-  const colors=['primary','secondary','accent','background','text','muted','border','button'];
-  const choices={headingSize:['40px','54px','72px'],bodySize:['14px','16px','18px'],sectionSpacing:['40px','70px','100px'],containerWidth:['700px','1100px','1400px'],radius:['0px','4px','24px'],alignment:['left','center','right'],lineHeight:['1.4','1.7','2'],letterSpacing:['0px','1px','2px'],shadow:['none','0 8px 24px #203e361a','0 12px 38px #203e3633'],accentFont:['Cormorant Garamond','Playfair Display','Great Vibes','Cinzel','Jost'],motion:['full','gentle','none'],imageTreatment:['natural','mono','warm'],decoration:['template','botanical','ornate','minimal'],overlay:['.2','.45','.7'],headingWeight:['400','500','600','700']};
-  for(const [k,v] of Object.entries(input.theme)){if(typeof v!=='string'||!(colors.includes(k)?/^#[a-f0-9]{6}$/i.test(v):choices[k]?.includes(v)))throw new Error('Invalid theme option.');result.theme[k]=v;}
+  for(const [k,v] of Object.entries(input.theme)){if(!validTheme(k,v))throw new Error('Invalid theme option.');result.theme[k]=v;}
  }
  if(input.elementLinks!==undefined){if(!input.elementLinks||typeof input.elementLinks!=='object'||Array.isArray(input.elementLinks)||Object.keys(input.elementLinks).length>100)throw new Error('Invalid button links.');result.elementLinks={};for(const [k,v] of Object.entries(input.elementLinks)){if(!/^sections\.[a-zA-Z0-9]+\.button$/.test(k)||!result.sections[k.split('.')[1]]||typeof v!=='string'||v.length>2000||! /^(https:\/\/|mailto:|#ws-sec-)/.test(v))throw new Error('Invalid button link.');result.elementLinks[k]=v;}}
  result.basics.date=eventDate;return result;
