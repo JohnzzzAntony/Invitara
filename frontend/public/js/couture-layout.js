@@ -12,6 +12,18 @@
   saffron:function(){return '<div class="cx-veil cx-silk" aria-hidden="true"></div><div class="cx-petals" aria-hidden="true">'+repeat(14,function(i){return '<i style="--i:'+i+'"></i>';})+'</div>';},
   pearl:function(){return '<div class="cx-veil cx-ink" aria-hidden="true"></div><svg class="cx-waves" viewBox="0 0 400 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30Q25 10 50 30T100 30T150 30T200 30T250 30T300 30T350 30T400 30" fill="none" stroke="currentColor"/><path d="M0 44Q25 24 50 44T100 44T150 44T200 44T250 44T300 44T350 44T400 44" fill="none" stroke="currentColor" opacity=".5"/></svg>';}
  };
+ Object.assign(ornaments,{
+  rosewater:function(){return '<div class="cx-veil cx-rosewater" aria-hidden="true"></div>';},
+  fieldnotes:function(){return '<svg class="cx-botanical" viewBox="0 0 400 500" aria-hidden="true"><path d="M25 470C115 360 100 185 195 40M82 405c-45-9-62-39-62-75 38 8 62 31 62 75Zm25-87c-41-11-54-40-49-72 35 10 52 30 49 72Zm33-87c-38-12-48-39-40-68 32 10 47 29 40 68Zm32-77c-29-13-34-34-23-56 26 12 35 30 23 56Zm-77 185c44-3 65-27 70-59-39 3-63 22-70 59Zm33-91c38-4 54-27 55-55-34 4-51 20-55 55Z"/></svg><div class="cx-veil cx-field-wash" aria-hidden="true"></div>';},
+  heirloom:function(){return '<div class="cx-veil cx-seal" aria-hidden="true"><span>H</span></div>';},
+  camellia:function(){return '<div class="cx-veil cx-fan" aria-hidden="true">'+repeat(9,function(i){return '<i style="--i:'+i+'"></i>';})+'</div>';},
+  solstice:function(){return '<div class="cx-veil cx-sunbeams" aria-hidden="true"></div>';},
+  wildflower:function(){return '<div class="cx-veil cx-wildflowers" aria-hidden="true">'+repeat(12,function(i){return '<i style="--i:'+i+'"></i>';})+'</div>';},
+  'sunday-table':function(){return '<div class="cx-veil cx-linen" aria-hidden="true"><i></i><i></i></div>';},
+  marigold:function(){return '<div class="cx-veil cx-lantern" aria-hidden="true"></div>';},
+  afterglow:function(){return '<div class="cx-veil cx-confetti" aria-hidden="true">'+repeat(18,function(i){return '<i style="--i:'+i+'"></i>';})+'</div>';},
+  'paper-moon':function(){return '<div class="cx-veil cx-vellum" aria-hidden="true"><i></i><i></i></div>';}
+ });
  E.INVITARA_artDirect=function(root,d,t,opts){
   if(!t.couture){if(base)base(root,d,t,opts);return;}
   var key=t.family,h=d.sections.hero,b=d.basics,hero=root.querySelector('.nx-section-hero'),config=(E.INVITARA_COUTURE||[]).find(function(e){return e.key===key;})||{};

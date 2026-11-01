@@ -39,6 +39,10 @@
 .couture-obsidian { --cx-display: 'CX Bodoni', Didot, Georgia, serif; }
 .couture-eclipse  { --cx-display: 'CX Italiana', 'CX Cormorant', Georgia, serif; }
 .couture-saffron  { --cx-display: 'CX Playfair', Georgia, serif; }
+.couture-heirloom, .couture-solstice, .couture-marigold { --cx-display: 'CX Bodoni', Didot, Georgia, serif; }
+.couture-camellia, .couture-sunday-table { --cx-display: 'CX Playfair', Georgia, serif; }
+.couture-afterglow { --cx-display: 'CX Manrope', system-ui, sans-serif; }
+.couture-paper-moon { --cx-display: 'CX Italiana', 'CX Cormorant', Georgia, serif; }
 
 /* ---------- Controls ---------- */
 .cx-toolbar {
@@ -307,6 +311,176 @@
 @container (min-width: 820px) { .couture-pearl .cx-numeral { font-size: clamp(110px, 14cqw, 190px); } }
 .couture-pearl .cx-names { color: var(--ws-ink); }
 .couture-pearl .nx-story-image { border-radius: 46% 54% 50% 50% / 36% 38% 62% 64%; }
+
+/* Ten new invitation editions: distinct print-inspired openings, all reduced-motion safe. */
+.cx-rosewater { background: linear-gradient(135deg,rgba(255,248,243,.97),rgba(170,111,112,.78),rgba(246,238,233,.96)); mix-blend-mode:screen; opacity:.9; transition:opacity 1.8s var(--cx-ease),transform 1.8s var(--cx-ease); }
+.cx-open .cx-rosewater { opacity:0; transform:scale(1.08); }
+.cx-botanical { position:absolute; inset:0; z-index:4; width:100%; height:100%; fill:none; stroke:var(--ws-gold); stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; pointer-events:none; }
+.cx-botanical path { stroke-dasharray:1400; stroke-dashoffset:0; transition:stroke-dashoffset 2.4s var(--cx-ease); }
+.cx-open .cx-botanical path { stroke-dashoffset:1400; }
+.cx-field-wash { background:linear-gradient(155deg,rgba(240,239,231,.88),rgba(113,130,99,.55)); clip-path:inset(0); transition:clip-path 2s var(--cx-ease); }
+.cx-open .cx-field-wash { clip-path:inset(0 0 100%); }
+.cx-seal { display:grid; place-items:center; background:radial-gradient(circle, #a98a54 0 15%,#7b5b32 16% 19%,rgba(231,221,200,.96) 20% 100%); transition:opacity 1.2s var(--cx-ease),transform 1.5s var(--cx-ease); }
+.cx-seal span { display:grid; place-items:center; width:68px; aspect-ratio:1; border:1px solid rgba(255,249,230,.7); border-radius:50%; color:#fff9e6; font:italic 32px var(--cx-display); }
+.cx-open .cx-seal { opacity:0; transform:scale(.42) rotate(-18deg); }
+.cx-fan { inset:18% 12% auto; height:64%; transform-origin:50% 100%; transition:transform 1.7s var(--cx-ease),opacity 1.2s var(--cx-ease); }
+.cx-fan i { position:absolute; left:calc(50% - 13%); bottom:0; width:26%; height:100%; border:1px solid rgba(255,245,238,.55); border-radius:100% 100% 4px 4px; background:linear-gradient(180deg,rgba(173,120,130,.92),rgba(245,233,232,.82)); transform-origin:50% 100%; transform:rotate(calc((var(--i) - 4) * 13deg)); }
+.cx-open .cx-fan { transform:translateY(-105%) rotate(8deg); opacity:0; }
+.cx-sunbeams { background:repeating-conic-gradient(from -12deg at 50% 90%,rgba(193,164,108,.28) 0 4deg,transparent 4deg 14deg); opacity:.92; transition:opacity 2s var(--cx-ease); }
+.cx-open .cx-sunbeams { opacity:0; }
+.cx-wildflowers i { position:absolute; top:-8%; left:calc(var(--i) * 8%); width:11px; height:16px; border-radius:90% 0 90% 0; background:color-mix(in srgb,var(--ws-gold) 68%,white); opacity:0; }
+.cx-open .cx-wildflowers i { animation:cx-fall calc(8s + var(--i)*.3s) calc(var(--i)*-.55s + .5s) linear infinite; }
+.cx-linen i,.cx-vellum i { position:absolute; inset:0 50% 0 0; background:repeating-linear-gradient(100deg,rgba(255,255,255,.42) 0 2px,transparent 2px 24px),var(--ws-soft); box-shadow:12px 0 24px rgba(0,0,0,.12); transition:transform 2s var(--cx-ease); }
+.cx-linen i+i,.cx-vellum i+i { inset:0 0 0 50%; box-shadow:-12px 0 24px rgba(0,0,0,.12); }
+.cx-open .cx-linen i:first-child,.cx-open .cx-vellum i:first-child { transform:translateX(-105%); }
+.cx-open .cx-linen i+i,.cx-open .cx-vellum i+i { transform:translateX(105%); }
+.cx-lantern { background:repeating-linear-gradient(45deg,transparent 0 20px,rgba(195,164,92,.7) 21px 22px,transparent 23px 44px),repeating-linear-gradient(-45deg,rgba(53,70,56,.96) 0 20px,rgba(195,164,92,.65) 21px 22px,rgba(53,70,56,.96) 23px 44px); opacity:.94; transition:opacity 1.8s var(--cx-ease),transform 1.8s var(--cx-ease); }
+.cx-open .cx-lantern { opacity:0; transform:scale(1.12); }
+.cx-confetti i { position:absolute; top:-5%; left:calc(var(--i)*5.4%); width:7px; height:15px; background:var(--ws-gold); opacity:0; transform:rotate(calc(var(--i)*23deg)); }
+.cx-open .cx-confetti i { animation:cx-fall calc(5s + var(--i)*.24s) calc(var(--i)*-.24s + .2s) linear infinite; }
+.cx-vellum i { background:linear-gradient(90deg,#dfe5e3 0%,rgba(237,240,239,.93) 70%,rgba(137,153,160,.36) 100%); }
+.cx-vellum i+i { background:linear-gradient(270deg,#dfe5e3 0%,rgba(237,240,239,.93) 70%,rgba(137,153,160,.36) 100%); }
+.couture-solstice .cx-title,.couture-marigold .cx-title,.couture-heirloom .cx-title { font-weight:400; }
+.couture-afterglow .cx-title { font-family:var(--cx-body); font-weight:300; letter-spacing:-.06em; }
+.couture-fieldnotes .cx-section h2,.couture-paper-moon .cx-section h2 { font-style:italic; }
+/* Consistent square geometry for invitation controls, image frames and content surfaces. */
+.couture :is(.cx-frame,.cx-photo,.nx-story-image,.cx-open-button,.cx-cta,.cx-section,.cx-calendar,.cx-meta,.cx-toolbar,.cx-toolbar button) { border-radius:0 !important; }
+.couture .cx-wordmark { flex-shrink:0; white-space:nowrap; }
+.cx-toolbar button { min-height:44px; }
+@container (max-width:500px) {
+  .couture .cx-top { gap:12px; padding:18px 5%; }
+  .couture .cx-wordmark { font-size:14px; letter-spacing:.14em; }
+  .couture .cx-label { max-width:58%; font-size:9px; line-height:1.4; letter-spacing:.15em; }
+  .couture-solstice .cx-title,.couture-afterglow .cx-title { font-size:clamp(44px,15vw,64px); }
+}
+
+/* Collection editions: each gets its own art direction and responsive composition. */
+.couture-rosewater .cx-stage { grid-template-columns:.88fr 1.12fr; }
+.couture-rosewater .cx-art { width:min(90%,440px); }
+.couture-rosewater .cx-frame { aspect-ratio:3/4; outline:1px solid var(--ws-gold); outline-offset:8px; }
+.couture-rosewater .cx-title { font-style:italic; font-size:clamp(56px,7.4cqw,104px); }
+.couture-rosewater .cx-note { max-width:34ch; }
+
+.couture-fieldnotes { background:#f0efe7; }
+.couture-fieldnotes .cx-stage { grid-template-columns:1.15fr .85fr; gap:8%; }
+.couture-fieldnotes .cx-art { width:min(100%,560px); }
+.couture-fieldnotes .cx-frame { aspect-ratio:5/6; border:10px solid #e2e4d9; outline:1px solid #718263; outline-offset:4px; }
+.couture-fieldnotes .cx-copy { padding-block:40px; }
+.couture-fieldnotes .cx-title { font-size:clamp(56px,7cqw,104px); }
+.couture-fieldnotes .cx-kicker,.couture-fieldnotes .cx-meta dt { color:#526746; }
+
+.couture-heirloom .cx-stage { grid-template-columns:1fr; gap:34px; text-align:center; }
+.couture-heirloom .cx-art { width:min(58%,360px); }
+.couture-heirloom .cx-frame { aspect-ratio:2/3; outline:1px solid var(--ws-gold); outline-offset:-12px; }
+.couture-heirloom .cx-copy { width:min(100%,680px); margin:auto; text-align:center; }
+.couture-heirloom .cx-title { text-align:center; font-size:clamp(52px,9cqw,112px); }
+.couture-heirloom .cx-note { margin-inline:auto; }
+.couture-heirloom .cx-meta { max-width:540px; margin-inline:auto; text-align:left; }
+
+.couture-camellia .cx-stage { display:flex; flex-direction:column; gap:26px; }
+.couture-camellia .cx-copy { order:-1; width:min(100%,760px); margin:auto; text-align:center; }
+.couture-camellia .cx-art { width:min(64%,400px); }
+.couture-camellia .cx-frame { aspect-ratio:4/5; outline:1px solid var(--ws-gold); outline-offset:10px; }
+.couture-camellia .cx-title { text-align:center; font-style:italic; font-size:clamp(50px,8cqw,104px); }
+.couture-camellia .cx-note { margin-inline:auto; }
+.couture-camellia .cx-meta { max-width:560px; margin-inline:auto; text-align:left; }
+
+.couture-solstice .cx-stage { position:relative; display:block; min-height:680px; padding:0; }
+.couture-solstice .cx-art { position:absolute; inset:0; width:100%; max-width:none; }
+.couture-solstice .cx-frame { position:absolute; inset:0; aspect-ratio:auto; }
+.couture-solstice .cx-photo { filter:brightness(.38) saturate(.75) !important; }
+.couture-solstice .cx-copy { position:relative; z-index:4; width:min(660px,82%); margin:auto; padding:110px 0; text-align:center; color:#f2ead8; }
+.couture-solstice .cx-title { text-align:center; font-size:clamp(58px,10cqw,126px); }
+.couture-solstice .cx-copy :is(.cx-note,.cx-names,.cx-meta dd) { color:rgba(242,234,216,.88); }
+.couture-solstice .cx-meta { text-align:left; border-color:rgba(242,234,216,.35); }
+.couture-solstice .cx-cta { color:#f2ead8; }
+
+.couture-wildflower .cx-stage { grid-template-columns:1.25fr .75fr; gap:8%; }
+.couture-wildflower .cx-art { width:100%; }
+.couture-wildflower .cx-frame { aspect-ratio:1/1.08; border:1px solid var(--ws-gold); padding:10px; background:var(--ws-bg); }
+.couture-wildflower .cx-frame .cx-photo { border:1px solid var(--ws-gold); }
+.couture-wildflower .cx-title { font-style:italic; font-size:clamp(52px,7cqw,100px); }
+.couture-wildflower .cx-kicker,.couture-wildflower .cx-meta dt { color:#647250; }
+
+.couture-sunday-table .cx-stage { grid-template-columns:1.35fr .65fr; gap:7%; }
+.couture-sunday-table .cx-art { width:100%; }
+.couture-sunday-table .cx-frame { aspect-ratio:16/11; }
+.couture-sunday-table .cx-copy { padding-block:26px; }
+.couture-sunday-table .cx-title { font-size:clamp(50px,6.3cqw,92px); }
+.couture-sunday-table .cx-meta { grid-template-columns:1fr; }
+
+.couture-marigold { --cx-display:'CX Bodoni',Didot,Georgia,serif; }
+.couture-marigold .cx-hero { background:linear-gradient(120deg,#263329 0 62%,#354638 62%); }
+.couture-marigold .cx-stage { grid-template-columns:.78fr 1.22fr; gap:9%; }
+.couture-marigold .cx-art { width:min(100%,410px); }
+.couture-marigold .cx-frame { aspect-ratio:4/5; outline:1px solid var(--ws-gold); outline-offset:-14px; }
+.couture-marigold .cx-copy { padding:30px 0; }
+.couture-marigold .cx-title { font-size:clamp(56px,8cqw,112px); }
+
+.couture-afterglow .cx-stage { position:relative; display:block; min-height:700px; padding:0; }
+.couture-afterglow .cx-art { position:absolute; inset:0; width:100%; max-width:none; }
+.couture-afterglow .cx-frame { position:absolute; inset:0; aspect-ratio:auto; }
+.couture-afterglow .cx-photo { filter:brightness(.46) saturate(.82) !important; }
+.couture-afterglow .cx-copy { position:absolute; z-index:4; left:8%; bottom:8%; width:min(650px,82%); color:#f5ebe2; }
+.couture-afterglow .cx-title { text-transform:uppercase; text-align:left; font-size:clamp(60px,12cqw,148px); line-height:.78; }
+.couture-afterglow .cx-copy :is(.cx-note,.cx-names,.cx-meta dd) { color:rgba(245,235,226,.9); }
+.couture-afterglow .cx-meta { border-color:rgba(245,235,226,.42); }
+.couture-afterglow .cx-cta { color:#f5ebe2; }
+
+.couture-paper-moon .cx-hero { background:#edf0ef; }
+.couture-paper-moon .cx-stage { grid-template-columns:1fr; gap:32px; text-align:center; }
+.couture-paper-moon .cx-art { width:min(82%,720px); }
+.couture-paper-moon .cx-frame { aspect-ratio:16/8; outline:1px solid var(--ws-gold); outline-offset:8px; }
+.couture-paper-moon .cx-copy { width:min(100%,720px); margin:auto; text-align:center; }
+.couture-paper-moon .cx-title { text-align:center; font-size:clamp(52px,8cqw,112px); }
+.couture-paper-moon .cx-note { margin-inline:auto; }
+.couture-paper-moon .cx-meta { max-width:560px; margin-inline:auto; text-align:left; }
+
+@container (max-width:819px) {
+  .couture-rosewater .cx-stage,.couture-fieldnotes .cx-stage,.couture-wildflower .cx-stage,.couture-sunday-table .cx-stage,.couture-marigold .cx-stage { grid-template-columns:1fr; }
+  .couture-heirloom .cx-art,.couture-camellia .cx-art { width:min(78%,360px); }
+  .couture-solstice .cx-stage,.couture-afterglow .cx-stage { min-height:620px; }
+  .couture-solstice .cx-copy { width:86%; padding:80px 0; }
+  .couture-afterglow .cx-copy { left:7%; bottom:7%; width:86%; }
+  .couture-paper-moon .cx-frame { aspect-ratio:4/3; }
+}
+@container (max-width:500px) {
+  .couture-solstice .cx-title,.couture-afterglow .cx-title { font-size:clamp(38px,11vw,44px); }
+  .couture-solstice .cx-copy { width:92%; padding:42px 0; }
+}
+
+/* Mobile-first fit for every couture invitation and all shared story sections. */
+@container (max-width:819px) {
+  .couture .cx-hero { min-height:680px; }
+  .couture .cx-stage { gap:32px; padding:36px 6% 44px; }
+  .couture .cx-section { padding:72px 6%; }
+  .couture .cx-section h2 { margin:14px 0 24px; font-size:clamp(36px,9cqw,64px); }
+  .couture .cx-section h3 { font-size:25px; }
+  .couture .cx-note { font-size:16px; line-height:1.7; }
+  .couture .cx-meta dd { overflow-wrap:anywhere; }
+  .couture .nx-moment { grid-template-columns:84px minmax(0,1fr); gap:14px; }
+  .couture .cx-calendar { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .couture .cx-calendar > * { justify-content:center; min-width:0; padding-inline:12px; }
+}
+@container (max-width:500px) {
+  .couture .cx-hero { min-height:640px; }
+  .couture .cx-stage { gap:26px; padding:30px 6% 38px; }
+  .couture .cx-title { font-size:clamp(44px,14cqw,58px); line-height:.98; }
+  .couture .cx-names { font-size:24px; }
+  .couture .cx-meta { grid-template-columns:1fr; }
+  .couture .cx-section { padding:60px 6%; }
+  .couture .cx-section h2 { font-size:clamp(34px,10cqw,52px); }
+  .couture .nx-section-story { gap:26px; }
+  .couture .nx-moment { grid-template-columns:68px minmax(0,1fr); gap:12px; padding:20px 0; }
+  .couture .nx-moment-date { font-size:20px; }
+  .couture .nx-gallery { gap:10px; }
+  .couture .cx-calendar { grid-template-columns:1fr; }
+  .couture .cx-calendar > * { width:100%; min-height:48px; }
+  .couture .cx-countdown { gap:14px 18px; }
+  .couture .cx-countdown strong { font-size:clamp(40px,13vw,58px); }
+  .couture .ex-form { width:100%; }
+  .couture-solstice .cx-title,.couture-afterglow .cx-title { font-size:clamp(38px,11vw,44px); }
+}
 
 /* ---------- Motion primitives ---------- */
 @keyframes cx-breathe { 50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--ws-gold) 14%, transparent); } }
