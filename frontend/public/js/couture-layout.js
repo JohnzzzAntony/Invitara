@@ -22,7 +22,13 @@
   'sunday-table':function(){return '<div class="cx-veil cx-linen" aria-hidden="true"><i></i><i></i></div>';},
   marigold:function(){return '<div class="cx-veil cx-lantern" aria-hidden="true"></div>';},
   afterglow:function(){return '<div class="cx-veil cx-confetti" aria-hidden="true">'+repeat(18,function(i){return '<i style="--i:'+i+'"></i>';})+'</div>';},
-  'paper-moon':function(){return '<div class="cx-veil cx-vellum" aria-hidden="true"><i></i><i></i></div>';}
+  'paper-moon':function(){return '<div class="cx-veil cx-vellum" aria-hidden="true"><i></i><i></i></div>';},
+  'grand-opening':function(){return '<div class="cx-veil cx-portal" aria-hidden="true"><i></i><i></i></div>';},
+  'earth-and-ink':function(){return '<div class="cx-veil cx-pressed-leaf" aria-hidden="true"><i></i><i></i><i></i></div>';},
+  'love-in-motion':function(){return '<div class="cx-veil cx-road" aria-hidden="true"><i></i></div>';},
+  'wild-at-heart':function(){return '<div class="cx-veil cx-wild-film" aria-hidden="true"><i></i><i></i></div>';},
+  'palace-in-bloom':function(){return '<div class="cx-veil cx-palace-gate" aria-hidden="true"><i></i><i></i><i></i></div>';},
+  'chapter-and-verse':function(){return '<div class="cx-veil cx-book-pages" aria-hidden="true"><i></i><i></i></div>';}
  });
  E.INVITARA_artDirect=function(root,d,t,opts){
   if(!t.couture){if(base)base(root,d,t,opts);return;}

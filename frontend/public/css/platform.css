@@ -156,3 +156,22 @@
 .nx-decor-industrial[data-paused=true] .nx-cover-copy,.nx-decor-industrial[data-paused=true] .nx-cover-photo{transform:none!important}
 @container(max-width:640px){.nx-decor-industrial .sf-machine{inset:58px 0 auto auto;width:190px;height:170px;opacity:.78}.nx-decor-industrial .sf-machine-label{display:none}.nx-decor-industrial .sf-machine[data-loading=true]::after{font-size:8px;bottom:20px}.nx-decor-industrial .sf-motion-control{right:20px;bottom:14px;font-size:9px}.nx-decor-industrial .sf-signature{flex-direction:column;align-items:flex-start;gap:16px}.nx-decor-industrial .nx-section-hero h1{font-size:clamp(42px,13.3cqw,76px)}.nx-decor-industrial .nx-section-hero .nx-cover-copy{padding-top:72px}.nx-decor-industrial .sf-topline{font-size:8px}}
 @media(prefers-reduced-motion:reduce){.nx-decor-industrial *::before,.nx-decor-industrial *::after{animation:none!important}}
+
+/* Shared alignment safeguards for every invitation family and viewport. */
+.nx :is(h1,h2,h3){text-wrap:balance;overflow-wrap:anywhere}
+.nx .nx-section{min-width:0;scroll-margin-top:64px}
+.nx .nx-cover-copy,.nx .nx-section>*{min-width:0}
+.nx .nx-cover-copy{width:min(100%,760px);margin-inline:auto}
+.nx .nx-section-hero h1{max-width:15ch;margin-inline:auto}
+.nx .nx-button,.nx .nx-reveal-next{max-width:100%;min-height:48px;white-space:normal;line-height:1.4;text-align:center}
+.nx .nx-section-story{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.nx .nx-facts{grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));align-items:start}
+.nx .nx-facts>div,.nx .nx-moment>div{min-width:0}
+.nx .nx-facts dd,.nx .nx-moment :is(h3,p){overflow-wrap:anywhere}
+.nx .nx-gallery figure{min-width:0}
+.nx .ex-form{width:100%;min-width:0}
+.nx .ex-form>*{min-width:0;max-width:100%}
+.nx .ex-form :is(input,select,textarea){width:100%;min-width:0;max-width:100%;font-size:16px}
+.nx :is(a,button,input,select,textarea):focus-visible{outline:2px solid var(--ws-gold);outline-offset:3px}
+@container(max-width:699px){.nx .nx-section{padding-inline:clamp(20px,6cqw,32px)}.nx .nx-section-hero{padding-inline:clamp(20px,6cqw,32px)}.nx .nx-section-hero h1{max-width:14ch;font-size:clamp(36px,10cqw,var(--nx-heading-size,58px));line-height:1.05}.nx .nx-section-story{grid-template-columns:minmax(0,1fr)}.nx .nx-facts{grid-template-columns:minmax(0,1fr)}.nx .nx-moment{grid-template-columns:minmax(56px,76px) minmax(0,1fr)}.nx .nx-section-hero .nx-button{justify-self:center}.nx .nx-section-rsvp .ex-form{grid-template-columns:minmax(0,1fr)}.nx .nx-section-rsvp .ex-form>*{grid-column:1/-1}.nx .nx-countdown{flex-flow:row wrap;justify-content:center;gap:16px 24px}.nx .nx-countdown strong{font-size:clamp(40px,12cqw,64px)}.nx .nx-magazine .nx-section-hero h1,.nx-magazine .nx-section-hero h1{margin-inline:0}.nx-decor-industrial .nx-section-hero h1{margin-inline:0}}
+@media(max-width:699px){.nx-book-pages{grid-template-columns:minmax(0,1fr)}.nx .nx-lightbox{padding:16px}}

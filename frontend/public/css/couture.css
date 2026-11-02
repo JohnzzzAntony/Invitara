@@ -503,3 +503,132 @@
 /* Editor: every layer stays clickable and the opening is shown finished. */
 .couture.nx-editing .cx-veil, .couture.nx-editing .cx-petals, .couture.nx-editing .cx-sweep, .couture.nx-editing .cx-flare { display: none; }
 @media print { .cx-toolbar, .cx-open-button, .cx-veil, .cx-petals { display: none !important; } .couture .cx-copy > * { opacity: 1 !important; transform: none !important; } }
+
+/* Pinterest-inspired editions: each composition uses a different crop, frame and silhouette. */
+.couture-grand-opening { --cx-display:'CX Manrope',sans-serif; }
+.couture-grand-opening .cx-hero { background:linear-gradient(110deg,#18221e 0 58%,#29342c 58%); }
+.couture-grand-opening .cx-stage { grid-template-columns:.7fr 1.3fr; }
+.couture-grand-opening .cx-art { width:min(100%,440px); }
+.couture-grand-opening .cx-frame { aspect-ratio:3/4; border:1px solid var(--ws-gold); padding:13px; }
+.couture-grand-opening .cx-copy { color:#f4efdf; }
+.couture-grand-opening .cx-title { text-transform:uppercase; letter-spacing:.07em; font:500 clamp(44px,7cqw,88px)/1.05 var(--cx-body); }
+.couture-grand-opening .cx-copy :is(.cx-note,.cx-names,.cx-meta dd) { color:rgba(244,239,223,.84); }
+.couture-grand-opening .cx-meta { border-color:rgba(244,239,223,.3); }
+.couture-earth-and-ink .cx-stage { grid-template-columns:1fr 1fr; }
+.couture-earth-and-ink .cx-art { width:min(100%,530px); }
+.couture-earth-and-ink .cx-frame { aspect-ratio:4/5; border-radius:48% 48% 2px 2px; outline:1px solid var(--ws-gold); outline-offset:8px; }
+.couture-earth-and-ink .cx-title { font-style:italic; font-size:clamp(58px,8cqw,108px); }
+.couture-love-in-motion .cx-stage { grid-template-columns:1fr; gap:28px; text-align:center; }
+.couture-love-in-motion .cx-art { width:min(88%,780px); }
+.couture-love-in-motion .cx-frame { aspect-ratio:16/9; border:8px solid #e8ddd0; }
+.couture-love-in-motion .cx-copy { width:min(100%,760px); margin:auto; text-align:center; }
+.couture-love-in-motion .cx-title { text-align:center; font-size:clamp(52px,9cqw,112px); }
+.couture-love-in-motion .cx-note { margin-inline:auto; }
+.couture-love-in-motion .cx-meta { max-width:620px; margin-inline:auto; text-align:left; }
+.couture-wild-at-heart .cx-stage { grid-template-columns:1.25fr .75fr; }
+.couture-wild-at-heart .cx-frame { aspect-ratio:4/5; border-radius:48% 48% 2px 2px; }
+.couture-wild-at-heart .cx-title { font-style:italic; font-size:clamp(58px,8cqw,110px); }
+.couture-palace-in-bloom .cx-hero { background:radial-gradient(ellipse at 50% 20%,#6f5140,#342820 62%); color:#f1e7dc; }
+.couture-palace-in-bloom .cx-stage { grid-template-columns:.82fr 1.18fr; }
+.couture-palace-in-bloom .cx-art { width:min(100%,480px); }
+.couture-palace-in-bloom .cx-frame { aspect-ratio:4/5; border:9px double var(--ws-gold); padding:7px; outline:1px solid color-mix(in srgb,var(--ws-gold) 55%,transparent); outline-offset:5px; }
+.couture-palace-in-bloom .cx-title { font-size:clamp(54px,7.5cqw,106px); }
+.couture-palace-in-bloom .cx-copy :is(.cx-note,.cx-names,.cx-meta dd) { color:rgba(241,231,220,.84); }
+.couture-palace-in-bloom .cx-meta { border-color:rgba(241,231,220,.35); }
+.couture-chapter-and-verse .cx-hero { background:#f2ede4; }
+.couture-chapter-and-verse .cx-stage { grid-template-columns:1fr; text-align:center; gap:30px; }
+.couture-chapter-and-verse .cx-art { width:min(86%,680px); }
+.couture-chapter-and-verse .cx-frame { aspect-ratio:16/9; border:1px solid var(--ws-gold); outline:1px solid var(--ws-gold); outline-offset:8px; }
+.couture-chapter-and-verse .cx-copy { width:min(100%,720px); margin:auto; text-align:center; }
+.couture-chapter-and-verse .cx-title { text-align:center; font-style:italic; font-size:clamp(54px,9cqw,112px); }
+.couture-chapter-and-verse .cx-note { margin-inline:auto; }
+.couture-chapter-and-verse .cx-meta { max-width:620px; margin-inline:auto; text-align:left; }
+.cx-portal { inset:0 50%; width:0; border-left:1px solid var(--ws-gold); border-right:1px solid var(--ws-gold); transition:inset 1.4s var(--cx-ease),width 1.4s var(--cx-ease); }
+.cx-open .cx-portal { inset:0; width:100%; border:0; }
+.cx-portal i { position:absolute; inset:0 auto 0 0; width:50%; border:1px solid var(--ws-gold); background:linear-gradient(90deg,#17211d,#29342c); transform-origin:left; transition:transform 1.8s var(--cx-ease); }
+.cx-portal i+ i { left:50%; transform-origin:right; }
+.cx-open .cx-portal i { transform:perspective(700px) rotateY(-110deg); }
+.cx-open .cx-portal i+i { transform:perspective(700px) rotateY(110deg); }
+.cx-pressed-leaf { background:radial-gradient(ellipse at 50% 50%,transparent 30%,rgba(233,227,213,.78)); }
+.cx-pressed-leaf i { position:absolute; width:44%; height:60%; border:1px solid var(--ws-gold); border-radius:100% 0 100% 0; transform:rotate(-38deg) scale(.55); opacity:.5; transition:transform 1.5s var(--cx-ease),opacity 1s; }
+.cx-pressed-leaf i:nth-child(2) { left:43%;top:14%;transform:rotate(22deg) scale(.55); }
+.cx-pressed-leaf i:nth-child(3) { left:25%;top:36%;transform:rotate(65deg) scale(.55); }
+.cx-open .cx-pressed-leaf i { transform:rotate(-38deg) scale(1);opacity:.18; }
+.cx-open .cx-pressed-leaf i:nth-child(2) { transform:rotate(22deg) scale(1); }
+.cx-open .cx-pressed-leaf i:nth-child(3) { transform:rotate(65deg) scale(1); }
+.cx-road { background:linear-gradient(120deg,transparent 45%,rgba(255,255,255,.92) 46% 47%,transparent 48%); transform:translateX(-105%); transition:transform 1.5s var(--cx-ease); }
+.cx-open .cx-road { transform:translateX(105%); }
+.cx-road i { position:absolute; left:0;right:0;top:75%;height:1px;border-top:1px dashed rgba(255,255,255,.9); }
+.cx-wild-film { background:linear-gradient(0deg,rgba(24,34,26,.55),transparent 44%),linear-gradient(90deg,rgba(238,240,231,.2),transparent);opacity:.9;transition:opacity 1.2s; }
+.cx-wild-film i { position:absolute;inset:0;border:1px solid rgba(255,255,255,.72);margin:12px; }
+.cx-wild-film i+i { inset:6px;margin:0;border-color:rgba(255,255,255,.45); }
+.cx-open .cx-wild-film { opacity:.25; }
+.cx-palace-gate { background:rgba(47,34,25,.34);transition:background 1s; }
+.cx-palace-gate i { position:absolute;inset:5% 14%;border:1px solid var(--ws-gold);border-bottom:0;border-radius:50% 50% 0 0;transform:scaleY(.92);transform-origin:bottom;transition:transform 1.6s var(--cx-ease); }
+.cx-palace-gate i+i { inset:10% 20%; }
+.cx-palace-gate i+i+i { inset:16% 27%;border-color:rgba(255,255,255,.75); }
+.cx-open .cx-palace-gate { background:transparent; }
+.cx-open .cx-palace-gate i { transform:scaleY(1.06); }
+.cx-book-pages { display:flex;perspective:800px; }
+.cx-book-pages i { width:50%;height:100%;background:#e7ded1;border:1px solid #a58462;transform-origin:left;transition:transform 1.5s var(--cx-ease); }
+.cx-book-pages i+i { transform-origin:right; }
+.cx-open .cx-book-pages i { transform:rotateY(-112deg); }
+.cx-open .cx-book-pages i+i { transform:rotateY(112deg); }
+.storybook-feature { display:grid;grid-template-columns:minmax(240px,.7fr) minmax(0,1.3fr);gap:clamp(24px,5vw,72px);align-items:start;margin:36px 0 48px;padding:clamp(24px,4vw,56px);background:#f3efe8;border:1px solid #ded5c8; }
+.storybook-feature-copy h2 { margin:8px 0 12px;font:400 clamp(34px,5vw,58px)/1.05 'CX Italiana',Georgia,serif;color:#292b31; }
+.storybook-feature-copy p:not(.studio-kicker) { max-width:42ch;line-height:1.7;color:#5b5a55; }
+.storybook-feature-list { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px; }
+.storybook-feature-list .ex-mini { min-width:0; }
+.storybook-feature-list .ex-mini { height:320px; }
+@media (max-width:800px) { .storybook-feature { grid-template-columns:1fr; } }
+@container (max-width:819px) { .couture-grand-opening .cx-stage,.couture-earth-and-ink .cx-stage,.couture-wild-at-heart .cx-stage,.couture-palace-in-bloom .cx-stage { grid-template-columns:1fr; }.couture-grand-opening .cx-art,.couture-palace-in-bloom .cx-art { width:min(78%,400px); }.couture-chapter-and-verse .cx-frame { aspect-ratio:4/3; } }
+@container (max-width:500px) { .couture-love-in-motion .cx-frame { aspect-ratio:4/3; }.storybook-feature-list { grid-template-columns:1fr; }.couture-grand-opening .cx-title,.couture-palace-in-bloom .cx-title { font-size:clamp(38px,11vw,48px); } }
+
+/* Alignment pass: shared content rails, predictable type measure, and small-screen rhythm. */
+.couture .cx-top,.couture .cx-foot { width:100%; padding-inline:clamp(22px,7%,96px); }
+.couture .cx-stage { width:100%; max-width:1540px; margin-inline:auto; padding-inline:clamp(22px,7%,96px); }
+.couture .cx-art { width:min(100%,560px); min-width:0; }
+.couture .cx-copy { width:100%; max-width:640px; min-width:0; justify-self:center; }
+.couture .cx-title { max-width:14ch; text-wrap:balance; hyphens:auto; }
+.couture .cx-kicker { max-width:54ch; }
+.couture .cx-note { width:100%; max-width:44ch; overflow-wrap:anywhere; }
+.couture .cx-meta { width:100%; min-width:0; align-items:start; }
+.couture .cx-meta div { min-width:0; }
+.couture .cx-meta dd { overflow-wrap:anywhere; }
+.couture .cx-cta { max-width:100%; min-width:48px; justify-content:center; white-space:normal; text-align:center; line-height:1.4; }
+.couture .cx-section h2,.couture .cx-section h3 { text-wrap:balance; overflow-wrap:anywhere; }
+.couture .cx-section h2 { margin:12px 0 26px; }
+.couture .cx-section p:not(.nx-kicker) { margin-block:12px; }
+.couture .cx-section .nx-moment { grid-template-columns:minmax(72px,112px) minmax(0,1fr); align-items:start; }
+.couture .cx-section .nx-moment > div { min-width:0; }
+.couture .cx-section .nx-facts dd,.couture .cx-section .nx-moment h3,.couture .cx-section .nx-moment p { overflow-wrap:anywhere; }
+.couture .cx-section .nx-facts { grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr)); align-items:start; }
+.couture .cx-section .nx-gallery { align-items:start; }
+.couture .cx-section .nx-gallery figure { min-width:0; }
+.couture .cx-section .nx-gallery figcaption { max-width:100%; overflow-wrap:anywhere; }
+.couture .cx-countdown { justify-content:flex-start; align-items:flex-start; }
+.couture .ex-form { width:100%; min-width:0; }
+.couture .ex-form > * { min-width:0; }
+.couture .ex-form :is(input,select,textarea) { width:100%; max-width:100%; }
+.couture .ex-form .nx-button,.couture .cx-calendar > * { min-height:48px; }
+.couture :is(a,button,input,select,textarea):focus-visible { outline:2px solid var(--ws-gold); outline-offset:4px; }
+@container (max-width:819px) {
+  .couture .cx-stage { grid-template-columns:minmax(0,1fr); }
+  .couture .cx-copy { max-width:680px; }
+  .couture .cx-art { width:min(92%,560px); }
+  .couture .cx-title { max-width:15ch; font-size:clamp(42px,9cqw,74px); line-height:1; }
+  .couture .cx-section .nx-facts { grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr)); }
+}
+@container (max-width:500px) {
+  .couture .cx-top,.couture .cx-foot { gap:12px; padding-inline:18px; font-size:9px; letter-spacing:.15em; }
+  .couture .cx-stage { padding-inline:18px; }
+  .couture .cx-art { width:min(94%,420px); }
+  .couture .cx-title { max-width:14ch; font-size:clamp(38px,11cqw,54px); line-height:1.02; }
+  .couture .cx-names { font-size:24px; }
+  .couture .cx-meta { grid-template-columns:minmax(0,1fr); }
+  .couture .cx-open-button { max-width:calc(100% - 24px); padding-inline:16px; white-space:normal; text-align:center; line-height:1.35; }
+  .couture .cx-section .nx-moment { grid-template-columns:minmax(56px,72px) minmax(0,1fr); }
+  .couture .cx-section .nx-facts { grid-template-columns:minmax(0,1fr); }
+  .couture .cx-calendar { display:grid; grid-template-columns:minmax(0,1fr); }
+  .couture .cx-calendar > * { width:100%; min-width:0; }
+}
