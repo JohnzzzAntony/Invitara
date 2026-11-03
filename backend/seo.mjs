@@ -118,7 +118,7 @@ function designFacts(catalog, t) {
   const engine = catalog.INVITARA_CATALOG.experiences[t.experience];
   const occasion = catalog.INVITARA_CATALOG.label(t.occasion);
   const price = catalog.EVER_C.startingPrice(t.id);
-  const photo = catalog.EVER_siteDefaults(t.id).sections.hero?.photo || 'assets/ws-couple.jpg';
+  const photo = catalog.EVER_siteDefaults(t.id).sections.hero?.photo || t.poster || 'assets/ws-couple.jpg';
   return { engine, occasion, price, photo, features: (t.premiumFeatures||engine.features).concat(['Mobile & desktop responsive', 'Customisable sections', 'Private RSVP management']) };
 }
 

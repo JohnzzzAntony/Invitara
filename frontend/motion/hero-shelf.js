@@ -40,6 +40,8 @@ function drawCover(t, img, scale) {
   const g = c.getContext('2d'); g.scale(scale, scale);
   const dark = luminance(t.bg) < .3, accent = Math.abs(luminance(t.gold) - luminance(t.bg)) < .12 ? t.ink : t.gold;
   g.fillStyle = t.bg; g.fillRect(0, 0, 512, 768);
+  // Animated designs ship a poster of their opening screen; it already carries the name and art.
+  if (img && t.poster) { drawFit(g, img, 0, 0, 512, 768); return c; }
   if (img && dark) {
     drawFit(g, img, 0, 0, 512, 768);
     const fade = g.createLinearGradient(0, 200, 0, 768);
@@ -73,7 +75,7 @@ async function start() {
   let renderer;
   try { renderer = new THREE.WebGLRenderer({canvas, antialias: true, alpha: true, powerPreference: 'high-performance'}); } catch { return; }
   host.append(canvas); host.classList.add('has-shelf');
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
   renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05; renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   const scene = new THREE.Scene(), pmrem = new THREE.PMREMGenerator(renderer);
@@ -88,21 +90,23 @@ async function start() {
   const edgeH = new THREE.MeshStandardMaterial({map: pagesTexture(false), roughness: .9});
   const edgeV = new THREE.MeshStandardMaterial({map: pagesTexture(true), roughness: .9});
   const anisotropy = renderer.capabilities.getMaxAnisotropy(), scale = coarse ? .62 : .75;
-  const n = templates.length, disposables = [geometry, edgeH, edgeV, pmrem];
+  // Covers start with a blank map so the real one swaps in without recompiling a shader per book.
+  const blank = new THREE.DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1); blank.colorSpace = THREE.SRGBColorSpace; blank.needsUpdate = true;
+  const n = templates.length, disposables = [geometry, edgeH, edgeV, pmrem, blank];
   const books = templates.map((t, i) => {
     const spine = new THREE.Color(t.bg).multiplyScalar(.62);
-    const cover = new THREE.MeshPhysicalMaterial({color: t.bg, roughness: .42, clearcoat: .55, clearcoatRoughness: .35});
+    const cover = new THREE.MeshPhysicalMaterial({map: blank, color: t.bg, roughness: .42, clearcoat: .55, clearcoatRoughness: .35});
     const side = new THREE.MeshPhysicalMaterial({color: spine, roughness: .55, clearcoat: .3});
     const back = new THREE.MeshStandardMaterial({color: spine, roughness: .6});
     disposables.push(cover, side, back);
     const mesh = new THREE.Mesh(geometry, [edgeH, side, edgeV, edgeV, cover, back]);
-    const group = new THREE.Group(); group.position.set(1.55 - .5 * i, -1.12, .9 - .2 * i); group.rotation.y = .32;
+    const group = new THREE.Group(); group.position.set(1.55 - .5 * i, -1.45, .9 - .2 * i); group.rotation.y = .32;
     group.add(mesh); scene.add(group);
     mesh.userData.index = i;
-    loadImage(t.content?.sections?.hero?.photo).then(img => {
+    loadImage(t.poster || t.content?.sections?.hero?.photo).then(img => {
       const tex = new THREE.CanvasTexture(drawCover(t, img, scale));
       tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = anisotropy;
-      cover.map = tex; cover.color.set(0xffffff); cover.needsUpdate = true; disposables.push(tex); dirty = true;
+      cover.map = tex; cover.color.set(0xffffff); disposables.push(tex); dirty = true;
     });
     return {t, mesh, y: reduced ? 0 : -3, vy: 0, z: 0, vz: 0};
   });

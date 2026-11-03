@@ -16,5 +16,5 @@
 
 .replay-opening{display:block;margin:0 auto 18px;padding:10px 20px;min-height:42px;border:1px solid #b9c5ac;border-radius:25px;background:#f8f7f2;color:#465639;font:11px var(--studio-sans);cursor:pointer}@media(max-width:767px){.replay-opening{margin:8px auto}}
 .editor-page .ed-tabs{grid-template-columns:repeat(3,1fr)}
-.template-frame{display:block;width:100%;aspect-ratio:3/4;border:0;pointer-events:none;background:#eee9df}
+.template-frame{display:block;width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;border:0;pointer-events:none;background:#eee9df}
 [data-page=home] .editorial-gallery .collection-art .template-frame{position:absolute;inset:0;height:100%;aspect-ratio:auto}

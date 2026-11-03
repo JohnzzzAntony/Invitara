@@ -10,13 +10,6 @@
   function F(k, label, type) { return { k: k, label: label, type: type || 'text' }; }
   var LABELS = { intro: 'Opening', top: 'Cover', story: 'Story', events: 'Schedule', venue: 'Venue', rsvp: 'RSVP', footer: 'Closing', other: 'Other text' };
 
-  function frame(t, d, host, className) {
-    var f = document.createElement('iframe');
-    f.className = className; f.title = t.name + ' invitation';
-    f.__animated = Object.assign(host, { state: d });
-    f.src = BASE + t.animatedPath;
-    return f;
-  }
   function render(d, t, opts) {
     var el = E.EVER_siteRoot(d, t, opts), host = {}, editor = E.EVER_EDITOR;
     el.classList.add('ws-animated');
@@ -29,17 +22,22 @@
       host.inviteId = opts.inviteId;
       host.send = function (body) { return E.EVER_API.request('/invites/' + encodeURIComponent(opts.inviteId) + '/rsvp', 'POST', body); };
     }
-    var f = frame(t, d, host, 'ws-animated-frame');
+    var f = document.createElement('iframe');
+    f.className = 'ws-animated-frame'; f.title = t.name + ' invitation';
+    f.__animated = Object.assign(host, { state: d });
+    f.src = BASE + t.animatedPath;
     f.style.cssText = 'display:block;width:100%;height:100%;border:0';
     el.appendChild(f);
     return el;
   }
+  // Thumbnails are posters, not live pages: a grid of running templates would stutter the whole page.
   function mini(d, t) {
     var el = document.createElement('div');
     el.className = 'wsm ws-animated-mini'; el.setAttribute('aria-hidden', 'true');
-    var f = frame(t, d, {}, 'template-frame');
-    f.loading = 'lazy'; f.tabIndex = -1;
-    el.appendChild(f);
+    var img = document.createElement('img');
+    img.className = 'template-frame'; img.alt = ''; img.loading = 'lazy'; img.decoding = 'async';
+    img.width = 600; img.height = 900; img.src = t.poster;
+    el.appendChild(img);
     return el;
   }
 
@@ -63,7 +61,7 @@
     E.EVER_THEMES.push({
       id: id, name: a.design, event: occasion ? occasion[0] : 'other', occasion: occasion ? occasion[0] : 'other',
       category: 'Luxury', style: 'Luxury', experience: 'reveal', layout: id, family: slug, animated: true, archived: false,
-      animatedPath: a.path, price: 79, bg: a.themeColor, ink: '#f5efe2', dark: a.themeColor, gold: '#c9a35c', soft: a.themeColor,
+      animatedPath: a.path, poster: a.poster, price: 79, bg: a.themeColor, ink: '#f5efe2', dark: a.themeColor, gold: '#c9a35c', soft: a.themeColor,
       nameFont: 'corm', decoration: 'minimal',
       description: a.intro + '. ' + a.motion + '.',
       premiumFeatures: [a.intro, 'Scroll-driven motion', 'Every text editable', 'Online RSVP']
