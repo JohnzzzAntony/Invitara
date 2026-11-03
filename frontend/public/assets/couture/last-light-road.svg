@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 1200" role="img" aria-labelledby="title desc">
+  <title id="title">A vintage wedding car beneath a floating scarlet veil</title>
+  <desc id="desc">An art-directed overhead view of a cream convertible travelling along a dusky country road framed by olive foliage, with a long red bridal veil caught in the wind.</desc>
+  <defs>
+    <linearGradient id="road" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#343a37"/><stop offset=".48" stop-color="#252b29"/><stop offset="1" stop-color="#171d1b"/></linearGradient>
+    <linearGradient id="silk" x1=".1" y1="0" x2=".82" y2="1"><stop stop-color="#ef5360"/><stop offset=".46" stop-color="#b5162b"/><stop offset="1" stop-color="#710d21"/></linearGradient>
+    <linearGradient id="car" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff4dc"/><stop offset=".55" stop-color="#d8c9ad"/><stop offset="1" stop-color="#95836b"/></linearGradient>
+    <filter id="shadow" x="-.4" y="-.4" width="1.8" height="1.8"><feGaussianBlur stdDeviation="22"/></filter>
+    <pattern id="grain" width="90" height="90" patternUnits="userSpaceOnUse"><circle cx="8" cy="22" r="1" fill="#fff" opacity=".14"/><circle cx="51" cy="69" r="1" fill="#fff" opacity=".1"/><path d="M19 78l4-1M73 17l3 1" stroke="#fff" opacity=".08"/></pattern>
+  </defs>
+  <path fill="#465446" d="M0 0h960v1200H0z"/>
+  <g fill="#293c31">
+    <path d="M0 0h248L127 176 221 282 42 435 157 550 0 721zM960 0H757l88 166-110 122 172 154-97 141 150 155zM0 1200h258L99 1011l126-132L58 742l89-137L0 497zM960 1200H741l111-175-141-131 174-133-94-124 169-133z"/>
+    <path d="M0 0h100L18 183l88 103L0 399zm960 0H866l63 176-91 120 122 111zM0 1200h112L20 1026l105-116L0 765zm960 0H850l87-183-105-109 128-150z" fill="#68735a" opacity=".62"/>
+  </g>
+  <g fill="#879073" opacity=".52">
+    <path d="M0 129l219 111-94 40L0 223zm0 341 163 74-109 37L0 553zm960-390L781 187l105 40 74-45zM960 581l-153 68 100 30 53-27zM0 874l173 63-89 48L0 948zm960 135-180-67 92-47 88 39z"/>
+    <path d="M0 0h45L9 100l70 38-72 30zm960 0h-40l32 104-68 41 76 25zM0 1200h40l-24-93 64-40-80-25zm960 0h-48l37-93-67-40 78-25z" fill="#a9a687"/>
+  </g>
+  <path fill="url(#road)" d="M259 0h459l-31 142 37 173-30 174 26 167-40 183 35 182-48 179H287l39-182-34-183 43-179-37-168 34-174-35-176z"/>
+  <path fill="url(#grain)" d="M259 0h459l-31 142 37 173-30 174 26 167-40 183 35 182-48 179H287l39-182-34-183 43-179-37-168 34-174-35-176z"/>
+  <path d="M496-10l-5 144 12 132-7 137 11 141-8 144 10 143-7 145 9 145" fill="none" stroke="#d8c7a3" stroke-width="5" stroke-dasharray="42 36" opacity=".77"/>
+  <path d="M267 0l-33 145 40 173-34 171 40 168-45 186 36 178-41 179M712 0l-30 143 39 174-29 172 24 170-39 180 35 178-48 183" fill="none" stroke="#d2c3a4" stroke-width="2" opacity=".22"/>
+  <ellipse cx="610" cy="356" rx="176" ry="86" fill="#080b09" opacity=".6" filter="url(#shadow)"/>
+  <g transform="rotate(90 610 326)">
+    <path d="M524 239q0-42 42-54 43-13 86 0 42 12 42 54l13 167q2 50-37 69-62 31-122 0-39-19-37-69z" fill="url(#car)" stroke="#f2e7cf" stroke-width="7"/>
+    <path d="M544 256q4-35 32-42 37-10 68 0 28 7 32 42l-4 44H548z" fill="#52605c" stroke="#9f9078" stroke-width="5"/>
+    <path d="M549 310h123l12 82q2 22-18 32-53 27-111 0-20-10-18-32z" fill="#9d8770" stroke="#eee0c5" stroke-width="5"/>
+    <path d="M560 324h102l8 62q-56 19-117 0z" fill="#353f3b"/>
+    <path d="M549 303h119m-121 88h124" stroke="#c5af8d" stroke-width="5"/>
+    <path d="M531 266h-16v56h17m121-56h16v56h-17M534 413h-15v42h18m112-42h15v42h-18" fill="#d9c9ad" stroke="#6d6151" stroke-width="4"/>
+    <path d="M556 226l20-22h63l34 25" fill="none" stroke="#fff4dc" stroke-width="5" opacity=".72"/>
+    <circle cx="540" cy="266" r="7" fill="#fff3ce"/><circle cx="690" cy="266" r="7" fill="#fff3ce"/>
+  </g>
+  <path d="M573 415c-83 29-103 93-173 137-48 30-119 44-132 102-11 49 39 74 87 61 61-17 88-71 132-101 47-32 109-32 136-80 27-48 13-132-50-119Z" fill="#100b0c" opacity=".32"/>
+  <path d="M581 392c-58 37-88 88-156 117-52 22-127 24-150 79-24 59 36 91 93 73 68-22 99-75 144-99 51-27 113-21 145-69 32-49 14-139-76-101Z" fill="url(#silk)" stroke="#f06b73" stroke-width="3"/>
+  <path d="M563 409c-40 42-82 75-140 105-39 21-78 32-112 68 55 4 95-21 143-51 54-33 102-53 149-91 22-18 27-33 26-52-19 5-42 10-66 21Z" fill="#f88386" opacity=".5"/>
+  <path d="M489 461c-45 45-106 75-160 104m209-71c-44 39-77 57-124 83m-10 28c-33 25-57 45-88 67" fill="none" stroke="#ffd0ba" stroke-width="4" opacity=".42"/>
+  <g fill="#eadbc1" opacity=".83"><circle cx="604" cy="420" r="5"/><circle cx="557" cy="452" r="3"/><circle cx="518" cy="485" r="4"/><circle cx="475" cy="511" r="3"/><circle cx="448" cy="551" r="4"/><circle cx="398" cy="568" r="3"/></g>
+  <path d="M0 0h960v1200H0z" fill="none" stroke="#d0b990" stroke-width="3" opacity=".35"/>
+</svg>

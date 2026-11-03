@@ -525,6 +525,23 @@
 .couture-love-in-motion .cx-title { text-align:center; font-size:clamp(52px,9cqw,112px); }
 .couture-love-in-motion .cx-note { margin-inline:auto; }
 .couture-love-in-motion .cx-meta { max-width:620px; margin-inline:auto; text-align:left; }
+.couture-last-light-road { --cx-display:'CX Bodoni',Didot,Georgia,serif; }
+.couture-last-light-road .cx-hero { color:#f2e9d8; background:radial-gradient(ellipse at 14% 80%,#3c2829 0,transparent 46%),linear-gradient(122deg,#171d1b,#252b28 55%,#1a211e); }
+.couture-last-light-road .cx-stage { grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:clamp(28px,6vw,92px); }
+.couture-last-light-road .cx-art { width:min(100%,520px); }
+.couture-last-light-road .cx-frame { aspect-ratio:4/5; border:1px solid rgba(213,184,140,.78); padding:9px; background:#242a26; box-shadow:0 32px 78px rgba(0,0,0,.32); }
+.couture-last-light-road .cx-photo { object-fit:cover; }
+.couture-last-light-road .cx-film { position:absolute; z-index:1; inset:9px; width:calc(100% - 18px); height:calc(100% - 18px); object-fit:cover; background:#1b201e; }
+.couture-last-light-road .cx-film:focus { outline:0; }
+.couture-last-light-road .cx-photo { position:relative; z-index:0; }
+.couture-last-light-road:not(.cx-open) .cx-photo { filter:saturate(.84) brightness(.78); }
+.couture-last-light-road .cx-copy { color:#f2e9d8; }
+.couture-last-light-road .cx-kicker,.couture-last-light-road .cx-meta dt { color:#d2ae83; }
+.couture-last-light-road .cx-title { font-size:clamp(48px,7.5cqw,100px); max-width:10ch; }
+.couture-last-light-road .cx-note,.couture-last-light-road .cx-names,.couture-last-light-road .cx-meta dd { color:rgba(242,233,216,.86); }
+.couture-last-light-road .cx-meta { border-color:rgba(213,184,140,.4); }
+.couture-last-light-road .cx-cta,.couture-last-light-road .cx-open-button { border-color:#bd263b; }
+.couture-last-light-road .cx-cta:hover,.couture-last-light-road .cx-open-button:hover { background:#bd263b; }
 .couture-wild-at-heart .cx-stage { grid-template-columns:1.25fr .75fr; }
 .couture-wild-at-heart .cx-frame { aspect-ratio:4/5; border-radius:48% 48% 2px 2px; }
 .couture-wild-at-heart .cx-title { font-style:italic; font-size:clamp(58px,8cqw,110px); }
@@ -559,6 +576,12 @@
 .cx-road { background:linear-gradient(120deg,transparent 45%,rgba(255,255,255,.92) 46% 47%,transparent 48%); transform:translateX(-105%); transition:transform 1.5s var(--cx-ease); }
 .cx-open .cx-road { transform:translateX(105%); }
 .cx-road i { position:absolute; left:0;right:0;top:75%;height:1px;border-top:1px dashed rgba(255,255,255,.9); }
+.cx-last-light { overflow:hidden; background:linear-gradient(112deg,transparent 35%,rgba(255,246,224,.82) 48%,rgba(255,246,224,.15) 56%,transparent 64%); transform:translateX(-112%); transition:transform 1.5s var(--cx-ease); }
+.cx-last-light i { position:absolute; top:12%; left:42%; width:29%; height:88%; background:linear-gradient(104deg,rgba(239,83,96,.18),rgba(190,31,53,.9) 44%,rgba(107,12,32,.78)); clip-path:polygon(22% 0,100% 4%,87% 19%,96% 37%,76% 59%,83% 76%,48% 100%,64% 78%,42% 61%,57% 42%,30% 29%,45% 14%); transform:translateY(-4%) rotate(-7deg); transform-origin:top center; transition:transform 1.4s var(--cx-ease),opacity 1s; opacity:.92; }
+.cx-last-light i+i { left:49%; width:22%; opacity:.55; filter:blur(1px); transition-delay:.08s; }
+.cx-last-light i+i+i { left:35%; width:14%; opacity:.68; transition-delay:.14s; }
+.cx-open .cx-last-light { transform:translateX(112%); }
+.cx-open .cx-last-light i { transform:translateY(8%) rotate(7deg); }
 .cx-wild-film { background:linear-gradient(0deg,rgba(24,34,26,.55),transparent 44%),linear-gradient(90deg,rgba(238,240,231,.2),transparent);opacity:.9;transition:opacity 1.2s; }
 .cx-wild-film i { position:absolute;inset:0;border:1px solid rgba(255,255,255,.72);margin:12px; }
 .cx-wild-film i+i { inset:6px;margin:0;border-color:rgba(255,255,255,.45); }
@@ -582,6 +605,8 @@
 .storybook-feature-list .ex-mini { height:320px; }
 @media (max-width:800px) { .storybook-feature { grid-template-columns:1fr; } }
 @container (max-width:819px) { .couture-grand-opening .cx-stage,.couture-earth-and-ink .cx-stage,.couture-wild-at-heart .cx-stage,.couture-palace-in-bloom .cx-stage { grid-template-columns:1fr; }.couture-grand-opening .cx-art,.couture-palace-in-bloom .cx-art { width:min(78%,400px); }.couture-chapter-and-verse .cx-frame { aspect-ratio:4/3; } }
+@container (max-width:819px) { .couture-last-light-road .cx-stage { grid-template-columns:minmax(0,1fr); gap:34px; }.couture-last-light-road .cx-art { width:min(82%,470px); margin-inline:auto; }.couture-last-light-road .cx-copy { max-width:680px; margin-inline:auto; text-align:center; }.couture-last-light-road .cx-title,.couture-last-light-road .cx-note { margin-inline:auto; }.couture-last-light-road .cx-title { max-width:12ch; }.couture-last-light-road .cx-cta { margin-inline:auto; }.couture-last-light-road .cx-meta { max-width:600px; margin-inline:auto; text-align:left; } }
+@container (max-width:500px) { .couture-last-light-road .cx-art { width:min(92%,400px); }.couture-last-light-road .cx-frame { padding:6px; }.couture-last-light-road .cx-title { font-size:clamp(40px,11cqw,56px); } }
 @container (max-width:500px) { .couture-love-in-motion .cx-frame { aspect-ratio:4/3; }.storybook-feature-list { grid-template-columns:1fr; }.couture-grand-opening .cx-title,.couture-palace-in-bloom .cx-title { font-size:clamp(38px,11vw,48px); } }
 
 /* Alignment pass: shared content rails, predictable type measure, and small-screen rhythm. */

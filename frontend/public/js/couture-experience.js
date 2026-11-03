@@ -9,7 +9,7 @@
   var prior=root.__premiumDispose,clean=[],animations=[],frame=0,disposed=false,editing=options&&options.editing,
    reduced=matchMedia('(prefers-reduced-motion: reduce)'),paused=reduced.matches||root.dataset.motion==='none',
    d=root.__wsData,b=d.basics,details=d.sections.details,openingType=d.sections.hero.openingType,
-   hero=root.querySelector('.cx-hero'),button=root.querySelector('.cx-open-button');
+   hero=root.querySelector('.cx-hero'),button=root.querySelector('.cx-open-button'),film=root.querySelector('.cx-film');
   function on(node,event,fn,opts){if(!node)return;node.addEventListener(event,fn,opts);clean.push(function(){node.removeEventListener(event,fn,opts);});}
   root.__premiumDispose=function(){if(disposed)return;disposed=true;cancelAnimationFrame(frame);animations.forEach(function(a){a.cancel();});clean.splice(0).forEach(function(fn){fn();});if(prior)prior();};
 
@@ -34,7 +34,7 @@
   var controls=document.createElement('div');controls.className='cx-toolbar';controls.setAttribute('aria-label','Invitation controls');
   controls.innerHTML='<button type="button" class="cx-motion">Pause motion</button><button type="button" class="cx-replay">Replay opening</button><button type="button" class="cx-share">Share ↗</button><span class="cx-status" role="status"></span>';root.prepend(controls);
   var motion=controls.querySelector('.cx-motion'),replay=controls.querySelector('.cx-replay'),status=controls.querySelector('.cx-status');
-  function setMotion(){root.dataset.paused=String(paused);motion.textContent=paused?'Resume motion':'Pause motion';motion.setAttribute('aria-pressed',String(paused));if(paused){animations.forEach(function(a){a.cancel();});animations=[];}}
+  function setMotion(){root.dataset.paused=String(paused);motion.textContent=paused?'Resume motion':'Pause motion';motion.setAttribute('aria-pressed',String(paused));if(film){if(paused)film.pause();else film.play().catch(function(){});}if(paused){animations.forEach(function(a){a.cancel();});animations=[];}}
   on(motion,'click',function(){paused=!paused;setMotion();});on(reduced,'change',function(){paused=reduced.matches||root.dataset.motion==='none';setMotion();});setMotion();
 
   function open(){if(root.classList.contains('cx-open'))return;root.classList.add('cx-open');if(button){button.textContent='Opened';button.setAttribute('aria-expanded','true');button.tabIndex=-1;}}

@@ -3,6 +3,7 @@
  'use strict';var E=window,base=E.INVITARA_artDirect,esc=E.EVER_esc;
  function field(path,value,tag,cls){return '<'+(tag||'span')+' class="'+(cls||'')+'" data-field="'+path+'" data-editable="true">'+esc(value)+'</'+(tag||'span')+'>';}
  function image(path,value,alt){return '<img class="cx-photo" data-field="'+path+'" data-editable="true" data-edit-type="image" src="'+esc(E.EVER_photoSrc(value))+'" alt="'+esc(alt)+'" width="900" height="1100" decoding="async">';}
+ function film(value,poster){var src=String(value||'').trim();if(!/^(https:\/\/|assets\/)[^"<>]+\.(?:mp4|webm)(?:[?#][^"<>]*)?$/i.test(src))return '';var type=/\.webm(?:[?#]|$)/i.test(src)?'video/webm':'video/mp4';return '<video class="cx-film" data-field="sections.hero.videoUrl" data-editable="true" aria-hidden="true" muted autoplay loop playsinline preload="metadata" poster="'+esc(E.EVER_photoSrc(poster))+'"><source src="'+esc(src)+'" type="'+type+'"></video>';}
  function repeat(n,fn){var out='';for(var i=0;i<n;i++)out+=fn(i);return out;}
  // Decorative layers only; all are aria-hidden and carry no content.
  var ornaments={
@@ -26,6 +27,7 @@
   'grand-opening':function(){return '<div class="cx-veil cx-portal" aria-hidden="true"><i></i><i></i></div>';},
   'earth-and-ink':function(){return '<div class="cx-veil cx-pressed-leaf" aria-hidden="true"><i></i><i></i><i></i></div>';},
   'love-in-motion':function(){return '<div class="cx-veil cx-road" aria-hidden="true"><i></i></div>';},
+  'last-light-road':function(){return '<div class="cx-veil cx-last-light" aria-hidden="true"><i></i><i></i><i></i></div>';},
   'wild-at-heart':function(){return '<div class="cx-veil cx-wild-film" aria-hidden="true"><i></i><i></i></div>';},
   'palace-in-bloom':function(){return '<div class="cx-veil cx-palace-gate" aria-hidden="true"><i></i><i></i><i></i></div>';},
   'chapter-and-verse':function(){return '<div class="cx-veil cx-book-pages" aria-hidden="true"><i></i><i></i></div>';}
@@ -39,11 +41,12 @@
   if(opts.mini||opts.editing||h.openingType==='none')root.classList.add('cx-open');
   if(hero){
    hero.classList.add('cx-hero');
+   var filmLayer=film(h.videoUrl,h.photo);if(filmLayer)hero.classList.add('cx-has-film');
    var numeral=key==='saffron'||key==='pearl'?field('basics.brand',b.brand,'span','cx-numeral'):'';
    var names=field('basics.nameA',b.nameA,'span','cx-name')+(b.nameB?'<em class="cx-amp" aria-hidden="true">&amp;</em>'+field('basics.nameB',b.nameB,'span','cx-name'):'');
    var meta='<dl class="cx-meta"><div><dt>When</dt><dd>'+field('basics.date',E.EVER_fmtLongDate(b.date))+' · '+field('basics.time',b.time)+'</dd></div><div><dt>Where</dt><dd>'+field('basics.venue',b.venue)+' · '+field('basics.city',b.city)+'</dd></div></dl>';
    var copy='<div class="cx-copy">'+field('sections.hero.kicker',h.kicker,'p','cx-kicker')+field('sections.hero.title',h.title,'h1','cx-title')+'<p class="cx-names">'+names+'</p>'+field('sections.hero.note',h.note,'p','cx-note')+meta+'<a class="cx-cta" href="#ws-sec-story" data-goto="story" data-field="sections.hero.button" data-editable="true" data-edit-type="button">'+esc(h.button)+' <span aria-hidden="true">→</span></a></div>';
-   var art='<div class="cx-art">'+numeral+'<div class="cx-frame">'+image('sections.hero.photo',h.photo,(b.nameA||'The host')+' — invitation portrait')+(ornaments[key]?ornaments[key]():'')+'</div></div>';
+   var art='<div class="cx-art">'+numeral+'<div class="cx-frame">'+image('sections.hero.photo',h.photo,(b.nameA||'The host')+' — invitation portrait')+filmLayer+(ornaments[key]?ornaments[key]():'')+'</div></div>';
    hero.innerHTML='<div class="cx-top">'+field('basics.brand',b.brand,'span','cx-wordmark')+'<span class="cx-label">'+esc(config.label||t.name)+'</span></div><div class="cx-stage">'+art+copy+'</div><div class="cx-foot"><span>'+field('basics.date',E.EVER_fmtLongDate(b.date))+'</span><span aria-hidden="true">'+esc(config.cue||'Scroll')+' ↓</span></div>';
    if(!opts.mini&&!opts.editing&&h.openingType!=='none'){var button=document.createElement('button');button.type='button';button.className='cx-open-button';button.textContent=config.action||'Open the invitation';button.setAttribute('aria-expanded','false');if(h.openingType==='scroll')button.setAttribute('aria-label',(config.action||'Open the invitation')+'. Scroll or press Enter to open.');hero.querySelector('.cx-frame').append(button);}
   }
