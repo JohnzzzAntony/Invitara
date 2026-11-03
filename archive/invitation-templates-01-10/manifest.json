@@ -1,0 +1,145 @@
+{
+  "version": 1,
+  "templates": [
+    {
+      "id": "01-wedding-save-the-date-navy",
+      "occasion": "Wedding \u00b7 Save the Date",
+      "design": "Navy & Gold Emboss",
+      "path": "01-wedding-save-the-date-navy/index.html",
+      "themeColor": "#0b1530",
+      "envelopeOpener": true,
+      "event": {
+        "date": "2027-03-05T16:00:00+04:00",
+        "hours": "6",
+        "title": "Amelia & Rayan \u2014 Wedding",
+        "venue": "The Rosewood Garden Estate"
+      }
+    },
+    {
+      "id": "02-grand-opening-watercolor-estate",
+      "occasion": "Grand Opening",
+      "design": "Watercolor Estate",
+      "path": "02-grand-opening-watercolor-estate/index.html",
+      "themeColor": "#f7f5ef",
+      "envelopeOpener": true,
+      "event": {
+        "date": "2027-04-18T19:00:00+04:00",
+        "hours": "3",
+        "title": "Maison Lumi\u00e8re \u2014 Grand Opening",
+        "venue": "Maison Lumi\u00e8re, City Walk, Dubai"
+      }
+    },
+    {
+      "id": "03-mehndi-night-mughal-arch",
+      "occasion": "Mehndi Night",
+      "design": "Lilac Mughal Arch",
+      "path": "03-mehndi-night-mughal-arch/index.html",
+      "themeColor": "#d7cbe6",
+      "envelopeOpener": true,
+      "event": {
+        "date": "2027-02-12T19:30:00+04:00",
+        "hours": "5",
+        "title": "Zara & Arjun \u2014 Mehndi Night",
+        "venue": "The Courtyard, Jumeirah, Dubai"
+      }
+    },
+    {
+      "id": "04-engagement-burgundy-envelope",
+      "occasion": "Engagement",
+      "design": "Burgundy Photo Envelope",
+      "path": "04-engagement-burgundy-envelope/index.html",
+      "themeColor": "#fbf7f1",
+      "envelopeOpener": true,
+      "event": {
+        "date": "2027-06-21T12:30:00+02:00",
+        "hours": "5",
+        "title": "Clara & Elliot \u2014 Engagement",
+        "venue": "Occitanie, France"
+      }
+    },
+    {
+      "id": "05-anniversary-embossed-burgundy",
+      "occasion": "Anniversary",
+      "design": "Embossed Burgundy Envelope",
+      "path": "05-anniversary-embossed-burgundy/index.html",
+      "themeColor": "#5a111e",
+      "envelopeOpener": true,
+      "event": {
+        "date": "2027-11-14T19:00:00+04:00",
+        "hours": "5",
+        "title": "Helena & Marcus \u2014 25th Anniversary",
+        "venue": "The Grand Ballroom, Dubai"
+      }
+    },
+    {
+      "id": "06-bridal-shower-dusty-rose-seal",
+      "occasion": "Bridal Shower",
+      "design": "Dusty Rose Wax Seal",
+      "path": "06-bridal-shower-dusty-rose-seal/index.html",
+      "themeColor": "#d4a29d",
+      "envelopeOpener": true,
+      "event": {
+        "date": "2027-05-09T11:00:00+04:00",
+        "hours": "3",
+        "title": "Bridal Shower \u2014 Honoring Sophie",
+        "venue": "The Rose Terrace, Downtown Dubai"
+      }
+    },
+    {
+      "id": "07-wedding-reception-royal-crest",
+      "occasion": "Wedding Reception",
+      "design": "Royal Crest Garden",
+      "path": "07-wedding-reception-royal-crest/index.html",
+      "themeColor": "#eef0ec",
+      "envelopeOpener": true,
+      "event": {
+        "date": "2027-11-27T18:00:00+04:00",
+        "hours": "6",
+        "title": "Alexandra & Nikolai \u2014 Wedding Reception",
+        "venue": "Palace Gardens, Abu Dhabi"
+      }
+    },
+    {
+      "id": "08-baby-shower-eucalyptus-gold",
+      "occasion": "Baby Shower",
+      "design": "Eucalyptus & Gold Line",
+      "path": "08-baby-shower-eucalyptus-gold/index.html",
+      "themeColor": "#f7f6f2",
+      "envelopeOpener": true,
+      "event": {
+        "date": "2027-03-06T15:00:00+04:00",
+        "hours": "3",
+        "title": "Baby Shower \u2014 Honoring Layla",
+        "venue": "The Garden Tea Room, Dubai"
+      }
+    },
+    {
+      "id": "09-birthday-blush-gold-monogram",
+      "occasion": "Birthday",
+      "design": "Blush Gold Numerals",
+      "path": "09-birthday-blush-gold-monogram/index.html",
+      "themeColor": "#efdfd8",
+      "envelopeOpener": true,
+      "event": {
+        "date": "2027-07-24T20:00:00+04:00",
+        "hours": "5",
+        "title": "Elena's 30th Birthday",
+        "venue": "Sky Lounge, Dubai Marina"
+      }
+    },
+    {
+      "id": "10-haldi-ceremony-garden-path",
+      "occasion": "Haldi Ceremony",
+      "design": "Garden Path & Vintage Car",
+      "path": "10-haldi-ceremony-garden-path/index.html",
+      "themeColor": "#2c4a22",
+      "envelopeOpener": true,
+      "event": {
+        "date": "2027-12-10T10:00:00+04:00",
+        "hours": "4",
+        "title": "Meera & Kabir \u2014 Haldi Ceremony",
+        "venue": "The Palm Garden, Al Barsha, Dubai"
+      }
+    }
+  ]
+}

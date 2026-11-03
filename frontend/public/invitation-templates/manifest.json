@@ -1,0 +1,156 @@
+{
+  "version": 2,
+  "series": "animated",
+  "templates": [
+    {
+      "id": "11-wedding-moonlit-garden-gates",
+      "occasion": "Wedding",
+      "design": "Moonlit Garden Gates",
+      "intro": "Iron gates swing open",
+      "motion": "Fireflies, parallax garden, moonrise + rising lanterns (pinned), scroll-drawn timeline",
+      "path": "11-wedding-moonlit-garden-gates/index.html",
+      "themeColor": "#0b1430",
+      "event": {
+        "date": "2027-09-18T18:30:00+04:00",
+        "hours": "6",
+        "title": "Sofia & Adrian \u2014 Wedding",
+        "venue": "The Moon Garden, Al Barari, Dubai"
+      }
+    },
+    {
+      "id": "12-wedding-royal-palace-doors",
+      "occasion": "Wedding (Indian)",
+      "design": "Royal Palace Doors",
+      "intro": "Carved doors open in 3D",
+      "motion": "Falling marigold petals, rotating mandala, arch fly-through tunnel (pinned), horizontal event carousel (pinned)",
+      "path": "12-wedding-royal-palace-doors/index.html",
+      "themeColor": "#5b1626",
+      "event": {
+        "date": "2027-01-24T19:00:00+05:30",
+        "hours": "6",
+        "title": "Ananya & Vikram \u2014 Wedding",
+        "venue": "The Lake Palace, Udaipur"
+      }
+    },
+    {
+      "id": "13-anniversary-golden-50-champagne",
+      "occasion": "Anniversary (50th)",
+      "design": "Golden Champagne",
+      "intro": "Pop the cork + confetti burst",
+      "motion": "Gold dust, 0\u219250 counter, horizontal film-strip timeline (pinned), clinking glasses",
+      "path": "13-anniversary-golden-50-champagne/index.html",
+      "themeColor": "#14100a",
+      "event": {
+        "date": "2027-06-12T19:00:00+04:00",
+        "hours": "5",
+        "title": "Margaret & Richard \u2014 50th Anniversary",
+        "venue": "The Crystal Room, Dubai"
+      }
+    },
+    {
+      "id": "14-anniversary-cinema-love-story",
+      "occasion": "Anniversary (10th)",
+      "design": "Cinema Love Story",
+      "intro": "Curtains part + 3-2-1 film leader",
+      "motion": "Film grain, projector beam, scroll-spun reels, masked film frames, ticket reveal",
+      "path": "14-anniversary-cinema-love-story/index.html",
+      "themeColor": "#120c0a",
+      "event": {
+        "date": "2027-10-15T20:00:00+04:00",
+        "hours": "4",
+        "title": "Leila & Omar \u2014 10th Anniversary Premiere",
+        "venue": "The Grand Picture House, Dubai"
+      }
+    },
+    {
+      "id": "15-birthday-gates-in-the-clouds",
+      "occasion": "Birthday (18th)",
+      "design": "Gates in the Clouds",
+      "intro": "Untie the bow, gates & clouds part",
+      "motion": "Parallax clouds & balloons, 18 counter, balloon rise + sky-to-night shift (pinned)",
+      "path": "15-birthday-gates-in-the-clouds/index.html",
+      "themeColor": "#f6d9e4",
+      "event": {
+        "date": "2027-08-05T19:30:00+04:00",
+        "hours": "5",
+        "title": "Aria's 18th Birthday",
+        "venue": "Cloud Nine Rooftop, Dubai"
+      }
+    },
+    {
+      "id": "16-birthday-art-deco-cocktail",
+      "occasion": "Birthday (40th)",
+      "design": "Art-Deco Cocktail Night",
+      "intro": "Deco panels slide apart",
+      "motion": "Self-drawing deco frame, neon flicker, martini fills as you scroll (pinned)",
+      "path": "16-birthday-art-deco-cocktail/index.html",
+      "themeColor": "#0b0b0c",
+      "event": {
+        "date": "2027-11-20T20:00:00+04:00",
+        "hours": "5",
+        "title": "Marcus's 40th \u2014 A Cocktail Soir\u00e9e",
+        "venue": "The Gilded Lounge, DIFC, Dubai"
+      }
+    },
+    {
+      "id": "17-product-launch-perfume-unveil",
+      "occasion": "Product Launch",
+      "design": "Perfume Unveil",
+      "intro": "Silk drape lifts off the bottle",
+      "motion": "Spotlight + smoke, floating bottle, fragrance notes reveal (pinned), 500 counter",
+      "path": "17-product-launch-perfume-unveil/index.html",
+      "themeColor": "#070605",
+      "event": {
+        "date": "2027-03-03T20:00:00+04:00",
+        "hours": "3",
+        "title": "Noir \u00c9clat \u2014 Launch Evening by Maison Sahar",
+        "venue": "Maison Sahar Atelier, Dubai Design District"
+      }
+    },
+    {
+      "id": "18-product-launch-coming-soon-drop",
+      "occasion": "Product Launch",
+      "design": "Coming Soon Drop",
+      "intro": "3-2-1 launch countdown + flash",
+      "motion": "Scroll-linked marquee type, product zoom with feature callouts (pinned), stat counters",
+      "path": "18-product-launch-coming-soon-drop/index.html",
+      "themeColor": "#08080a",
+      "event": {
+        "date": "2027-04-09T20:00:00+04:00",
+        "hours": "4",
+        "title": "Orbit One \u2014 Launch Night by Halo Audio",
+        "venue": "Warehouse 21, Alserkal Avenue, Dubai"
+      }
+    },
+    {
+      "id": "19-housewarming-we-found-our-home",
+      "occasion": "Housewarming",
+      "design": "We Found Our Home",
+      "intro": "Turn the key, door swings open",
+      "motion": "House builds itself as you scroll \u2014 walls, roof, lights, smoke (pinned)",
+      "path": "19-housewarming-we-found-our-home/index.html",
+      "themeColor": "#fbf6ef",
+      "event": {
+        "date": "2027-05-16T12:00:00+04:00",
+        "hours": "5",
+        "title": "Sara & Adam's Housewarming",
+        "venue": "12 Jasmine Lane, Arabian Ranches, Dubai"
+      }
+    },
+    {
+      "id": "20-housewarming-griha-pravesh-diya",
+      "occasion": "Housewarming (Griha Pravesh)",
+      "design": "Diya & Rangoli",
+      "intro": "Light the diya, rangoli draws itself",
+      "motion": "Swinging marigold toran, rangoli blooms layer by layer (pinned), flickering diyas",
+      "path": "20-housewarming-griha-pravesh-diya/index.html",
+      "themeColor": "#5c1019",
+      "event": {
+        "date": "2027-02-14T08:00:00+04:00",
+        "hours": "6",
+        "title": "Griha Pravesh \u2014 The Iyer Family",
+        "venue": "Villa 27, Mirdif, Dubai"
+      }
+    }
+  ]
+}

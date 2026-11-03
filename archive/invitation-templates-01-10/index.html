@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Invitation Templates · Gallery</title><meta name="description" content="Ten digital invitation templates for weddings, engagements, showers, birthdays and more.">
+<style>
+:root{color-scheme:light}*{box-sizing:border-box}body{margin:0;font:15px/1.5 system-ui,sans-serif;background:#faf7f2;color:#171717}
+header{max-width:1200px;margin:0 auto;padding:48px 20px 8px}h1{font:500 2.2rem/1.1 Georgia,serif;margin:0}p{color:#555;margin:.5rem 0 0}
+ul{list-style:none;margin:0 auto;padding:24px 20px 60px;max-width:1200px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:24px}
+a{color:inherit;text-decoration:none;display:block}a:focus-visible{outline:2px solid #652901;outline-offset:4px}
+.frame{display:block;position:relative;aspect-ratio:390/700;overflow:hidden;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.1);background:#eee;transition:transform .2s}
+a:hover .frame{transform:translateY(-3px)}
+iframe{position:absolute;top:0;left:0;width:390px;height:700px;border:0;transform-origin:0 0;pointer-events:none}
+b{display:block;margin-top:12px;font-weight:600}small{color:#666}
+</style><link rel="stylesheet" href="premium-controls.css">
+</head><body>
+<header><h1>Invitation templates</h1><p>Ten mobile-first digital invitations. Click a card to open the live template.</p></header>
+<ul>
+    <li><a href="01-wedding-save-the-date-navy/index.html"><span class="frame"><iframe src="01-wedding-save-the-date-navy/index.html" title="Wedding · Save the Date preview" loading="lazy" tabindex="-1" scrolling="no"></iframe></span><b>Wedding · Save the Date</b><small>Navy & Gold Emboss</small></a></li>
+    <li><a href="02-grand-opening-watercolor-estate/index.html"><span class="frame"><iframe src="02-grand-opening-watercolor-estate/index.html" title="Grand Opening preview" loading="lazy" tabindex="-1" scrolling="no"></iframe></span><b>Grand Opening</b><small>Watercolor Estate</small></a></li>
+    <li><a href="03-mehndi-night-mughal-arch/index.html"><span class="frame"><iframe src="03-mehndi-night-mughal-arch/index.html" title="Mehndi Night preview" loading="lazy" tabindex="-1" scrolling="no"></iframe></span><b>Mehndi Night</b><small>Lilac Mughal Arch</small></a></li>
+    <li><a href="04-engagement-burgundy-envelope/index.html"><span class="frame"><iframe src="04-engagement-burgundy-envelope/index.html" title="Engagement preview" loading="lazy" tabindex="-1" scrolling="no"></iframe></span><b>Engagement</b><small>Burgundy Photo Envelope</small></a></li>
+    <li><a href="05-anniversary-embossed-burgundy/index.html"><span class="frame"><iframe src="05-anniversary-embossed-burgundy/index.html" title="Anniversary preview" loading="lazy" tabindex="-1" scrolling="no"></iframe></span><b>Anniversary</b><small>Embossed Burgundy Envelope</small></a></li>
+    <li><a href="06-bridal-shower-dusty-rose-seal/index.html"><span class="frame"><iframe src="06-bridal-shower-dusty-rose-seal/index.html" title="Bridal Shower preview" loading="lazy" tabindex="-1" scrolling="no"></iframe></span><b>Bridal Shower</b><small>Dusty Rose Wax Seal</small></a></li>
+    <li><a href="07-wedding-reception-royal-crest/index.html"><span class="frame"><iframe src="07-wedding-reception-royal-crest/index.html" title="Wedding Reception preview" loading="lazy" tabindex="-1" scrolling="no"></iframe></span><b>Wedding Reception</b><small>Royal Crest Garden</small></a></li>
+    <li><a href="08-baby-shower-eucalyptus-gold/index.html"><span class="frame"><iframe src="08-baby-shower-eucalyptus-gold/index.html" title="Baby Shower preview" loading="lazy" tabindex="-1" scrolling="no"></iframe></span><b>Baby Shower</b><small>Eucalyptus & Gold Line</small></a></li>
+    <li><a href="09-birthday-blush-gold-monogram/index.html"><span class="frame"><iframe src="09-birthday-blush-gold-monogram/index.html" title="Birthday preview" loading="lazy" tabindex="-1" scrolling="no"></iframe></span><b>Birthday</b><small>Blush Gold Numerals</small></a></li>
+    <li><a href="10-haldi-ceremony-garden-path/index.html"><span class="frame"><iframe src="10-haldi-ceremony-garden-path/index.html" title="Haldi Ceremony preview" loading="lazy" tabindex="-1" scrolling="no"></iframe></span><b>Haldi Ceremony</b><small>Garden Path & Vintage Car</small></a></li>
+</ul>
+<script>
+function fit(){document.querySelectorAll('.frame').forEach(function(f){f.firstChild.style.transform='scale('+f.clientWidth/390+')'})}
+fit();addEventListener('resize',fit);
+</script>
+<script src="gallery-motion.js"></script>
+</body></html>
