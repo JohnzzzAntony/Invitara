@@ -160,7 +160,7 @@
     if (!tpl) return null;
 
     var tier = TIERS[tpl.layout] || { basePrice: 29, editorLevel: 'basic', plans: PLAN_ORDER.slice() };
-    if (tpl.layout === 'platform') tier = { basePrice: tpl.price || 79, editorLevel: 'full', plans: ['studio'] };
+    if (tpl.layout === 'platform' || tpl.animated) tier = { basePrice: tpl.price || 79, editorLevel: 'full', plans: ['studio'] };
     /* Custom user designs are always the entry tier. */
     if (tpl.custom) tier = { basePrice: 29, editorLevel: 'basic', plans: PLAN_ORDER.slice() };
 

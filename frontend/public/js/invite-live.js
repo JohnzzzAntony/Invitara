@@ -5,7 +5,7 @@
  try{
   if(!id)throw new Error('Missing invitation');
  var payload=await E.EVER_API.request('/invites/'+encodeURIComponent(id));
-  var site=E.EVER_renderSite(payload.s,{interactive:true});root.appendChild(site);E.EVER_bindSite(site,{rsvpDemo:false});
+  var site=E.EVER_renderSite(payload.s,{interactive:true,inviteId:id});root.appendChild(site);E.EVER_bindSite(site,{rsvpDemo:false});
   document.title=(payload.s.basics.title||payload.s.basics.brand)+' — you’re invited';
   site.querySelectorAll('.ws-rsvp-form').forEach(function(form){
    var status=document.createElement('p');status.setAttribute('role','status');status.className='ex-form-note';form.appendChild(status);

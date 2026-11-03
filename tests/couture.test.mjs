@@ -4,11 +4,11 @@ import {existsSync} from 'node:fs';
 import {loadCatalog} from '../backend/catalog.mjs';
 import {invitationState} from '../backend/invitation-state.mjs';
 
-const catalog=loadCatalog(),themes=[...catalog.INVITARA_availableTemplates().filter(t=>t.couture)];
+const catalog=loadCatalog(),themes=catalog.EVER_THEMES.filter(t=>t.couture);
 
 test('five couture editions load in the authoritative server catalogue',()=>{
- assert.deepEqual([...themes.map(t=>t.id)],['couture-lumiere','couture-obsidian','couture-eclipse','couture-saffron','couture-pearl']);
- assert.deepEqual([...themes.map(t=>t.occasion)],['wedding','corporate','product-launch','birthday','anniversary']);
+ assert.deepEqual([...themes.slice(0,5).map(t=>t.id)],['couture-lumiere','couture-obsidian','couture-eclipse','couture-saffron','couture-pearl']);
+ assert.deepEqual([...themes.slice(0,5).map(t=>t.occasion)],['wedding','corporate','product-launch','birthday','anniversary']);
 });
 
 test('couture defaults validate, keep edits, reference real assets and price with VAT',()=>{

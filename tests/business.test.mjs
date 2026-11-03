@@ -8,7 +8,7 @@ import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {DatabaseSync} from 'node:sqlite';
 import {createHash} from 'node:crypto';
-const catalog=loadCatalog(),themes=catalog.INVITARA_availableTemplates().filter(t=>t.business);
+const catalog=loadCatalog(),themes=catalog.EVER_THEMES.filter(t=>t.business);
 test('six business editions retain editable content, assets and authoritative pricing',()=>{
  assert.equal(themes.length,6);
  for(const theme of themes){
