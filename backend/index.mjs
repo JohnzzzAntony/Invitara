@@ -236,8 +236,8 @@ app.get('/api/projects/:id/qr',async(req,res)=>{const p=owned(req,res);if(!p)ret
 app.get('/api/config',(req,res)=>res.json({businessName:process.env.BUSINESS_NAME||'Respondr',supportEmail:process.env.SUPPORT_EMAIL||''}));
 app.get('/api/health',(req,res)=>{db.prepare('SELECT 1').get();res.json({ok:true,paymentsConfigured:!!stripe});});
 // Explicit public allowlist: never expose database, secrets, source or dependencies.
-// The template gallery previews each template in a same-origin iframe.
-const templateFraming = { 'X-Frame-Options': 'SAMEORIGIN', 'Content-Security-Policy': SECURITY_HEADERS['Content-Security-Policy'].replace("frame-src", "frame-src 'self'").replace("frame-ancestors 'none'", "frame-ancestors 'self'") };
+// Template cards preview each template in a same-origin iframe.
+const templateFraming = { 'X-Frame-Options': 'SAMEORIGIN', 'Content-Security-Policy': SECURITY_HEADERS['Content-Security-Policy'].replace("frame-ancestors 'none'", "frame-ancestors 'self'") };
 app.use('/invitation-templates', (req, res, next) => { res.set(templateFraming); next(); }, express.static(path.join(publicRoot, 'invitation-templates'), { dotfiles: 'deny' }));
 for (const dir of ['assets', 'mu', 'css', 'js', 'vendor']) app.use('/' + dir, express.static(path.join(publicRoot, dir), { dotfiles: 'deny' }));
 // Search engines and AI crawlers may read every public page; private app pages stay out of the index.
