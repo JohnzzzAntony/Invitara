@@ -24,7 +24,8 @@
     "test:premium": "node scripts/premium-check.mjs",
     "test:editions": "node scripts/editions-check.mjs",
     "lint": "eslint . --max-warnings=0",
-    "test:couture": "node scripts/couture-check.mjs"
+    "test:couture": "node scripts/couture-check.mjs",
+    "test:home": "node scripts/home-showcase-check.mjs"
   },
   "dependencies": {
     "compression": "1.8.1",

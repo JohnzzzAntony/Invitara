@@ -1,0 +1,10 @@
+/*!
+ * Shadow Text — ported to plain JavaScript from kokonutUI (https://kokonutui.com, @dorianbaffier), MIT License,
+ * Copyright (c) 2025 kokonutUI. Original source and full notice: third_party/podie/.
+ * The effect logic is unchanged; only the React wrapper became a function that takes an element.
+ */
+/*!
+ * Feature Carousel — ported to plain JavaScript from uselayouts (https://uselayouts.com), MIT License,
+ * Copyright (c) 2025 Urvish Mali. Original source and full notice: third_party/podie/.
+ * Same motion library, timings, easing and interactions; React state became a small render loop.
+ */
