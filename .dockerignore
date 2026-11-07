@@ -14,3 +14,4 @@ archive
 docs
 .env.*
 !.env.example
+*.zip

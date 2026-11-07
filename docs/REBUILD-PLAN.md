@@ -18,6 +18,13 @@ invite page 899 → 269 KB), offer headline as the H1, `/contact.html` + footer 
 page (`SUPPORT_EMAIL`, `SUPPORT_WHATSAPP`), opt-in Plausible analytics (`PLAUSIBLE_DOMAIN`).
 Open: per-page / per-design asset splitting (issues 1–2), which needs the catalogue scripts restructured.
 
+**P1/P2 status (2026-11-07):** done: one CTA label ("Choose a design") site-wide, homepage
+filters/search moved to `/create` only, final CTA band on home, hidden H1 on demo/editor,
+`/prompts` noindexed and out of the footer, `frontend.zip` untracked, lint fixed. Checked, no
+change needed: served page titles are already unique (issue 11). Dropped: issue 13, since the
+orange brand was a deliberate change (commit 7ee51af). Open: social proof (issue 6) waits for real
+customer quotes; CSS consolidation (issue 9) and self-hosted fonts go with the asset split.
+
 ---
 
 ## 1. Executive summary
