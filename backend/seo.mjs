@@ -103,6 +103,8 @@ export const OCCASIONS = [
     body: ['A holiday party invitation sets the mood for the season. Respondr’s winter design unwraps like a parcel under a quiet moonlit sky.', 'Share the date, venue and plan for the evening, and collect replies online.'],
     faqs: [['When should holiday party invitations go out?', 'Send holiday party invitations three to four weeks ahead, as December calendars fill quickly.']] },
 ];
+// Occasions that currently have at least one design; the rest would only lead to an empty page.
+export const stockedOccasions = catalog => OCCASIONS.filter(o => catalog.INVITARA_availableTemplates().some(t => t.occasion === o.key));
 export const occasionBySlug = Object.fromEntries(OCCASIONS.map(o => [o.slug, o]));
 export const occasionByKey = Object.fromEntries(OCCASIONS.map(o => [o.key, o]));
 export const occasionPath = key => occasionByKey[key] ? '/' + occasionByKey[key].slug : '/create.html';
@@ -165,7 +167,7 @@ export function seoFor(file, { origin, catalog, query = {}, occasion, supportEma
   } else if (file === 'create.html') {
     graph.push({ '@type': 'CollectionPage', name: 'Digital invitation templates', description: base.description, url: origin + '/create.html', isPartOf: { '@id': origin + '/#website' }, mainEntity: { '@type': 'ItemList', itemListElement: templates.map((t, i) => ({ '@type': 'ListItem', position: i + 1, url: origin + designPath(t.id), name: t.name })) } }, breadcrumbs(origin, [['Home', '/'], ['Invitations', '/create.html']]));
     out.replace.push(['<p class="studio-kicker">Made for your moment</p><h1 id="collection-title">Beautiful invitations</h1>', '<p class="studio-kicker">Made for your moment</p><h1 id="collection-title" data-seo-title="Digital invitation templates">Digital invitation templates</h1>'],
-      ['</main>', '<nav class="occasion-index" aria-label="Invitations by occasion"><p class="studio-kicker">Browse by occasion</p><ul>' + OCCASIONS.map(o => '<li><a href="' + o.slug + '">' + escapeHtml(o.h1) + '</a></li>').join('') + '</ul></nav></main>']);
+      ['</main>', '<nav class="occasion-index" aria-label="Invitations by occasion"><p class="studio-kicker">Browse by occasion</p><ul>' + stockedOccasions(catalog).map(o => '<li><a href="' + o.slug + '">' + escapeHtml(o.h1) + '</a></li>').join('') + '</ul></nav></main>']);
   } else if (file === 'design.html') {
     const t = catalog.EVER_findTemplate(query.id) && templates.find(x => x.id === query.id) || templates[0];
     const f = designFacts(catalog, t), o = occasionByKey[t.occasion];
@@ -183,7 +185,7 @@ export function seoFor(file, { origin, catalog, query = {}, occasion, supportEma
 }
 
 export function sitemapXml(origin, catalog, lastmod) {
-  const urls = ['/', '/create.html', '/pricing.html', ...OCCASIONS.map(o => '/' + o.slug), ...catalog.INVITARA_availableTemplates().map(t => designPath(t.id)), '/contact.html', '/terms.html', '/privacy.html'];
+  const urls = ['/', '/create.html', '/pricing.html', ...stockedOccasions(catalog).map(o => '/' + o.slug), ...catalog.INVITARA_availableTemplates().map(t => designPath(t.id)), '/contact.html', '/terms.html', '/privacy.html'];
   return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls.map(u => '<url><loc>' + escapeHtml(origin + u) + '</loc><lastmod>' + lastmod + '</lastmod></url>').join('\n') + '\n</urlset>\n';
 }
 
@@ -201,7 +203,7 @@ export function llmsTxt(origin, catalog) {
 - Guest privacy: invitations are private links (not indexed); only the host sees replies.
 
 ## Occasions
-${OCCASIONS.map(o => `- [${o.h1}](${origin}/${o.slug}): ${o.description}`).join('\n')}
+${stockedOccasions(catalog).map(o => `- [${o.h1}](${origin}/${o.slug}): ${o.description}`).join('\n')}
 
 ## Designs
 ${templates.map(t => `- [${t.name}](${origin}${designPath(t.id)}): ${catalog.INVITARA_CATALOG.label(t.occasion)}, ${t.style}. ${t.description}`).join('\n')}

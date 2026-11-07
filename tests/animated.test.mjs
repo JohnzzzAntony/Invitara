@@ -32,3 +32,28 @@ test('animated texts reject non-text input',()=>{
  const t=themes[0],state=catalog.EVER_siteDefaults(t.id);state.sections.rsvp[Object.keys(state.sections.rsvp).find(k=>k!=='on')]={html:'<script>'};
  assert.throws(()=>invitationState(catalog,state,t.id,'2027-06-10'),/Invalid or oversized field/);
 });
+
+test('quick details: every fact appears in its design, and changing one rewrites every copy',()=>{
+ for(const theme of themes){
+  const layout=catalog.EVER_findLayout(theme.id),facts=layout.basics.filter(f=>f.fact);
+  assert.ok(facts.length>=4,theme.id+' needs quick details');
+  for(const f of facts){
+   const state=catalog.EVER_siteDefaults(theme.id),sample=state.basics[f.k];
+   assert.ok(catalog.INVITARA_replaceFact(state,sample,'Zq Test')>0,theme.id+': "'+sample+'" ('+f.label+') appears nowhere');
+   assert.equal(catalog.INVITARA_replaceFact(state,sample,'Zq Other'),0,theme.id+': "'+sample+'" left behind');
+  }
+  const state=catalog.EVER_siteDefaults(theme.id);for(const f of facts)state.basics[f.k]='Edited';
+  assert.equal(invitationState(catalog,state,theme.id,'2027-06-10').basics[facts[0].k],'Edited');
+ }
+ const s=catalog.EVER_siteDefaults('animated-wedding-moonlit-garden-gates');
+ catalog.INVITARA_replaceFact(s,'Sofia','Maya');
+ assert.equal(s.sections.top.tg,'Maya');assert.equal(s.sections.footer.tcb,'Maya & Adrian');assert.match(s.basics.title,/^Maya & Adrian/);
+ assert.equal(catalog.INVITARA_replaceFact(s,'Maya',''),0,'an empty value must never erase text');
+});
+
+test('only occasions with designs get a landing page, filter or sitemap entry',async()=>{
+ const {stockedOccasions}=await import('../backend/seo.mjs');
+ const stocked=stockedOccasions(catalog).map(o=>o.key);
+ assert.ok(stocked.includes('wedding')&&!stocked.includes('eid'));
+ assert.ok(!sitemapXml('https://x.test',catalog,'2027-01-01').includes('eid-invitations'));
+});

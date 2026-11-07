@@ -513,15 +513,34 @@
     var host = document.getElementById('basics-body');
     if (!host) return;
     host.innerHTML = '';
-    var specs = layout().basics || [];
+    var specs = layout().basics || [], plain = {};
 
     function bind(f) {
+      if (f.fact) {
+        // Applied on change, not per keystroke: an emptied field mid-typing must not erase every copy.
+        // Drafts saved before quick details existed fall back to the design's sample text.
+        var current = function () { var v = getVal(state.basics, f.k); return v == null ? layout().defaults().basics[f.k] : v; };
+        var factField = fieldHtml(f, current(), function () {});
+        var input = factField.querySelector('input');
+        input.addEventListener('change', function () {
+          var from = current(), to = input.value.trim();
+          if (!accessAllowed() || !to) { input.value = from || ''; return; }
+          window.INVITARA_replaceFact(state, from, to);
+          setVal(state.basics, f.k, to);
+          // Update the other boxes in place so keyboard focus (Tab to the next detail) survives.
+          Object.keys(plain).forEach(function (k) { var v = getVal(state.basics, k); if (typeof v === 'string') plain[k].value = v; });
+          buildGroups();
+          refresh();
+        });
+        return factField;
+      }
       var field = fieldHtml(f, getVal(state.basics, f.k), function (v) {
         if (access && f.k === 'date') return;
         setVal(state.basics, f.k, v);
         refresh();
       });
       if (access && f.k === 'date') { field.querySelector('input').disabled = true; field.querySelector('input').title = 'Event date fixed at purchase'; }
+      plain[f.k] = field.querySelector('input,textarea');
       return field;
     }
 

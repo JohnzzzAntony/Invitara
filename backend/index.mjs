@@ -2,7 +2,7 @@ import express from 'express';
 import compression from 'compression';
 import { resolveOrigin } from './origin.mjs';
 import { pageHtml } from './page-meta.mjs';
-import { seoFor, sitemapXml, llmsTxt, occasionBySlug, occasionByKey, occasionPath } from './seo.mjs';
+import { seoFor, sitemapXml, llmsTxt, stockedOccasions, occasionBySlug, occasionByKey, occasionPath } from './seo.mjs';
 import Stripe from 'stripe';
 import QRCode from 'qrcode';
 import { DatabaseSync } from 'node:sqlite';
@@ -257,6 +257,8 @@ app.get('/', (req, res) => res.type('html').send(pageHtml('index.html', origin, 
 app.get('/:slug', (req, res, next) => {
   const occasion = occasionBySlug[req.params.slug];
   if (!occasion) return next();
+  // An occasion without designs sends visitors to the full catalogue instead of an empty page.
+  if (!stockedOccasions(catalog).includes(occasion)) return res.redirect(302, '/create.html');
   res.type('html').send(pageHtml('create.html', origin, null, seo('create.html', { occasion })));
 });
 app.get('/invite.html', (req, res) => {
