@@ -27,6 +27,7 @@
     "test:couture": "node scripts/couture-check.mjs"
   },
   "dependencies": {
+    "compression": "1.8.1",
     "express": "5.1.0",
     "luxon": "3.7.2",
     "qrcode": "^1.5.4",

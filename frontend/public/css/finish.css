@@ -211,6 +211,7 @@ img:not([src$=".svg"]):not([src*="logo"]), video, picture img {
 [data-page=home] .hs { position: relative; isolation: isolate; overflow: hidden; height: calc(100svh - 94px); min-height: 600px; max-height: 1040px; background: #0b0807; color: #f6ece8; }
 [data-page=home] .hs .hs-wordmark { position: absolute; z-index: 1; inset: 3% 0 auto; margin: 0; text-align: center; color: #f6ece8; font: 400 min(36vh, 25vw)/1 "Libre Caslon Display", Georgia, serif; letter-spacing: -.02em; }
 .hs-copy { position: absolute; z-index: 3; top: calc(3% + min(36vh, 25vw) * 1.22); left: 50%; width: min(560px, calc(100% - 40px)); transform: translateX(-50%); text-align: center; }
+[data-page=home] .hs .hs-title { margin: 0 0 10px; color: #f6ece8; font-size: clamp(22px, 2.4vw, 34px); font-weight: 500; line-height: 1.2; text-shadow: 0 0 14px #0b0807, 0 0 4px #0b0807; }
 .hs-lead { margin: 0 auto 20px; color: rgba(246, 236, 232, .86); font-size: clamp(15px, 1.15vw, 17px); line-height: 1.6; text-shadow: 0 0 14px #0b0807, 0 0 4px #0b0807, 0 1px 2px #0b0807; }
 .hs-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
 [data-page=home] .hs .studio-button.light { border-color: rgba(246, 236, 232, .45) !important; background: rgba(11, 8, 7, .55) !important; color: #f6ece8 !important; }

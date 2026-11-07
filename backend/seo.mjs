@@ -28,6 +28,10 @@ const PAGES = {
     title: 'Privacy Policy | Respondr',
     description: 'How Respondr protects your account, guest replies and photos: what we store, cookies and device storage, payment handling, invitation privacy and data requests.',
   },
+  'contact.html': {
+    title: 'Contact Us | Respondr',
+    description: 'Questions about a digital invitation, payment or your RSVP list? Email or WhatsApp the Respondr team.',
+  },
   'design.html': { title: 'Invitation Design | Respondr', description: 'Preview an interactive digital invitation, then make every detail yours.' },
 };
 
@@ -170,8 +174,8 @@ export function seoFor(file, { origin, catalog, query = {}, occasion, supportEma
     const fill = (id, text) => out.replace.push([new RegExp('(<[^>]+id="' + id + '"[^>]*>)(</)'), '$1' + escapeHtml(text) + '$2']);
     fill('detail-title', t.name); fill('detail-breadcrumb', t.name); fill('detail-occasion', f.occasion + ' invitation'); fill('detail-description', t.description || f.engine.description); fill('detail-price', 'AED ' + f.price + ' / event'); fill('detail-badges', t.style + ' · ' + f.engine.name + ' · Fully customisable');
     out.replace.push([/(<ul id="detail-features"[^>]*>)(<\/ul>)/, '$1' + f.features.map(s => '<li>' + escapeHtml(s) + '</li>').join('') + '$2']);
-  } else if (file === 'terms.html' || file === 'privacy.html') {
-    graph.push(breadcrumbs(origin, [['Home', '/'], [file === 'terms.html' ? 'Terms' : 'Privacy', '/' + file]]));
+  } else if (file === 'terms.html' || file === 'privacy.html' || file === 'contact.html') {
+    graph.push(breadcrumbs(origin, [['Home', '/'], [{ 'terms.html': 'Terms', 'privacy.html': 'Privacy', 'contact.html': 'Contact' }[file], '/' + file]]));
   }
   out.graph = out.graph || (() => graph);
   out.jsonLd = html => jsonLd({ '@context': 'https://schema.org', '@graph': out.graph(html) });
@@ -179,7 +183,7 @@ export function seoFor(file, { origin, catalog, query = {}, occasion, supportEma
 }
 
 export function sitemapXml(origin, catalog, lastmod) {
-  const urls = ['/', '/create.html', '/pricing.html', ...OCCASIONS.map(o => '/' + o.slug), ...catalog.INVITARA_availableTemplates().map(t => designPath(t.id)), '/terms.html', '/privacy.html'];
+  const urls = ['/', '/create.html', '/pricing.html', ...OCCASIONS.map(o => '/' + o.slug), ...catalog.INVITARA_availableTemplates().map(t => designPath(t.id)), '/contact.html', '/terms.html', '/privacy.html'];
   return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls.map(u => '<url><loc>' + escapeHtml(origin + u) + '</loc><lastmod>' + lastmod + '</lastmod></url>').join('\n') + '\n</urlset>\n';
 }
 

@@ -1,4 +1,5 @@
 import express from 'express';
+import compression from 'compression';
 import { resolveOrigin } from './origin.mjs';
 import { pageHtml } from './page-meta.mjs';
 import { seoFor, sitemapXml, llmsTxt, occasionBySlug, occasionByKey, occasionPath } from './seo.mjs';
@@ -43,8 +44,11 @@ if(process.env.TRUST_PROXY_HOPS){
   app.set('trust proxy',hops);
 }
 app.disable('x-powered-by');
+app.use(compression());
+// Plausible analytics is opt-in: set PLAUSIBLE_DOMAIN to load its script (no cookies, path-only pageviews).
+const pageHeaders = process.env.PLAUSIBLE_DOMAIN ? { ...SECURITY_HEADERS, 'Content-Security-Policy': SECURITY_HEADERS['Content-Security-Policy'].replace("script-src 'self'", "script-src 'self' https://plausible.io").replace("connect-src 'self'", "connect-src 'self' https://plausible.io") } : SECURITY_HEADERS;
 app.use((req, res, next) => {
-  res.set(SECURITY_HEADERS);
+  res.set(pageHeaders);
   if (production) res.set('Strict-Transport-Security', 'max-age=31536000');
   next();
 });
@@ -233,7 +237,7 @@ app.post('/api/invites/:id/rsvp',(req,res)=>{
 });
 app.get('/api/projects/:id/replies',(req,res)=>{const p=owned(req,res);if(!p)return;res.json(db.prepare('SELECT body FROM replies WHERE project=?').all(p.id).map(r=>JSON.parse(r.body)));});
 app.get('/api/projects/:id/qr',async(req,res)=>{const p=owned(req,res);if(!p)return;if(!p.paid||!p.published)return res.status(409).json({error:'Publish your invitation before sharing.'});try{const svg=await QRCode.toString(origin+'/invite.html?e='+encodeURIComponent(p.id),{type:'svg',errorCorrectionLevel:'M',margin:4,color:{dark:'#6B3529',light:'#ffffff'}});res.type('image/svg+xml').send(svg);}catch(_){res.status(500).json({error:'Could not generate the QR code.'});}});
-app.get('/api/config',(req,res)=>res.json({businessName:process.env.BUSINESS_NAME||'Respondr',supportEmail:process.env.SUPPORT_EMAIL||''}));
+app.get('/api/config',(req,res)=>res.json({businessName:process.env.BUSINESS_NAME||'Respondr',supportEmail:process.env.SUPPORT_EMAIL||'',supportWhatsapp:(process.env.SUPPORT_WHATSAPP||'').replace(/\D/g,'')}));
 app.get('/api/health',(req,res)=>{db.prepare('SELECT 1').get();res.json({ok:true,paymentsConfigured:!!stripe});});
 // Explicit public allowlist: never expose database, secrets, source or dependencies.
 // Template cards preview each template in a same-origin iframe.
@@ -270,7 +274,7 @@ app.get('/:file', (req, res, next) => {
     const key = { 'baby-shower': 'baby', 'save-the-date': 'save-date', 'bridal-shower': 'bridal' }[req.query.occasion] || req.query.occasion;
     if (occasionByKey[key]) return res.redirect(301, occasionPath(key));
   }
-  if (['index.html','create.html','design.html','pricing.html','account.html','dashboard.html','editor.html','checkout.html','demo.html','terms.html','privacy.html'].includes(file)) return res.type('html').send(pageHtml(file, origin, null, seo(file, { query: { id: typeof req.query.id === 'string' ? req.query.id : '' } })));
+  if (['index.html','create.html','design.html','pricing.html','account.html','dashboard.html','editor.html','checkout.html','demo.html','terms.html','privacy.html','contact.html'].includes(file)) return res.type('html').send(pageHtml(file, origin, null, seo(file, { query: { id: typeof req.query.id === 'string' ? req.query.id : '' } })));
   if (/^[a-z0-9-]+\.html$/.test(req.params.file) || ['styles.css', 'robots.txt', 'sitemap.xml'].includes(req.params.file)) return res.sendFile(path.join(publicRoot, req.params.file));
   next();
 });

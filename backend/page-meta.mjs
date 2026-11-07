@@ -20,6 +20,7 @@ export function pageHtml(file, origin, project, seo = {}) {
     + '<meta property="og:image" content="' + escape(image.url) + '"><meta property="og:image:alt" content="' + escape(image.alt) + '">'
     + '<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="' + escape(title) + '"><meta name="twitter:description" content="' + escape(description) + '"><meta name="twitter:image" content="' + escape(image.url) + '">'
     + '<link rel="apple-touch-icon" href="/assets/respondr-logo.png">';
+  if (process.env.PLAUSIBLE_DOMAIN) tags += '<script defer data-domain="' + escape(process.env.PLAUSIBLE_DOMAIN) + '" src="https://plausible.io/js/script.outbound-links.js"></script>';
   if (seo.keywords) tags += '<meta name="keywords" content="' + escape(seo.keywords) + '">';
   if (privatePages.has(file)) tags += '<meta name="robots" content="noindex, nofollow">';
   else tags += '<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">' + (seo.jsonLd ? seo.jsonLd(html) : '');
