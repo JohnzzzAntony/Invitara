@@ -1,4 +1,4 @@
-/* Respondr motion layer for studio pages: splash, heading word reveals, cursor dot, full-screen menu state, showroom FLIP.
+/* Respondr motion layer for studio pages: heading word reveals, cursor dot, full-screen menu state, showroom FLIP.
  * Loads before premium-ui.js so headings it animates are marked and not animated twice. */
 (function(){
  'use strict';
@@ -6,25 +6,8 @@
  var reduced=matchMedia('(prefers-reduced-motion: reduce)'),fine=matchMedia('(hover:hover) and (pointer:fine)');
  if(!reduced.matches)html.classList.add('rs-motion');
 
- /* ---- Splash (homepage markup; once per session) ---- */
- var readyFns=[],isReady=false;
- function whenReady(fn){if(isReady)fn();else readyFns.push(fn);}
- function ready(){if(isReady)return;isReady=true;html.classList.remove('rs-splashing');readyFns.splice(0).forEach(function(fn){fn();});}
- var splash=document.getElementById('rs-splash');
- if(!splash||html.classList.contains('rs-seen')){if(splash)splash.remove();ready();}
- else{
-  var bar=splash.querySelector('s'),born=performance.now(),done=0,total=2,finished=false;
-  try{sessionStorage.setItem('rs-splash','1');}catch(e){}
-  function tick(){done++;bar.style.transform='scaleX('+Math.min(1,done/total)+')';if(done>=total)finish();}
-  function finish(){if(finished)return;finished=true;bar.style.transform='scaleX(1)';setTimeout(function(){splash.classList.add('out');ready();setTimeout(function(){splash.remove();},950);},Math.max(0,1150-(performance.now()-born)));}
-  (document.fonts?document.fonts.ready:Promise.resolve()).then(tick,tick);
-  var grid=document.getElementById('collection-grid');
-  if(grid&&!grid.children.length){var seen=new MutationObserver(function(){if(grid.children.length){seen.disconnect();tick();}});seen.observe(grid,{childList:true});}else tick();
-  setTimeout(finish,4000);
- }
-
  /* ---- Heading word reveals ---- */
- var SKIP='.ws,.collection-art,.ex-mini,.nx-mini,.hs,.eg-float,[aria-hidden="true"],[hidden]';
+ var SKIP='[data-shadow-text],.ws,.collection-art,.ex-mini,.nx-mini,.hs,.eg-float,[aria-hidden="true"],[hidden]';
  function split(h){
   var i=0,label=h.textContent.replace(/\s+/g,' ').trim();
   var walker=document.createTreeWalker(h,NodeFilter.SHOW_TEXT),nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
@@ -45,7 +28,7 @@
   var headings=Array.from(document.querySelectorAll('main h1,main h2')).filter(function(h){return !h.closest(SKIP)&&!h.querySelector('a,button,input')&&!h.classList.contains('sr-only')&&h.textContent.trim();});
   headings.forEach(split);
   var wordObserver=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('is-in');wordObserver.unobserve(e.target);}});},{threshold:.2,rootMargin:'0px 0px -4% 0px'});
-  whenReady(function(){headings.forEach(function(h){wordObserver.observe(h);});});
+  headings.forEach(function(h){wordObserver.observe(h);});
  }
 
  /* ---- Cursor dot (fine pointers only; lerp .2 toward the pointer) ---- */

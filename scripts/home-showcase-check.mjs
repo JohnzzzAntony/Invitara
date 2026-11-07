@@ -5,10 +5,23 @@ const origin=process.env.TEST_ORIGIN||'http://localhost:3000';
 const browser=await chromium.launch({channel:'msedge',headless:true});
 try{
  const page=await browser.newPage({viewport:{width:1440,height:900}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
- await page.goto(origin+'/');
+ const headline='Beautiful digital invitations with online RSVP.';
+ // Hold the enhancement bundle to check what a first-time visitor sees while it loads.
+ const {promise:showcaseReady,resolve:releaseShowcase}=Promise.withResolvers();
+ await page.route('**/vendor/home-showcase.js',async route=>{await showcaseReady;await route.continue();},{times:1});
+ await page.goto(origin+'/',{waitUntil:'commit'});
+ await page.waitForFunction(()=>document.documentElement.classList.contains('rs-motion'));
+ const title=page.getByRole('heading',{level:1,name:headline});
+ assert.equal(await title.textContent(),headline);
+ assert.equal(await title.evaluate(el=>{
+  const {x,y,width,height}=el.getBoundingClientRect();
+  return !el.classList.contains('rs-words')&&el.contains(document.elementFromPoint(x+width/2,y+height/2));
+ }),true,'the hero title is visible before the animation bundle loads');
+ releaseShowcase();
+ await page.waitForLoadState('domcontentloaded');
  const letter=page.locator('.shadow-letter').first();
  await page.waitForFunction(()=>document.querySelector('.shadow-letter')?.style.textShadow.includes('px'));
- assert.equal(await page.getByRole('heading',{level:1}).textContent().then(t=>t.includes('Beautiful digital invitations with online RSVP.')),true);
+ assert.equal(await title.count(),1);
  const box=await page.locator('.lh-title').boundingBox(),shadow=()=>letter.evaluate(el=>el.style.textShadow.split(',')[0]);
  await page.mouse.move(box.x+box.width+40,box.y-40);await page.waitForTimeout(900);const fromRight=await shadow();
  await page.mouse.move(box.x-40,box.y+box.height+40);await page.waitForTimeout(900);assert.notEqual(await shadow(),fromRight,'the pointer moves the shadows');
