@@ -2,9 +2,9 @@
    Every hidden starting state is scoped to html.rs-motion, which only JavaScript adds, so content never disappears without it. */
 :root{--rs-ease:cubic-bezier(.22,.61,.36,1);--rs-ease-out:cubic-bezier(.22,1,.36,1);--rs-ink:var(--brand-ink,#111);--rs-paper:#f7f4ee;--rs-accent:var(--brand,#FF6A00)}
 
-/* Headings: words blur and rise into place, staggered. */
-html.rs-motion .rs-words .rs-word{display:inline-block;opacity:0;transform:translateY(.42em);filter:blur(7px);transition:opacity 1.05s var(--rs-ease),transform 1.15s var(--rs-ease),filter 1.05s var(--rs-ease);transition-delay:calc(.08s + var(--i) * .085s)}
-html.rs-motion .rs-words.is-in .rs-word{opacity:1;transform:none;filter:blur(0)}
+/* Headings: fade and rise into place as one piece (gradient text cannot animate per word). */
+html.rs-motion .rs-rise{opacity:0;transform:translateY(.3em);transition:opacity .5s var(--rs-ease-out),transform .6s var(--rs-ease-out)}
+html.rs-motion .rs-rise.is-in{opacity:1;transform:none}
 
 /* Cursor dot follows fine pointers; the native cursor stays visible. */
 .rs-dot{position:fixed;left:0;top:0;z-index:300;width:19px;height:19px;margin:-9.5px;border:1px solid transparent;border-radius:50%;background:rgba(214,212,209,.9);mix-blend-mode:difference;pointer-events:none;opacity:0;transition:width .35s ease,height .35s ease,margin .35s ease,background .35s ease,border-color .35s ease,opacity .3s ease}
@@ -51,8 +51,8 @@ html.rs-motion .rs-words.is-in .rs-word{opacity:1;transform:none;filter:blur(0)}
 
 /* Invitation templates: text blurs up and images unveil as they scroll into view. */
 html.rs-motion .rs-pre{opacity:0}
-@media print{html.rs-motion .rs-pre,html.rs-motion .rs-words .rs-word{opacity:1!important;transform:none!important;filter:none!important}}
+@media print{html.rs-motion .rs-pre,html.rs-motion .rs-rise{opacity:1!important;transform:none!important}}
 
 @media (prefers-reduced-motion:reduce){
- .rs-words .rs-word,.studio-links,.studio-links a,.studio-menu svg path{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.14s!important;transition-delay:0s!important}
+ .rs-rise,.studio-links,.studio-links a,.studio-menu svg path{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.14s!important;transition-delay:0s!important}
 }

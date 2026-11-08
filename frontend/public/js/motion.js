@@ -1,4 +1,4 @@
-/* Respondr motion layer for studio pages: heading word reveals, cursor dot, full-screen menu state, showroom FLIP.
+/* Respondr motion layer for studio pages: heading reveals, cursor dot, full-screen menu state, showroom FLIP.
  * Loads before premium-ui.js so headings it animates are marked and not animated twice. */
 (function(){
  'use strict';
@@ -6,27 +6,13 @@
  var reduced=matchMedia('(prefers-reduced-motion: reduce)'),fine=matchMedia('(hover:hover) and (pointer:fine)');
  if(!reduced.matches)html.classList.add('rs-motion');
 
- /* ---- Heading word reveals ---- */
+ /* ---- Heading reveals ----
+  * Each heading fades and rises as one piece. Per-word animation broke on the gradient headings:
+  * background-clip:text cannot paint words that are mid-transition, so they stayed blank, then popped in. */
  var SKIP='[data-shadow-text],.ws,.collection-art,.ex-mini,.nx-mini,.hs,.eg-float,[aria-hidden="true"],[hidden]';
- function split(h){
-  var i=0,label=h.textContent.replace(/\s+/g,' ').trim();
-  var walker=document.createTreeWalker(h,NodeFilter.SHOW_TEXT),nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
-  nodes.forEach(function(node){
-   var frag=document.createDocumentFragment();
-   node.textContent.split(/(\s+)/).forEach(function(part){
-    if(!part)return;
-    if(/^\s+$/.test(part)){frag.append(part);return;}
-    var w=document.createElement('span');w.className='rs-word';w.style.setProperty('--i',i++);w.textContent=part;frag.append(w);
-   });
-   node.replaceWith(frag);
-  });
-  h.setAttribute('aria-label',label);
-  Array.from(h.children).forEach(function(c){c.setAttribute('aria-hidden','true');});
-  h.classList.add('rs-words','ui-reveal');
- }
  if(!reduced.matches){
   var headings=Array.from(document.querySelectorAll('main h1,main h2')).filter(function(h){return !h.closest(SKIP)&&!h.querySelector('a,button,input')&&!h.classList.contains('sr-only')&&h.textContent.trim();});
-  headings.forEach(split);
+  headings.forEach(function(h){h.classList.add('rs-rise','ui-reveal');});
   var wordObserver=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('is-in');wordObserver.unobserve(e.target);}});},{threshold:.2,rootMargin:'0px 0px -4% 0px'});
   headings.forEach(function(h){wordObserver.observe(h);});
  }
