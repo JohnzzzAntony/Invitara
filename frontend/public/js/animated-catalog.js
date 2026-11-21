@@ -2,8 +2,8 @@
  * Each page gets its own layout whose fields are the page's visible texts (js/animated-data.js),
  * so saving, server validation, pricing and the AI assistant work like every other design.
  * The page renders in a same-origin frame; invitation-templates/edit.js applies the state inside it.
- * Loaded after every other catalogue: the animated designs replace the earlier collection,
- * which stays registered (archived) so saved invitations keep rendering. DOM-free at load (backend/catalog.mjs). */
+ * Loaded after every other catalogue. Earlier designs stay registered for saved invitations.
+ * DOM-free at load (backend/catalog.mjs). */
 (function () {
   'use strict';
   var E = window, cat = E.INVITARA_CATALOG, BASE = '/invitation-templates/', session = {};
@@ -104,5 +104,5 @@
       premiumFeatures: [a.intro, 'Scroll-driven motion', 'Every text editable', 'Online RSVP']
     });
   });
-  E.EVER_THEMES.forEach(function (t) { if (!t.animated) t.archived = true; });
+  E.EVER_THEMES.forEach(function (t) { if (!t.animated && t.id !== 'edition-ink-and-olive') t.archived = true; });
 })();

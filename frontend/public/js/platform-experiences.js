@@ -8,7 +8,11 @@
   function animate(node,frames,settings){if(reduce.matches||root.dataset.motion==="none"||!node.animate)return;if(root.dataset.motion==="gentle")settings.duration=300;var a=node.animate(frames,settings);clean.push(function(){a.cancel();});}
   function timer(){root.querySelectorAll('[data-deadline]').forEach(function(box){var end=new Date(box.dataset.deadline+'T00:00:00').getTime(),days=Math.max(0,Math.ceil((end-Date.now())/86400000));box.innerHTML='<strong>'+days+'</strong><span>'+(days===1?'day':'days')+' until we celebrate</span>';});}
   timer();var tick=setInterval(timer,60000);clean.push(function(){clearInterval(tick);});
-  if(editing){root.classList.add('nx-editing');root.__premiumDispose=function(){if(prior)prior();clean.forEach(function(fn){fn();});};return;}
+  if(editing){
+   root.classList.add('nx-editing');
+   root.querySelectorAll('.nx-questions details').forEach(function(question){question.open=true;});
+   root.__premiumDispose=function(){if(prior)prior();clean.forEach(function(fn){fn();});};return;
+  }
   var sections=Array.from(root.querySelectorAll(':scope > .nx-section'));
   if(root.classList.contains('nx-decor-industrial')){
    var motionControl=root.querySelector('.sf-motion-control'),sceneHost=root.querySelector('[data-scene-host]'),sceneDisposed=false,disposeScene;

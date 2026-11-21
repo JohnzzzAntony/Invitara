@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Respondr — commerce domain
+   momentsiz — commerce domain
    Owns everything the rendering engine deliberately does not: plans, feature
    permissions, theme pricing, projects, the purchase state machine and orders.
 
@@ -119,7 +119,9 @@
    * layout actually exposes. Features are DERIVED from the layout's own
    * section list, so a theme can never advertise a section its layout does
    * not render.                                                          */
-  var TIERS = {"vellum":{"basePrice":89,"editorLevel":"full","plans":["studio"]},"nocturne":{"basePrice":99,"editorLevel":"full","plans":["studio"]},"confetti":{"basePrice":69,"editorLevel":"full","plans":["studio"]},"bloom":{"basePrice":79,"editorLevel":"full","plans":["studio"]},"atlas":{"basePrice":99,"editorLevel":"full","plans":["studio"]}};
+  /* Every design is one price per event, before VAT. */
+  var TEMPLATE_PRICE = 99;
+  var TIERS = {"vellum":{"editorLevel":"full","plans":["studio"]},"nocturne":{"editorLevel":"full","plans":["studio"]},"confetti":{"editorLevel":"full","plans":["studio"]},"bloom":{"editorLevel":"full","plans":["studio"]},"atlas":{"editorLevel":"full","plans":["studio"]}};
 
   /* Visual style, used by the marketplace style filter. Derived from the
      theme's own `category` so there is one source of truth. */
@@ -159,10 +161,10 @@
       : tplOrId;
     if (!tpl) return null;
 
-    var tier = TIERS[tpl.layout] || { basePrice: 29, editorLevel: 'basic', plans: PLAN_ORDER.slice() };
-    if (tpl.layout === 'platform' || tpl.animated) tier = { basePrice: tpl.price || 79, editorLevel: 'full', plans: ['studio'] };
+    var tier = TIERS[tpl.layout] || { editorLevel: 'basic', plans: PLAN_ORDER.slice() };
+    if (tpl.layout === 'platform' || tpl.animated) tier = { editorLevel: 'full', plans: ['studio'] };
     /* Custom user designs are always the entry tier. */
-    if (tpl.custom) tier = { basePrice: 29, editorLevel: 'basic', plans: PLAN_ORDER.slice() };
+    if (tpl.custom) tier = { editorLevel: 'basic', plans: PLAN_ORDER.slice() };
 
     var layout = window.EVER_findLayout ? window.EVER_findLayout(tpl.layout) : null;
     var features = [];
@@ -178,7 +180,7 @@
       name: tpl.name,
       category: tpl.event || 'wedding',
       style: STYLE_OF[tpl.category] || 'Modern',
-      basePrice: tier.basePrice,
+      basePrice: TEMPLATE_PRICE,
       editorLevel: tier.editorLevel,
       plans: tier.plans,
       features: features,
@@ -243,6 +245,50 @@
   function money(n) {
     var v = Math.round(Number(n) * 100) / 100;
     return CURRENCY + ' ' + (v % 1 === 0 ? String(v) : v.toFixed(2));
+  }
+
+  /* ------------------------------------------------------------------ *
+   *  Regional display currency                                          *
+   * ------------------------------------------------------------------ *
+   * Checkout always charges AED (Stripe and the server verify it). Elsewhere a
+   * price is shown in the visitor's currency, picked from their time zone, then
+   * their browser locale. AED is pegged to the US dollar, so USD stays exact.
+   * shortcut: fixed rates per 1 AED (Nov 2026), refresh them or fetch live rates if a currency drifts. */
+  var RATES = { AED: 1, USD: 0.2723, SAR: 1.021, QAR: 0.991, KWD: 0.0837, BHD: 0.1026, OMR: 0.1047, EUR: 0.235, GBP: 0.207, INR: 23.6, PKR: 76, CAD: 0.38, AUD: 0.42, SGD: 0.355, EGP: 13.4 };
+  var ZONE_CURRENCY = { 'Asia/Dubai': 'AED', 'Asia/Muscat': 'OMR', 'Asia/Riyadh': 'SAR', 'Asia/Qatar': 'QAR', 'Asia/Kuwait': 'KWD', 'Asia/Bahrain': 'BHD',
+    'Asia/Kolkata': 'INR', 'Asia/Calcutta': 'INR', 'Asia/Karachi': 'PKR', 'Europe/London': 'GBP', 'Asia/Singapore': 'SGD', 'Africa/Cairo': 'EGP' };
+  var REGION_CURRENCY = { AE: 'AED', SA: 'SAR', QA: 'QAR', KW: 'KWD', BH: 'BHD', OM: 'OMR', IN: 'INR', PK: 'PKR', GB: 'GBP', US: 'USD', CA: 'CAD', AU: 'AUD', SG: 'SGD', EG: 'EGP',
+    DE: 'EUR', FR: 'EUR', IT: 'EUR', ES: 'EUR', NL: 'EUR', BE: 'EUR', IE: 'EUR', AT: 'EUR', PT: 'EUR', FI: 'EUR', GR: 'EUR' };
+
+  function regionCurrency(zone, langs) {
+    if (ZONE_CURRENCY[zone]) return ZONE_CURRENCY[zone];
+    if (/^Europe\//.test(zone || '') && zone !== 'Europe/Moscow') return 'EUR';
+    if (/^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage)/.test(zone || '')) return 'USD';
+    for (var i = 0; i < (langs || []).length; i++) {
+      var region = String(langs[i]).split('-')[1];
+      if (region && REGION_CURRENCY[region.toUpperCase()]) return REGION_CURRENCY[region.toUpperCase()];
+    }
+    return CURRENCY;
+  }
+
+  var displayCurrency = (function () {
+    try { return regionCurrency(Intl.DateTimeFormat().resolvedOptions().timeZone, navigator.languages || [navigator.language]); }
+    catch (e) { return CURRENCY; }
+  })();
+
+  /** An AED amount in the visitor's currency, e.g. 99 -> "$27" or "AED 99". */
+  function localMoney(aed, currency) {
+    var cur = currency || displayCurrency, v = Number(aed) * (RATES[cur] || 1);
+    if (!RATES[cur]) cur = CURRENCY;
+    if (cur === CURRENCY) return money(aed);
+    try { return new Intl.NumberFormat(undefined, { style: 'currency', currency: cur, maximumFractionDigits: v >= 100 ? 0 : 2, minimumFractionDigits: 0 }).format(v); }
+    catch (e) { return cur + ' ' + v.toFixed(2); }
+  }
+
+  /* Pricing page card: the per-event price in the visitor's currency. */
+  if (typeof document !== 'undefined' && displayCurrency !== CURRENCY) {
+    var amountEl = document.getElementById('pricing-amount'), currencyEl = document.querySelector('.price-card-currency');
+    if (amountEl && currencyEl) { currencyEl.textContent = displayCurrency; amountEl.textContent = localMoney(Number(amountEl.textContent)).replace(/[^\d.,\s]/g, '').trim(); }
   }
 
   /* ------------------------------------------------------------------ *
@@ -525,6 +571,10 @@
     startingPrice: startingPrice,
     quote: quote,
     money: money,
+    localMoney: localMoney,
+    regionCurrency: regionCurrency,
+    displayCurrency: function () { return displayCurrency; },
+    TEMPLATE_PRICE: TEMPLATE_PRICE,
 
     STATES: STATES,
     canTransition: canTransition,

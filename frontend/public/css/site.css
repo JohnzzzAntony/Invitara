@@ -1,4 +1,4 @@
-/* Respondr site system: shared header, typography, buttons and footer for every marketing page,
+/* momentsiz site system: shared header, typography, buttons and footer for every marketing page,
    mobile first, with 44px tap targets and a 12px text floor.
    Loaded last so it wins over the earlier style layers. */
 
@@ -8,9 +8,9 @@
   --olive: #5b6a39;
   --olive-deep: #4a5730;
   --gold: #b3955d;
-  --studio-ink: #9E5240;
+  --studio-ink: #7016D8;
   --studio-muted: #6c6a5f;
-  --studio-paper: #f8f5ef;
+  --studio-paper: #F8F6FC;
   --studio-line: #e5dfd2;
   --surface: #fffdf8;
   --surface-soft: #f1ece1;

@@ -24,7 +24,7 @@
    calendar.querySelector('.cx-google').href='https://calendar.google.com/calendar/render?'+new URLSearchParams({action:'TEMPLATE',text:b.title,dates:stamp(start)+'/'+stamp(end),ctz:details.timezone,location:b.venue+', '+b.city,details:d.sections.hero.note});
    on(calendar.querySelector('.cx-ics'),'click',function(){
     function safe(v){return String(v||'').replace(/\\/g,'\\\\').replace(/\r?\n/g,'\\n').replace(/[,;]/g,'\\$&');}
-    var body=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Respondr//Couture//EN','BEGIN:VEVENT','UID:'+encodeURIComponent(b.title+'-'+b.date)+'@respondr','DTSTAMP:'+stamp(Date.now()),'DTSTART:'+stamp(start),'DTEND:'+stamp(end),'SUMMARY:'+safe(b.title),'LOCATION:'+safe(b.venue+', '+b.city),'DESCRIPTION:'+safe(d.sections.hero.note),'END:VEVENT','END:VCALENDAR'].join('\r\n')+'\r\n';
+    var body=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//momentsiz//Couture//EN','BEGIN:VEVENT','UID:'+encodeURIComponent(b.title+'-'+b.date)+'@momentsiz','DTSTAMP:'+stamp(Date.now()),'DTSTART:'+stamp(start),'DTEND:'+stamp(end),'SUMMARY:'+safe(b.title),'LOCATION:'+safe(b.venue+', '+b.city),'DESCRIPTION:'+safe(d.sections.hero.note),'END:VEVENT','END:VCALENDAR'].join('\r\n')+'\r\n';
     var url=URL.createObjectURL(new Blob([body],{type:'text/calendar;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='event.ics';a.click();
     var t=setTimeout(function(){URL.revokeObjectURL(url);},1000);clean.push(function(){clearTimeout(t);URL.revokeObjectURL(url);});
    });

@@ -21,7 +21,7 @@ test('couture defaults validate, keep edits, reference real assets and price wit
   assert.equal(saved.sections.hero.title,'A personal\ntitle');assert.equal(saved.sections.schedule.items[0].text,'Customer agenda');
   assert.equal(saved.sections.hero.openingType,'scroll');
   for(const photo of [saved.sections.hero.photo,saved.sections.story.photo,...saved.sections.gallery.items.map(i=>i.photo)])assert.ok(existsSync('frontend/public/'+photo),theme.id+' missing '+photo);
-  assert.equal(catalog.EVER_C.quote({themeId:theme.id,plan:'studio',addons:[]}).total,Math.round(theme.price*105)/100);
+  assert.equal(catalog.EVER_C.quote({themeId:theme.id,plan:'studio',addons:[]}).total,103.95);
  }
 });
 

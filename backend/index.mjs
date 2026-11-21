@@ -237,7 +237,7 @@ app.post('/api/invites/:id/rsvp',(req,res)=>{
 });
 app.get('/api/projects/:id/replies',(req,res)=>{const p=owned(req,res);if(!p)return;res.json(db.prepare('SELECT body FROM replies WHERE project=?').all(p.id).map(r=>JSON.parse(r.body)));});
 app.get('/api/projects/:id/qr',async(req,res)=>{const p=owned(req,res);if(!p)return;if(!p.paid||!p.published)return res.status(409).json({error:'Publish your invitation before sharing.'});try{const svg=await QRCode.toString(origin+'/invite.html?e='+encodeURIComponent(p.id),{type:'svg',errorCorrectionLevel:'M',margin:4,color:{dark:'#6B3529',light:'#ffffff'}});res.type('image/svg+xml').send(svg);}catch(_){res.status(500).json({error:'Could not generate the QR code.'});}});
-app.get('/api/config',(req,res)=>res.json({businessName:process.env.BUSINESS_NAME||'Respondr',supportEmail:process.env.SUPPORT_EMAIL||'',supportWhatsapp:(process.env.SUPPORT_WHATSAPP||'').replace(/\D/g,'')}));
+app.get('/api/config',(req,res)=>res.json({businessName:process.env.BUSINESS_NAME||'momentsiz',supportEmail:process.env.SUPPORT_EMAIL||'',supportWhatsapp:(process.env.SUPPORT_WHATSAPP||'').replace(/\D/g,'')}));
 app.get('/api/health',(req,res)=>{db.prepare('SELECT 1').get();res.json({ok:true,paymentsConfigured:!!stripe});});
 // Explicit public allowlist: never expose database, secrets, source or dependencies.
 // Template cards preview each template in a same-origin iframe.
@@ -283,6 +283,6 @@ app.get('/:file', (req, res, next) => {
 app.use((req,res)=>{if(req.path.startsWith('/api/'))return res.status(404).json({error:'Not found.'});res.status(404).sendFile(path.join(publicRoot,'404.html'));});
 app.use((err, req, res, next) => { if(res.headersSent)return next(err);console.error('Request failed:',err.type||err.name||'Error'); res.status(err.status || 500).json({ error: err.status === 413 ? 'Invitation is too large. Use smaller images.' : 'Request could not be completed.' }); });
 const server=app.listen(Number(process.env.PORT || 3000));
-server.on('listening',()=>console.log('Respondr listening at '+origin));
+server.on('listening',()=>console.log('momentsiz listening at '+origin));
 server.on('error',err=>{console.error('Server could not start: '+err.message);process.exit(1);});
 for(const signal of ['SIGTERM','SIGINT'])process.on(signal,()=>server.close(()=>{db.close();process.exit(0);}));

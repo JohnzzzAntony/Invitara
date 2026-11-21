@@ -5,8 +5,8 @@ import {invitationState} from '../backend/invitation-state.mjs';
 
 const catalog=loadCatalog();
 test('all active and archived designs retain their server validation contract',()=>{
-  assert.equal(catalog.INVITARA_availableTemplates().length,10);
-  assert.equal(catalog.EVER_THEMES.length,113);
+  assert.equal(catalog.INVITARA_availableTemplates().length,11);
+  assert.equal(catalog.EVER_THEMES.length,114);
   for(const theme of catalog.EVER_THEMES){
     const state=catalog.EVER_siteDefaults(theme.id);
     const valid=invitationState(catalog,state,theme.id,'2027-06-10');
@@ -14,6 +14,17 @@ test('all active and archived designs retain their server validation contract',(
     assert.equal(valid.basics.date,'2027-06-10');
     assert.deepEqual(Array.from(valid.order),Array.from(state.order));
   }
+});
+test('Ink & Olive saves editable questions and theme colors',()=>{
+  const id='edition-ink-and-olive',state=catalog.EVER_siteDefaults(id);
+  state.sections.faq.items[0]={title:'Can we bring children?',text:'Children are welcome.'};
+  state.theme={background:'#efeadd',accent:'#634538'};
+  const saved=invitationState(catalog,state,id,'2027-06-10');
+  assert.equal(saved.sections.faq.items[0].title,'Can we bring children?');
+  assert.equal(saved.sections.faq.items[0].text,'Children are welcome.');
+  assert.equal(saved.theme.background,'#efeadd');
+  assert.equal(saved.theme.accent,'#634538');
+  assert.ok(saved.order.includes('rsvp'));
 });
 test('styles, section types and links reject executable or out-of-schema input',()=>{
   const id='edition-vow',state=catalog.EVER_siteDefaults(id);

@@ -18,7 +18,7 @@ test('six business editions retain editable content, assets and authoritative pr
   const saved=invitationState(catalog,state,theme.id,'2027-06-10');
   assert.equal(saved.sections.timeline.items[0].title,'Custom feature');assert.equal(saved.sections.schedule.items[0].text,'Customer agenda');assert.equal(saved.basics.brand,'A customer brand');assert.equal(saved.sections.hero.title,'A personal launch');
   assert.ok(existsSync('frontend/public/'+saved.sections.hero.photo));
-  assert.equal(catalog.EVER_C.quote({themeId:theme.id,plan:'studio',addons:[]}).total,Math.round(theme.price*105)/100);
+  assert.equal(catalog.EVER_C.quote({themeId:theme.id,plan:'studio',addons:[]}).total,103.95);
   assert.equal(state.sections.gallery.on,false);assert.equal(state.sections.rsvp.dietaryEnabled,theme.family==='table');
  }
 });

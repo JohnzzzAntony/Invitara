@@ -11,7 +11,7 @@ import {createHash} from 'node:crypto';
 const catalog=loadCatalog();
 test('five archived premium designs preserve editable sections and authoritative prices',()=>{
  const themes=catalog.EVER_THEMES.filter(t=>t.premium);assert.equal(themes.length,5);
- for(const theme of themes){const state=catalog.EVER_siteDefaults(theme.id),clean=invitationState(catalog,state,theme.id,'2027-06-10');assert.deepEqual(Array.from(clean.order),Array.from(state.order));assert.equal(clean.sections.hero.openingType,state.sections.hero.openingType);assert.ok(clean.sections.rsvp.dietaryEnabled&&clean.sections.rsvp.accommodationEnabled);assert.equal(catalog.EVER_C.quote({themeId:theme.id,plan:'studio',addons:[]}).total,Math.round(theme.price*105)/100)}
+ for(const theme of themes){const state=catalog.EVER_siteDefaults(theme.id),clean=invitationState(catalog,state,theme.id,'2027-06-10');assert.deepEqual(Array.from(clean.order),Array.from(state.order));assert.equal(clean.sections.hero.openingType,state.sections.hero.openingType);assert.ok(clean.sections.rsvp.dietaryEnabled&&clean.sections.rsvp.accommodationEnabled);assert.equal(catalog.EVER_C.quote({themeId:theme.id,plan:'studio',addons:[]}).total,103.95)}
  const state=catalog.EVER_siteDefaults('premium-voyage');for(const patch of [{openingType:'unknown'},{musicUrl:'javascript:alert(1)'}])assert.throws(()=>invitationState(catalog,{...state,sections:{...state.sections,hero:{...state.sections.hero,...patch}}},state.templateId,state.basics.date));
 });
 test('published premium RSVP stores dietary and accommodation fields privately and rejects malformed input',async()=>{

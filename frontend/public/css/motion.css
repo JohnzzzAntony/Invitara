@@ -1,6 +1,6 @@
-/* Respondr motion layer (js/motion.js, js/invite-motion.js, js/collection-carousel.js).
+/* momentsiz motion layer (js/motion.js, js/invite-motion.js, js/collection-carousel.js).
    Every hidden starting state is scoped to html.rs-motion, which only JavaScript adds, so content never disappears without it. */
-:root{--rs-ease:cubic-bezier(.22,.61,.36,1);--rs-ease-out:cubic-bezier(.22,1,.36,1);--rs-ink:var(--brand-ink,#111);--rs-paper:#f7f4ee;--rs-accent:var(--brand,#FF6A00)}
+:root{--rs-ease:cubic-bezier(.22,.61,.36,1);--rs-ease-out:cubic-bezier(.22,1,.36,1);--rs-ink:var(--brand-ink,#111);--rs-paper:#F8F6FC;--rs-accent:var(--brand,#FF6A00)}
 
 /* Headings: fade and rise into place as one piece (gradient text cannot animate per word). */
 html.rs-motion .rs-rise{opacity:0;transform:translateY(.3em);transition:opacity .5s var(--rs-ease-out),transform .6s var(--rs-ease-out)}
@@ -47,7 +47,7 @@ html.rs-motion .rs-rise.is-in{opacity:1;transform:none}
 [data-page=home] .eg-ring .collection-art .nx-mini,[data-page=home] .eg-ring .collection-art .ex-mini{transition:transform .5s ease}
 [data-page=home] .eg-ring .collection-card:hover .collection-art .nx-mini,[data-page=home] .eg-ring .collection-card:hover .collection-art .ex-mini{transform:scale(1.045)}
 [data-page=home] .eg-ring .collection-card-top,[data-page=home] .eg-ring .template-meta{opacity:calc(1 - var(--d,0) * 1.2)}
-.eg-vig{position:absolute;inset:0;z-index:3;pointer-events:none;background:radial-gradient(ellipse 88% 92% at 50% 50%,transparent 58%,#f7f4ee66 84%,#f7f4eedd 100%)}
+.eg-vig{position:absolute;inset:0;z-index:3;pointer-events:none;background:radial-gradient(ellipse 88% 92% at 50% 50%,transparent 58%,#F8F6FC66 84%,#F8F6FCdd 100%)}
 
 /* Invitation templates: text blurs up and images unveil as they scroll into view. */
 html.rs-motion .rs-pre{opacity:0}

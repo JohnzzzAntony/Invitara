@@ -1,10 +1,7 @@
-// Homepage: the shadow-lit headline (Shadow Text) and the design collection (Feature Carousel), fed by the live catalogue.
-import { shadowText } from './shadow-text.js';
+// Homepage: the design collection (Feature Carousel), fed by the live catalogue. The hero lives in js/hero.js.
 import { featureCarousel } from './feature-carousel.js';
 
 const E = window;
-// Settings from the Lumen Golden-Hour demo: a fixed afternoon sun, the pointer as a lamp, long shadows.
-document.querySelectorAll('[data-shadow-text]').forEach((el) => shadowText(el, { clock: false, interactive: true, reach: 1.45 }));
 
 const host = document.getElementById('design-carousel');
 if (host && E.INVITARA_availableTemplates) {

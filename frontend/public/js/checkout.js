@@ -1,4 +1,4 @@
-/* Respondr: event-date checkout via hosted Stripe. Payment confirmation is server-owned. */
+/* momentsiz: event-date checkout via hosted Stripe. Payment confirmation is server-owned. */
 (async function () {
   'use strict';
 
@@ -79,7 +79,8 @@
   }
 
   var totalEl = document.getElementById('summary-total');
-  if (totalEl) totalEl.textContent = C.money(quote.total);
+  /* Stripe charges AED; show the visitor's own currency beside it as a guide. */
+  if (totalEl) totalEl.textContent = C.money(quote.total) + (C.displayCurrency() !== C.CURRENCY ? ' (≈ ' + C.localMoney(quote.total) + ')' : '');
 
   var btnLabel = payBtn && payBtn.querySelector('.pay-btn-label');
   if (btnLabel) btnLabel.textContent = 'Pay ' + C.money(quote.total) + ' & create invitation';

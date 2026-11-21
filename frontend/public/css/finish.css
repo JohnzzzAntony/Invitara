@@ -2,15 +2,15 @@
 
 /* One font everywhere, including JS-rendered templates. Icon-font elements keep their glyph font. */
 html, body,
-body *:not(.hs-wordmark):not(.couture):not(.couture *):not([class^="ti-"]):not([class*=" ti-"]):not([class^="flaticon"]):not([class*=" flaticon"]) {
-  font-family: "Inter Tight", system-ui, -apple-system, "Segoe UI", sans-serif !important;
+body *:not(.hs-wordmark):not(.couture):not(.couture *):not(.ink-and-olive, .ink-and-olive *):not([class^="ti-"]):not([class*=" ti-"]):not([class^="flaticon"]):not([class*=" flaticon"]) {
+  font-family: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif !important;
 }
 body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
 h1, h2, h3, h4 { text-wrap: balance; letter-spacing: -0.02em; }
 p, li { text-wrap: pretty; }
 
 /* Eyebrows / kickers removed: decorative labels above headings that repeat the heading. */
-.kicker, .nx-kicker, .studio-kicker, .suite-kicker, .business-kicker,
+.kicker, .nx-kicker:not(.ink-and-olive *), .studio-kicker, .suite-kicker, .business-kicker,
 .ed-eyebrow, .ed-opening-eyebrow, .hw-eyebrow, .ex-eyebrow,
 .cover-copy > span:first-child, .cover-copy > small,
 .vellum-number, .business-chapter, .suite-chapter, .hw-topline, .sf-topline { display: none !important; }
@@ -20,12 +20,10 @@ img:not([src$=".svg"]):not([src*="logo"]), video, picture img {
   filter: saturate(.82) contrast(1.04) brightness(1.01);
 }
 
-/* Sharp corners on every card, button, input, panel and image.
-   Round stays only where the circle carries meaning: radios, dots/indicators, avatars/seals, spinners, CSS-drawn art.
-   shortcut: exemptions match class-name fragments, add a fragment here if a new round shape gets squared. */
-*:not(input[type="radio"]):not([class*="cx-"]):not(.rounded-circle):not(.tpl-swatch):not(.ex-index):not(.sf-live):not(.price-check):not([class*="dot"]):not([class*="seal"]):not([class*="avatar"]):not([class*="spinner"]):not([class*="circle"]):not([class*="orb"]):not([class*="moon"]):not([class*="halo"]):not([class*="ring"]):not([class*="crest"]):not([class*="knob"]):not([class*="heart"]):not([class*="sticker"]):not([class*="cloud"]):not([class*="hills"]):not([class*="-arch"]):not([class*="crescent"]):not([class*="disco"]):not([class*="record"]):not([class*="petal"]):not(.ed-opening-object *) {
-  border-radius: 0 !important;
-}
+/* Brand book: softly rounded cards (16-24 px), pill buttons and fields. */
+.studio :is(.studio-button, .studio-pill, .studio-login, .filter-toggle, .carousel-arrow) { border-radius: 999px !important; }
+.studio :is(.collection-card, .step, .price-card, .experience-price-card, .occasion-card, .fc-frame, .lh-card) { border-radius: 24px; overflow: hidden; }
+.studio :is(input, select, textarea) { border-radius: 12px; }
 
 /* Visible keyboard focus everywhere. */
 :focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
@@ -53,48 +51,45 @@ img:not([src$=".svg"]):not([src*="logo"]), video, picture img {
 .discovery-sidebar[popover] fieldset button { white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) { .discovery-sidebar[popover] { transition: none; } }
 
-/* Brand: orange #FF6A00 into black #111, as a gradient. Every brand token derives from these; neutrals stay neutral.
-   #FF6A00 is only 2.9:1 on white, so it carries the logo, large headings and decoration.
-   Small text and fills behind white labels use --brand-strong #C2410C (5.2:1 on white, 4.7:1 on cream) for WCAG AA; body ink is black. */
+/* Brand: momentsiz (brand book v1.0). Purple #7016D8, pink #F52D91, celebration orange #FF9238, blue #3548ED on ink #191527 / cloud #F8F6FC.
+   Purple is 7.5:1 on white, so it carries small text and links. Pink (3.7:1) and orange stay on large type, sparks and decoration.
+   Fills behind white labels stop at #C21C7A (5.6:1) so button text keeps WCAG AA. */
 :root {
-  --brand: #FF6A00; --brand-rgb: 255, 106, 0;
-  --brand-strong: #C2410C; --brand-hover: #9A3412; --brand-deep: #7C2D12;
-  --brand-tint: #FFF1E6; --brand-soft: rgba(var(--brand-rgb), .14);
-  --brand-ink: #111111;
-  --brand-gradient: linear-gradient(115deg, #FF6A00 0%, #C2410C 45%, #111111 100%);
-  /* Every stop keeps white labels at >= 4.5:1. */
-  --brand-fill: linear-gradient(115deg, #C2410C 0%, #9A3412 40%, #111111 100%);
+  --brand: #7016D8; --brand-rgb: 112, 22, 216;
+  --brand-pink: #F52D91; --brand-orange: #FF9238; --brand-blue: #3548ED;
+  --brand-strong: #7016D8; --brand-hover: #5A10B0; --brand-deep: #3E0A80;
+  --brand-tint: #F3ECFD; --brand-soft: rgba(var(--brand-rgb), .12);
+  --brand-ink: #191527; --brand-muted: #615C6E; --brand-cloud: #F8F6FC;
+  --brand-gradient: linear-gradient(100deg, #F52D91 0%, #7016D8 55%, #3548ED 100%);
+  --brand-fill: linear-gradient(115deg, #7016D8 0%, #A3179F 50%, #C21C7A 100%);
+  --brand-radius: 16px;
   --lux-ink: var(--brand-ink); --lux-accent: var(--brand);
-  --studio-ink: var(--brand-ink); --olive: var(--brand-strong); --olive-deep: var(--brand-ink); --gold: var(--brand);
-  --cinema-paper: var(--brand-ink); --cinema-accent: var(--brand-strong); --cinema-muted: #5f5a57; --studio-muted: #5f5a57;
+  --studio-ink: var(--brand-ink); --olive: var(--brand-strong); --olive-deep: var(--brand-ink); --gold: var(--brand-orange);
+  --cinema-paper: var(--brand-ink); --cinema-accent: var(--brand-strong); --cinema-muted: var(--brand-muted); --studio-muted: var(--brand-muted);
   --primary: var(--brand-strong); --teal: var(--brand-strong); --teal-dark: var(--brand-hover); --teal-deep: var(--brand-deep); --teal-tint: var(--brand-tint);
   --action: var(--brand-strong); --action-hover: var(--brand-hover); --action-text: #fff;
 }
 .editor-page { --primary: var(--brand-strong); --studio-ink: var(--brand-ink); }
+/* Neutral foundation: white pages, cloud surfaces (replaces the old warm cream papers). */
+:root, .studio { --lux-paper: #FFFFFF; --studio-paper: #FFFFFF; --studio-bg: #FFFFFF; --rs-paper: var(--brand-cloud); --surface: #FFFFFF; --surface-soft: var(--brand-cloud); --cinema-ink: var(--brand-cloud); --cinema-panel: #FFFFFF; --cinema-line: #E7E3F0; }
+body.studio { color: var(--brand-ink); background: #FFFFFF; }
+.studio-header { background-color: rgba(255, 255, 255, .86) !important; background-image: none !important; }
+body.studio h1:not(.ws *) { font-weight: 800; letter-spacing: -.03em; }
+body.studio h2:not(.ws *) { font-weight: 700; }
 :focus-visible { outline-color: var(--brand); }
 ::selection, body.studio ::selection { background: var(--brand-strong); color: #fff; }
 .ui-scroll-progress { background: var(--brand-gradient) !important; }
 .occasion-icon { color: var(--brand) !important; }
-/* Large display headings carry the orange-to-black gradient (the orange end clears the 3:1 floor for large text). */
+/* Large display headings carry the pink-purple-blue brand gradient (every stop clears 3:1 for large text). */
 .studio :is(h1, h2) { color: var(--brand-ink); background: var(--brand-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-.studio .lh :is(h1, h2) { background: none; -webkit-text-fill-color: currentColor; }
+.studio .mz-hero h1 { background: none; -webkit-text-fill-color: currentColor; }
 .studio footer a:not([class]) { color: inherit; }
-/* Logos are exempt from contrast minimums (WCAG 1.4.3), so the wordmark shows the true brand colour. */
-.studio-logo, .studio .studio-logo { color: var(--brand) !important; }
-/* Respondr logo: copper R mark | RESPONDR (header, editor); mark stacked over the word in the footer. */
-.studio-logo, .editor-page .ed-bar .studio-logo { display: inline-flex; flex: none; align-items: center; gap: 14px; min-height: 44px; font: 600 18px/1 'Inter Tight', Arial, sans-serif !important; letter-spacing: .26em !important; text-transform: uppercase; text-decoration: none; }
+/* momentsiz wordmark (assets/momentsiz-logo.svg): min 120 px wide per the brand book, 25% clear space from the link padding. */
+.studio-logo, .editor-page .ed-bar .studio-logo { display: inline-flex; flex: none; align-items: center; min-height: 44px; padding: 4px 0; text-decoration: none; }
 .studio-logo::before { content: none !important; }
-.studio-logo .logo-mark { display: block; width: auto; height: 34px; }
-.studio-logo .logo-word { display: flex; align-items: center; min-height: 34px; padding-left: 14px; border-left: 1.5px solid currentColor; margin-right: -.26em; }
-.studio-footer .studio-logo { flex-direction: column; gap: 10px; font-size: 16px !important; }
-.studio-footer .studio-logo .logo-mark { height: 46px; }
-.studio-footer .studio-logo .logo-word { min-height: 0; padding-left: 0; border-left: 0; }
-@media (max-width: 767px) {
-  .studio-logo, .editor-page .ed-bar .studio-logo { gap: 10px; font-size: 14px !important; letter-spacing: .2em !important; }
-  .studio-logo .logo-mark { height: 28px; }
-  .studio-logo .logo-word { min-height: 28px; padding-left: 10px; }
-  .editor-page .ed-bar .studio-logo .logo-word { display: none; }
-}
+.studio-logo .logo-img { display: block; width: auto; height: 38px; }
+.studio-footer .studio-logo .logo-img { height: 46px; }
+@media (max-width: 767px) { .studio-logo .logo-img { height: 34px; } }
 [data-page=home] .carousel-pagination .carousel-dot { background: rgba(var(--brand-rgb), .3); }
 [data-page=home] .carousel-pagination .carousel-dot:is(.is-active, [aria-current="true"]) { background: var(--brand); }
 

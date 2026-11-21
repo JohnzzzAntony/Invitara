@@ -1,4 +1,4 @@
-/* Respondr motion layer for studio pages: heading reveals, cursor dot, full-screen menu state, showroom FLIP.
+/* momentsiz motion layer for studio pages: heading reveals, cursor dot, full-screen menu state, showroom FLIP.
  * Loads before premium-ui.js so headings it animates are marked and not animated twice. */
 (function(){
  'use strict';
@@ -9,7 +9,7 @@
  /* ---- Heading reveals ----
   * Each heading fades and rises as one piece. Per-word animation broke on the gradient headings:
   * background-clip:text cannot paint words that are mid-transition, so they stayed blank, then popped in. */
- var SKIP='[data-shadow-text],.ws,.collection-art,.ex-mini,.nx-mini,.hs,.eg-float,[aria-hidden="true"],[hidden]';
+ var SKIP='[data-shadow-text],.mz-hero,.ws,.collection-art,.ex-mini,.nx-mini,.hs,.eg-float,[aria-hidden="true"],[hidden]';
  if(!reduced.matches){
   var headings=Array.from(document.querySelectorAll('main h1,main h2')).filter(function(h){return !h.closest(SKIP)&&!h.querySelector('a,button,input')&&!h.classList.contains('sr-only')&&h.textContent.trim();});
   headings.forEach(function(h){h.classList.add('rs-rise','ui-reveal');});

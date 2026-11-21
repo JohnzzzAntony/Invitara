@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Respondr — site interactions
+   momentsiz — site interactions
    Vanilla JS, no dependencies.
    ========================================================================== */
 (function () {
