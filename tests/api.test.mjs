@@ -58,6 +58,12 @@ test('server enforces ownership, payments, expiry, immutable dates and signed we
     assert.equal((await call('/projects/active/publish','POST',{})).status,200);
     assert.equal((await call('/projects/active/qr','GET',null,false)).status,404);
     const qr=await call('/projects/active/qr');assert.equal(qr.status,200);assert.match(await qr.text(),/<svg/);
+    // Each published invitation installs as its own app and works offline once opened.
+    const manifest=await call('/invites/active/manifest.webmanifest','GET',null,false);assert.equal(manifest.status,200);
+    const app=await manifest.json();assert.equal(app.start_url,'/invite.html?e=active');assert.equal(app.name,'Alex and Sam');assert.deepEqual(app.icons.map(i=>i.sizes),['192x192','512x512']);
+    assert.match(await (await fetch(origin+'/invite.html?e=active')).text(),/rel="manifest" href="\/api\/invites\/active\/manifest\.webmanifest"/);
+    const worker=await fetch(origin+'/sw.js');assert.equal(worker.status,200);assert.match(worker.headers.get('content-type'),/javascript/);
+    assert.equal((await call('/invites/unpaid/manifest.webmanifest','GET',null,false)).status,404);
     const guest=await call('/invites/active','GET',null,false),guestCookie=guest.headers.get('set-cookie').split(';')[0];
     await fetch(origin+'/api/invites/active',{headers:{Cookie:guestCookie}});
     await call('/invites/active');

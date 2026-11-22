@@ -1,5 +1,6 @@
 (async function(){
  'use strict';var E=window,root=document.getElementById('invite-root'),missing=document.getElementById('invite-missing'),id=new URLSearchParams(location.search).get('e');
+ if('serviceWorker' in navigator&&id)navigator.serviceWorker.register('/sw.js').catch(function(){});// installable, and viewable offline once opened
  document.getElementById('invite-retry').onclick=function(){location.reload();};
  document.getElementById('invite-retry').hidden=!id;
  try{

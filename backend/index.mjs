@@ -219,6 +219,17 @@ app.get('/api/invites/:id', (req, res) => {
   if(req.owner!==db.prepare('SELECT owner FROM projects WHERE id=?').get(p.id).owner)db.prepare('INSERT OR IGNORE INTO invitation_views VALUES (?,?)').run(p.id,req.sessionHash);
   res.json({ s: p.state, t: p.themeId, n: p.slug, closed:!editable(p) });
 });
+// Each published invitation installs as its own app: its title, opening straight to it.
+app.get('/api/invites/:id/manifest.webmanifest', (req, res) => {
+  const p = get(req.params.id);
+  if (!p?.published || !p.paid) return res.status(404).json({ error: 'Invitation unavailable.' });
+  const start = '/invite.html?e=' + encodeURIComponent(p.id), name = String(p.state.basics.title || p.themeName || 'Invitation').slice(0, 60);
+  res.type('application/manifest+json').send(JSON.stringify({
+    id: start, name, short_name: name.length > 12 ? name.slice(0, 12).trim() : name, description: 'Your invitation, saved to your home screen.',
+    start_url: start, scope: '/', display: 'standalone', background_color: '#ffffff', theme_color: '#7016D8',
+    icons: [192, 512].map(n => ({ src: '/assets/momentsiz-icon-' + n + '.png', sizes: n + 'x' + n, type: 'image/png', purpose: 'any' }))
+  }));
+});
 app.get('/api/invites/:id/qr',async(req,res)=>{
  const p=get(req.params.id);if(!p?.published||!p.paid)return res.status(404).json({error:'Invitation unavailable.'});
  if(limited('qr:'+req.ip,30))return res.status(429).json({error:'Please wait before requesting another QR code.'});
@@ -277,7 +288,7 @@ app.get('/:file', (req, res, next) => {
     if (occasionByKey[key]) return res.redirect(301, occasionPath(key));
   }
   if (['index.html','create.html','design.html','pricing.html','account.html','dashboard.html','editor.html','checkout.html','demo.html','terms.html','privacy.html','contact.html'].includes(file)) return res.type('html').send(pageHtml(file, origin, null, seo(file, { query: { id: typeof req.query.id === 'string' ? req.query.id : '' } })));
-  if (/^[a-z0-9-]+\.html$/.test(req.params.file) || ['styles.css', 'robots.txt', 'sitemap.xml'].includes(req.params.file)) return res.sendFile(path.join(publicRoot, req.params.file));
+  if (/^[a-z0-9-]+\.html$/.test(req.params.file) || ['styles.css', 'robots.txt', 'sitemap.xml', 'sw.js'].includes(req.params.file)) return res.sendFile(path.join(publicRoot, req.params.file));
   next();
 });
 app.use((req,res)=>{if(req.path.startsWith('/api/'))return res.status(404).json({error:'Not found.'});res.status(404).sendFile(path.join(publicRoot,'404.html'));});

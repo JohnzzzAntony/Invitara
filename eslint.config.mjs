@@ -8,4 +8,5 @@ export default [
     rules: { 'no-unused-vars': ['error', { args: 'after-used', caughtErrors: 'none' }] } },
   { files: ['frontend/public/js/**/*.js'], languageOptions: { sourceType: 'script', globals: globals.browser } },
   { files: ['frontend/motion/**/*.js'], languageOptions: { globals: globals.browser } },
+  { files: ['frontend/public/sw.js'], languageOptions: { sourceType: 'script', globals: globals.serviceworker } },
 ];
