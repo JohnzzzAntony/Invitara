@@ -3,7 +3,7 @@ import { promisify } from 'node:util';
 const derive=promisify(scrypt),digest=value=>createHash('sha256').update(value).digest('hex');
 export function initAuth(db){db.exec('CREATE TABLE IF NOT EXISTS accounts (id TEXT PRIMARY KEY,email TEXT UNIQUE NOT NULL,salt TEXT NOT NULL,password TEXT NOT NULL,recovery TEXT NOT NULL); CREATE TABLE IF NOT EXISTS account_sessions (token TEXT PRIMARY KEY,owner TEXT NOT NULL,expires INTEGER NOT NULL)');}
 export function accountFor(db,token){return db.prepare('SELECT a.id,a.email FROM accounts a JOIN account_sessions s ON s.owner=a.id WHERE s.token=? AND s.expires>?').get(token,Date.now())||null;}
-export function mountAuth(app,db,production){
+export function mountAuth(app,db,production,limited){
  const options={httpOnly:true,secure:production,sameSite:'lax',maxAge:365*86400000,path:'/'};
  function signIn(res,id){const token=randomBytes(32).toString('hex');db.prepare('INSERT INTO account_sessions VALUES (?,?,?)').run(digest(token),id,Date.now()+365*86400000);res.cookie('invitara_owner',token,options);}
  app.get('/api/me',(req,res)=>res.json({account:req.account||null}));
@@ -12,6 +12,8 @@ export function mountAuth(app,db,production){
   const {action}=req.params;const email=String(req.body.email||'').trim().toLowerCase(),password=String(req.body.password||'');
   if(!['login','register','recover'].includes(action))return res.sendStatus(404);
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||email.length>254||password.length<12||password.length>128)return res.status(400).json({error:'Use a valid email and a password of 12–128 characters.'});
+  // Per-email limit on top of the per-IP one: stops many IPs guessing one account's password.
+  if(limited('auth-email:'+email,10))return res.status(429).json({error:'Too many attempts for this account. Please wait a minute.'});
   const record=db.prepare('SELECT * FROM accounts WHERE email=?').get(email);
   if(action==='register'){
    if(record)return res.status(409).json({error:'An account already uses that email. Sign in or use your recovery code.'});

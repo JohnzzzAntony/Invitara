@@ -115,7 +115,7 @@ for (const [route, maximum, message] of [
   if (limited(route + ':' + req.ip, maximum)) return res.status(429).json({ error: message });
   next();
 });
-mountAuth(app,db,production);
+mountAuth(app,db,production,limited);
 mountAi(app,limited);
 
 

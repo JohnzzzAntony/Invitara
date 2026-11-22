@@ -15,6 +15,8 @@ export function validatePhoto(value) {
     let url;
     try { url = new URL(value); } catch { throw new Error('Use a valid image URL.'); }
     if (url.username || url.password) throw new Error('Image URLs cannot contain credentials.');
+    // Raw value lands in HTML attributes and CSS url(); refuse anything that could break out of them.
+    if (/[\s"'<>`\\]/.test(value)) throw new Error('Use a valid image URL.');
     return;
   }
   if (!/^(?:[a-zA-Z0-9_-]+|(?:\/?assets\/|\/?mu\/images\/)[a-zA-Z0-9_./-]+)$/.test(value) || value.includes('..')) throw new Error('Use a library photo or a valid image URL.');

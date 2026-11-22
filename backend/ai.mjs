@@ -182,7 +182,9 @@ export function mountAi(app, limited) {
   const route = handler => async (req, res) => {
     const key = process.env.NVIDIA_API_KEY;
     if (!key) return res.status(503).json({ error: 'The AI assistant is not configured on this server.' });
-    if (limited('ai:' + req.ip, 20)) return res.status(429).json({ error: 'Too many AI requests. Please wait a minute.' });
+    // Signed-in only, limited per account and per IP, so anonymous bots cannot spend the NVIDIA quota.
+    if (!req.account) return res.status(401).json({ error: 'Sign in to use the AI assistant.' });
+    if (limited('ai:' + req.ip, 20) || limited('ai-account:' + req.account.id, 20)) return res.status(429).json({ error: 'Too many AI requests. Please wait a minute.' });
     try { res.json(await handler(req.body, key)); }
     catch (e) {
       if (!(e instanceof AiError)) { console.error('AI request failed:', e.name); e = new AiError(500, 'The AI request failed. Please try again.'); }

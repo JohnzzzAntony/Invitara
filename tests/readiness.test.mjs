@@ -14,7 +14,7 @@ test('draft creation and updates report storage failures rather than success', (
 });
 
 test('photo fields reject executable data, forged image MIME and traversal', () => {
-  for (const value of ['data:image/svg+xml,<svg onload="alert(1)"/>', 'data:image/png;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==', 'javascript:alert(1)', '//evil.test/a', 'assets/../../.env', 'https://user:pass@example.com/a']) assert.throws(() => validatePhoto(value));
+  for (const value of ['data:image/svg+xml,<svg onload="alert(1)"/>', 'data:image/png;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==', 'javascript:alert(1)', 'https://x.test/a.jpg"><img src=x>', "https://x.test/a.jpg'); color:red", '//evil.test/a', 'assets/../../.env', 'https://user:pass@example.com/a']) assert.throws(() => validatePhoto(value));
   for (const value of ['', 'mu-hero-1', 'assets/ws-couple.jpg', 'https://example.com/photo.jpg', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=']) assert.doesNotThrow(() => validatePhoto(value));
 });
 
