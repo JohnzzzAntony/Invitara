@@ -7,7 +7,7 @@ try{
  const page=await browser.newPage({viewport:{width:1440,height:900}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(origin+'/');
  const title=page.getByRole('heading',{level:1});
- assert.match(await title.textContent(),/^Invitations as joyful as your celebration/);
+ assert.match(await title.textContent(),/^Digital invitations as joyful as your celebration/);
  await page.waitForFunction(()=>document.querySelector('.mz-deck')?.swiper);
  assert.equal(await page.evaluate(()=>document.querySelector('.mz-deck').swiper.params.effect),'coverflow','wide screens get the coverflow');
  assert.ok(await page.locator('.mz-slide').count()>=5,'the deck shows real designs');
@@ -19,8 +19,8 @@ try{
  const active=()=>page.locator('.fc-chip.is-active').textContent();
  await chips.nth(5).click();await page.waitForTimeout(500);assert.equal(await active(),await chips.nth(5).textContent());
  assert.match(await page.locator('.fc-card[aria-hidden="false"]').getAttribute('href'),/^design\.html\?id=animated-/);
- await page.getByRole('button',{name:'Pause',exact:true}).click();const held=await active();await page.mouse.move(0,0);await page.waitForTimeout(3500);assert.equal(await active(),held,'pause stops autoplay');
- await page.getByRole('button',{name:'Play',exact:true}).click();await page.waitForTimeout(3500);assert.notEqual(await active(),held,'play resumes autoplay');
+ await page.locator('#design-carousel').getByRole('button',{name:'Pause',exact:true}).click();const held=await active();await page.mouse.move(0,0);await page.waitForTimeout(3500);assert.equal(await active(),held,'pause stops autoplay');
+ await page.locator('#design-carousel').getByRole('button',{name:'Play',exact:true}).click();await page.waitForTimeout(3500);assert.notEqual(await active(),held,'play resumes autoplay');
  for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:900});await page.waitForTimeout(200);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'overflow at '+width);}
  await page.setViewportSize({width:390,height:844});await page.reload();await page.waitForFunction(()=>document.querySelector('.mz-deck')?.swiper);
  assert.equal(await page.evaluate(()=>document.querySelector('.mz-deck').swiper.params.effect),'cards','phones get the swipeable card deck');

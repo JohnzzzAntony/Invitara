@@ -6,7 +6,7 @@ const E = window;
 const host = document.getElementById('design-carousel');
 if (host && E.INVITARA_availableTemplates) {
   const icons = E.INVITARA_OCCASION_ICONS || {};
-  featureCarousel(host, E.INVITARA_availableTemplates().map((t) => ({
+  featureCarousel(host, E.INVITARA_availableTemplates().filter((t) => t.poster).map((t) => ({
     id: t.id,
     label: t.name,
     icon: (icons[t.occasion === 'product-launch' ? 'corporate' : t.occasion] || icons.other || ['', ''])[1],

@@ -6,31 +6,31 @@ export const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => 
 
 const PAGES = {
   'index.html': {
-    title: 'Digital Invitations & Online RSVP Maker | momentsiz',
-    description: 'Create interactive digital invitations for weddings, birthdays, baby showers and every celebration. Animated designs, online RSVP and one shareable link. Pay once.',
-    keywords: 'digital invitations, online invitation maker, e-invitations, digital wedding invitations, online RSVP, animated invitations, invitation website, invitation link, QR code invitation',
+    title: 'Online Invitation Maker with AI & RSVP | momentsiz',
+    description: 'Create digital invitations in minutes with our AI invitation maker. Animated wedding, birthday and party e-invites with online RSVP. One price, AED 99.',
+    keywords: 'online invitation maker, AI invitation maker, digital invitations, e-invitation, e-invite, invitation card maker, wedding invitation card, birthday invitation card, online RSVP, animated invitations, digital wedding invitation Dubai, e-invitation UAE, save the date',
   },
   'create.html': {
-    title: 'Digital Invitation Templates for Every Occasion | momentsiz',
-    description: 'Browse 19 interactive invitation templates for weddings, engagements, birthdays, baby showers, Eid, Ramadan and more. Preview free, personalise, share with online RSVP.',
-    keywords: 'invitation templates, digital invitation templates, online invitation designs, wedding invitation templates, birthday invitation templates, e-invite templates',
+    title: 'Invitation Templates: Wedding, Birthday & More | momentsiz',
+    description: 'Browse animated invitation templates for weddings, birthdays, anniversaries, housewarmings and launches. Preview free, fill in with AI, share with RSVP.',
+    keywords: 'invitation templates, digital invitation templates, wedding invitation templates, birthday invitation templates, e-invite templates, animated invitation card, online invitation designs',
   },
   'pricing.html': {
-    title: 'Invitation Pricing: One Payment, No Subscription | momentsiz',
-    description: 'Every momentsiz digital invitation is one payment per event, AED 99 plus VAT. No subscription or per-guest fees. Editor, photos, online RSVP and share link included.',
-    keywords: 'digital invitation price, online invitation cost, e-invitation pricing, wedding website price, RSVP website cost',
+    title: 'Invitation Maker Pricing: AED 99 Per Event | momentsiz',
+    description: 'One payment per event: AED 99 plus VAT for any momentsiz digital invitation. No subscription or per-guest fees. AI editor, photos and online RSVP included.',
+    keywords: 'digital invitation price, e-invitation cost, online invitation maker price, wedding e-invite cost UAE, RSVP website cost',
   },
   'terms.html': {
     title: 'Terms & Event Access | momentsiz',
-    description: 'How momentsiz event access works: editing stays open until midnight after your event, published invitations remain viewable, and how purchases and support are handled.',
+    description: 'How momentsiz event access works: edit until midnight after your event, keep your published invitation online, and how purchases and support are handled.',
   },
   'privacy.html': {
     title: 'Privacy Policy | momentsiz',
-    description: 'How momentsiz protects your account, guest replies and photos: what we store, cookies and device storage, payment handling, invitation privacy and data requests.',
+    description: 'How momentsiz protects your account, guest replies and photos: what we store, cookies, payment handling, invitation privacy and how to request your data.',
   },
   'contact.html': {
-    title: 'Contact Us | momentsiz',
-    description: 'Questions about a digital invitation, payment or your RSVP list? Email or WhatsApp the momentsiz team.',
+    title: 'Contact momentsiz | Digital Invitation Help & Support',
+    description: 'Questions about your digital invitation, payment or RSVP list? Email or WhatsApp the momentsiz team and we will help you get your invitation ready to share.',
   },
   'design.html': { title: 'Invitation Design | momentsiz', description: 'Preview an interactive digital invitation, then make every detail yours.' },
 };

@@ -139,3 +139,43 @@
   .fc .fc-chip { padding: 16px 32px; }
   .fc-stage { min-height: 0; padding: 64px 40px; border-top: 0; border-left: 1px solid rgba(24, 24, 27, .06); }
 }
+
+/* ---------- AI invitation builder highlight ---------- */
+.mz-ai-feature { display: grid; gap: 36px; padding-block: 64px; }
+.mz-ai-feature h2 { margin: 0; font-size: clamp(1.75rem, 6vw, 2.75rem); line-height: 1.12; }
+[data-page=home] .mz-ai-lead { max-width: 36rem; margin: 16px 0 0; font-size: 17px; line-height: 1.6; color: var(--brand-muted); }
+.mz-ai-points { display: grid; gap: 14px; margin: 24px 0 28px; padding: 0; list-style: none; }
+.mz-ai-points li { position: relative; padding-left: 30px; font-size: 15px; line-height: 1.55; color: var(--brand-muted); }
+.mz-ai-points li::before { content: ""; position: absolute; left: 0; top: 4px; width: 18px; height: 18px; border-radius: 50%; background: var(--brand-fill); box-shadow: inset 0 0 0 5px rgba(255, 255, 255, .55); }
+.mz-ai-points strong { color: var(--brand-ink); }
+.mz-ai-demo { overflow: hidden; border: 1px solid rgba(var(--brand-rgb), .14); border-radius: 24px; background: #fff; box-shadow: 0 40px 80px -40px rgba(var(--brand-rgb), .45); }
+.mz-ai-demo-head { padding: 16px 20px; background: var(--brand-fill); color: #fff; }
+.mz-ai-demo-head strong { display: block; font-size: 16px; font-weight: 800; }
+.mz-ai-demo-head span { font-size: 12px; opacity: .9; }
+.mz-ai-demo-log { display: flex; flex-direction: column; gap: 10px; padding: 20px 16px 22px; background: var(--brand-cloud); }
+.mz-ai-bubble { max-width: 85%; margin: 0; padding: 10px 14px; border-radius: 18px; font-size: 14px; font-weight: 500; line-height: 1.45; }
+.mz-ai-bubble.is-bot { align-self: flex-start; border-bottom-left-radius: 6px; background: #fff; color: var(--brand-ink); }
+.mz-ai-bubble.is-user { align-self: flex-end; border-bottom-right-radius: 6px; background: var(--brand); color: #fff; }
+.mz-ai-bubble.is-done { padding: 2px 6px; color: #1F7A4D; font-weight: 700; }
+.mz-ai-demo-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.mz-ai-demo-chips span { padding: 8px 12px; border: 1px solid rgba(var(--brand-rgb), .25); border-radius: 999px; background: #fff; font-size: 13px; font-weight: 600; color: var(--brand-ink); }
+.mz-ai-demo .mz-ai-bubble, .mz-ai-demo-chips { animation: mz-rise .6s cubic-bezier(.22, 1, .36, 1) both; }
+.mz-ai-demo .mz-ai-bubble:nth-child(2) { animation-delay: .15s; }
+.mz-ai-demo .mz-ai-bubble:nth-child(3) { animation-delay: .3s; }
+.mz-ai-demo .mz-ai-bubble:nth-child(4) { animation-delay: .45s; }
+.mz-ai-demo-chips { animation-delay: .6s; }
+
+/* ---------- Quote ---------- */
+.mz-quote { padding-block: 56px; }
+.mz-quote figure { position: relative; max-width: 56rem; margin: 0 auto; padding: 48px 24px 40px; border-radius: 24px; background: var(--brand-cloud); text-align: center; }
+.mz-quote figure::before { content: "\201C"; position: absolute; top: -10px; left: 50%; translate: -50% 0; font-size: 120px; font-weight: 800; line-height: 1; background: var(--brand-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.mz-quote blockquote { margin: 0; }
+.mz-quote blockquote p { margin: 0; font-size: clamp(1.4rem, 5vw, 2.25rem); font-weight: 700; line-height: 1.3; letter-spacing: -.02em; color: var(--brand-ink); text-wrap: balance; }
+.mz-quote figcaption { margin-top: 18px; font-size: 14px; font-weight: 700; color: var(--brand); }
+
+@media (min-width: 1024px) {
+  .mz-ai-feature { grid-template-columns: minmax(0, 1fr) minmax(0, .9fr); align-items: center; gap: 64px; padding-block: 96px; }
+  .mz-quote { padding-block: 80px; }
+  .mz-quote figure { padding: 64px 48px 52px; }
+}
+@media (prefers-reduced-motion: reduce) { .mz-ai-demo .mz-ai-bubble, .mz-ai-demo-chips { animation: none; } }

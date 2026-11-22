@@ -29,7 +29,7 @@ body.studio::before, body.editor-page::before {
 
 /* Shared glass surface. */
 .studio-header, body.studio.ui-scrolled > .studio-header,
-.studio :is(.step, .launch-pricing, .launch-faq details, .experience-price-card, .dashboard-stat, .loading-card, .checkout-summary, .studio-form, .collection-empty, .prompt-card, .template-detail-grid > *:first-child),
+.studio :is(.step, .launch-pricing, .launch-faq details, .experience-price-card, .dashboard-stat, .loading-card, .checkout-summary, .studio-form, .collection-empty, .template-detail-grid > *:first-child),
 .studio :is(.studio-filter, .carousel-arrow, .carousel-autoplay, .marquee-toggle, .collection-tools :is(input, select), .studio-button.light),
 .demo-bar,
 .editor-page :is(.ed-bar, .editor-journey, .ed-sidebar, .visual-inspector, .canvas-tools button, .replay-opening, .ed-tabs, .editor-help, .ed-group) {
@@ -60,7 +60,7 @@ body.studio::before, body.editor-page::before {
 .studio :is(.home-discovery, .collection-section, .studio-steps, .launch-faq, .studio-footer) { background: transparent; }
 .studio .studio-header { background-color: rgba(250, 246, 240, .6); border-width: 0 0 1px; }
 .studio .launch-pricing { }
-.studio :is(.step, .experience-price-card, .dashboard-stat, .loading-card, .checkout-summary, .studio-form, .collection-empty, .prompt-card) { }
+.studio :is(.step, .experience-price-card, .dashboard-stat, .loading-card, .checkout-summary, .studio-form, .collection-empty) { }
 .studio .step { padding: 26px 24px; }
 .studio .launch-faq details { padding-inline: 22px; margin-block: 10px; }
 .studio .collection-tools :is(input, select) { }
@@ -174,7 +174,7 @@ body.studio::before, body.editor-page::before {
 @layer glass {
   .studio :is(.studio-button, .studio-pill, .studio-filter, .carousel-arrow, .carousel-autoplay, .marquee-toggle, .collection-tools input, .collection-tools select, .hs-motion),
   .editor-page :is(.btn, .btn-ed, .ed-tab, .ed-tabs, .ed-device, .ed-dev-btn, .ed-badge, .canvas-tools button, .replay-opening, .ai-suggest button, .ai-attach, .ai-attached button, .editor-journey button) { border-radius: 999px !important; }
-  .studio :is(.step, .experience-price-card, .dashboard-stat, .loading-card, .checkout-summary, .studio-form, .collection-empty, .prompt-card),
+  .studio :is(.step, .experience-price-card, .dashboard-stat, .loading-card, .checkout-summary, .studio-form, .collection-empty),
   .editor-page :is(.ed-sidebar, .ed-canvas-wrap, .visual-inspector) { border-radius: var(--glass-radius) !important; }
   .studio .launch-pricing { border-radius: 32px !important; }
   .studio .price-card { border-radius: 30px !important; }

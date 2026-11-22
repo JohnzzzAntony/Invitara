@@ -32,7 +32,7 @@ try{
  }
  const page=await browser.newPage();await page.goto(origin+'/create.html?collection=couture');
  await page.locator('.collection-card').first().waitFor();assert.equal(await page.locator('.collection-card').count(),5);
- await page.goto(origin+'/prompts.html');assert.equal(await page.locator('.prompt-card').count(),7);
- await page.goto(origin+'/design.html?id=couture-pearl');await page.getByRole('button',{name:'Copy build prompt'}).waitFor();
+
+
  console.log('Couture checks passed for',keys.length,'editions at 320/390/1440px.');
 }finally{await browser.close();}
