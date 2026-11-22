@@ -255,7 +255,12 @@ app.get('/api/health',(req,res)=>{db.prepare('SELECT 1').get();res.json({ok:true
 // Animated templates are self-contained documents with inline scripts; only they get 'unsafe-inline', the site never does.
 const templateFraming = { 'X-Frame-Options': 'SAMEORIGIN', 'Content-Security-Policy': SECURITY_HEADERS['Content-Security-Policy'].replace("frame-ancestors 'none'", "frame-ancestors 'self'").replace("script-src 'self'", "script-src 'self' 'unsafe-inline'") };
 app.use('/invitation-templates', (req, res, next) => { res.set(templateFraming); next(); }, express.static(path.join(publicRoot, 'invitation-templates'), { dotfiles: 'deny' }));
-for (const dir of ['assets', 'mu', 'css', 'js', 'vendor']) app.use('/' + dir, express.static(path.join(publicRoot, dir), { dotfiles: 'deny' }));
+// Hash-stamped URLs (page-meta.mjs versionAssets) never change content: cache for a year. Images and fonts: a day.
+const staticCache = dir => res => {
+  if (res.req.query.v) res.set('Cache-Control', 'public, max-age=31536000, immutable');
+  else if (['assets', 'mu'].includes(dir)) res.set('Cache-Control', 'public, max-age=86400');
+};
+for (const dir of ['assets', 'mu', 'css', 'js', 'vendor']) app.use('/' + dir, express.static(path.join(publicRoot, dir), { dotfiles: 'deny', setHeaders: staticCache(dir) }));
 // Search engines and AI crawlers may read every public page; private app pages stay out of the index.
 const privatePaths = ['/api/', '/editor.html', '/dashboard.html', '/account.html', '/checkout.html', '/invite.html'];
 const robots = ['*', 'GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-SearchBot', 'PerplexityBot', 'Google-Extended', 'Applebot-Extended'].map(agent => 'User-agent: ' + agent + '\nAllow: /\n' + privatePaths.map(p => 'Disallow: ' + p).join('\n')).join('\n\n');

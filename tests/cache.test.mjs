@@ -26,3 +26,12 @@ test('quota fallback retains local drafts while discarding only reloadable serve
   assert.equal(result[0].state,null);
   assert.equal(result[1].state.photo,'local');
 });
+
+test('page CSS/JS get content-hash URLs; missing files and images are left alone', async () => {
+  const {versionAssets} = await import('../backend/page-meta.mjs');
+  const out = versionAssets('<link rel="stylesheet" href="css/site.css"><script src="/js/api.js"></script><script src="js/missing.js"></script><img src="/assets/ws-couple.jpg">');
+  assert.match(out, /href="\/css\/site\.css\?v=[a-f0-9]{10}"/);
+  assert.match(out, /src="\/js\/api\.js\?v=[a-f0-9]{10}"/);
+  assert.match(out, /src="js\/missing\.js"/);
+  assert.match(out, /src="\/assets\/ws-couple\.jpg"/);
+});

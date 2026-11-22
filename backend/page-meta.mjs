@@ -1,5 +1,18 @@
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { escapeHtml as escape } from './seo.mjs';
+
+// Stamps page CSS/JS with a content hash so the server can let browsers cache them for a year
+// (see the static handler in index.mjs); a deploy that changes a file changes its URL.
+const hashes = new Map();
+function assetHash(file) {
+  if (!hashes.has(file)) {
+    try { hashes.set(file, createHash('sha1').update(readFileSync(new URL('../frontend/public/' + file, import.meta.url))).digest('hex').slice(0, 10)); }
+    catch { hashes.set(file, null); }
+  }
+  return hashes.get(file);
+}
+export const versionAssets = html => html.replace(/(src|href)="\/?((?:css|js|vendor)\/[^"?#]+\.(?:css|js))"/g, (m, attr, file) => assetHash(file) ? attr + '="/' + file + '?v=' + assetHash(file) + '"' : m);
 
 const privatePages = new Set(['account.html', 'dashboard.html', 'editor.html', 'checkout.html', 'invite.html', 'demo.html']);
 /**
@@ -9,6 +22,7 @@ const privatePages = new Set(['account.html', 'dashboard.html', 'editor.html', '
 export function pageHtml(file, origin, project, seo = {}) {
   let html = readFileSync(new URL('../frontend/public/' + file, import.meta.url), 'utf8');
   for (const [from, to] of seo.replace || []) html = html.replace(from, to);
+  if (process.env.NODE_ENV === 'production') html = versionAssets(html);
   const url = project ? origin + '/' + file + '?e=' + encodeURIComponent(project.id) : origin + (seo.path || (file === 'index.html' ? '/' : '/' + file));
   const title = project ? project.state.basics.title || project.themeName : seo.title || /<title>(.*?)<\/title>/.exec(html)?.[1] || 'momentsiz';
   const description = project ? [project.state.basics.date, project.state.basics.venue, project.state.basics.city].filter(Boolean).join(' · ') : seo.description || /<meta name="description" content="([^"]*)">/.exec(html)?.[1] || 'Create a digital invitation and manage guest replies with momentsiz.';
