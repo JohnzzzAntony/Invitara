@@ -138,6 +138,12 @@ const PRICING_FAQS = [SHARED_FAQS[0], ['Do premium designs cost more?', 'No. Eve
 // Lucide icons (lucide.dev, ISC licence) for each invitation experience.
 const EXPERIENCE_ICONS = {"classic":["#3A6157","<path d=\"M15 12h-5\"/><path d=\"M15 8h-5\"/><path d=\"M19 17V5a2 2 0 0 0-2-2H4\"/><path d=\"M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3\"/>"],"story":["#C7487E","<path d=\"M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20\"/><path d=\"M8.62 9.8A2.25 2.25 0 1 1 12 6.836a2.25 2.25 0 1 1 3.38 2.966l-2.626 2.856a.998.998 0 0 1-1.507 0z\"/>"],"book":["#8E3B5C","<path d=\"M12 5v16\"/><path d=\"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z\"/>"],"magazine":["#D9653B","<path d=\"M15 18h-5\"/><path d=\"M18 14h-8\"/><path d=\"M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0v-9a2 2 0 0 1 2-2h2\"/><rect width=\"8\" height=\"4\" x=\"10\" y=\"6\" rx=\"1\"/>"],"cinematic":["#2F4B8A","<path d=\"m12.296 3.464 3.02 3.956\"/><path d=\"M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3z\"/><path d=\"M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/><path d=\"m6.18 5.276 3.1 3.899\"/>"],"reveal":["#B8862E","<path d=\"M12 7v14\"/><path d=\"M20 11v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8\"/><path d=\"M7.5 7a1 1 0 0 1 0-5A4.8 8 0 0 1 12 7a4.8 8 0 0 1 4.5-5 1 1 0 0 1 0 5\"/><rect x=\"3\" y=\"7\" width=\"18\" height=\"4\" rx=\"1\"/>"],"timeline":["#6A4FB0","<path d=\"M12 13v8\"/><path d=\"M12 3v3\"/><path d=\"M18.172 6a2 2 0 0 1 1.414.586l2.06 2.06a1.207 1.207 0 0 1 0 1.708l-2.06 2.06a2 2 0 0 1-1.414.586H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z\"/>"],"gallery":["#2E8B6A","<path d=\"m22 11-1.296-1.296a2.4 2.4 0 0 0-3.408 0L11 16\"/><path d=\"M4 8a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2\"/><circle cx=\"13\" cy=\"7\" r=\"1\" fill=\"currentColor\"/><rect x=\"8\" y=\"2\" width=\"14\" height=\"14\" rx=\"2\"/>"]};
 
+// The first design card is the page's largest paint: start its poster before the scripts that build the cards.
+function preloadPoster(out, templates) {
+  const first = templates.find(t => t.poster);
+  if (first) out.replace.push(['</head>', '<link rel="preload" as="image" href="' + escapeHtml(first.poster) + '" fetchpriority="high"></head>']);
+}
+
 /** Returns overrides for pageHtml: title, description, canonical path, image, JSON-LD and HTML replacements. */
 export function seoFor(file, { origin, catalog, query = {}, occasion, supportEmail }) {
   const base = PAGES[file] || {};
@@ -147,6 +153,8 @@ export function seoFor(file, { origin, catalog, query = {}, occasion, supportEma
 
   if (file === 'index.html') {
     out.graph = html => [...graph, faqPage(visibleFaqs(html))];
+    // The hero's first card (js/hero.js) is the largest paint: start it before the scripts that build the deck.
+    preloadPoster(out, templates);
   } else if (file === 'pricing.html') {
     const price = Math.min(...templates.map(t => catalog.EVER_C.startingPrice(t.id)));
     graph.push({ '@type': 'Product', name: 'momentsiz digital invitation', description: base.description, brand: { '@id': origin + '/#organization' }, image: origin + '/assets/ws-couple.jpg', offers: { '@type': 'AggregateOffer', priceCurrency: 'AED', lowPrice: price, highPrice: Math.max(...templates.map(t => catalog.EVER_C.startingPrice(t.id))), offerCount: templates.length, availability: 'https://schema.org/InStock' } }, breadcrumbs(origin, [['Home', '/'], ['Pricing', '/pricing.html']]), faqPage(PRICING_FAQS));
@@ -158,6 +166,7 @@ export function seoFor(file, { origin, catalog, query = {}, occasion, supportEma
     out.replace.push(['<strong id="pricing-amount">79</strong>', '<strong id="pricing-amount">' + price + '</strong>'], ['<div id="pricing-grid" class="experience-price-grid"></div>', '<div id="pricing-grid" class="experience-price-grid">' + cards + '</div>'], ['</main>', faqSection(PRICING_FAQS, 'Pricing questions') + '</main>']);
   } else if (file === 'create.html' && occasion) {
     const o = occasion, designs = templates.filter(t => t.occasion === o.key);
+    preloadPoster(out, designs);
     Object.assign(out, { title: o.title, description: o.description, keywords: o.keywords, path: '/' + o.slug, bodyOccasion: o.key });
     if (designs[0]) out.image = { url: origin + '/' + designFacts(catalog, designs[0]).photo, alt: designs[0].name + ' ' + o.label.toLowerCase() + ' invitation design' };
     const faqs = o.faqs.concat(SHARED_FAQS);
@@ -165,6 +174,7 @@ export function seoFor(file, { origin, catalog, query = {}, occasion, supportEma
     out.replace.push(['<p class="studio-kicker">Made for your moment</p><h1 id="collection-title">Beautiful invitations</h1><p id="collection-description">Find a design that feels like you. Make the experience your own.</p>', '<p class="studio-kicker">' + escapeHtml(o.label) + ' · Interactive · Online RSVP</p><h1 id="collection-title" data-seo-title="' + escapeHtml(o.h1) + '">' + escapeHtml(o.h1) + '</h1><p id="collection-description">' + escapeHtml(o.lead) + '</p>'],
       ['</main>', '<section class="occasion-guide" id="occasion-guide" data-occasion="' + o.key + '" aria-labelledby="occasion-guide-title"><p class="studio-kicker">The ' + escapeHtml(o.label.toLowerCase()) + ' guide</p><h2 id="occasion-guide-title">Why choose a digital ' + escapeHtml(guideNoun(o.h1)) + '?</h2>' + o.body.map(b => '<p>' + escapeHtml(b) + '</p>').join('') + (designs.length ? '<p class="occasion-guide-designs">Featured design: ' + designs.map(t => '<a href="' + designPath(t.id).slice(1) + '">' + escapeHtml(t.name) + '</a>').join(', ') + '.</p>' : '') + '</section>' + faqSection(faqs, o.label + ' invitation questions') + '</main>']);
   } else if (file === 'create.html') {
+    preloadPoster(out, templates);
     graph.push({ '@type': 'CollectionPage', name: 'Digital invitation templates', description: base.description, url: origin + '/create.html', isPartOf: { '@id': origin + '/#website' }, mainEntity: { '@type': 'ItemList', itemListElement: templates.map((t, i) => ({ '@type': 'ListItem', position: i + 1, url: origin + designPath(t.id), name: t.name })) } }, breadcrumbs(origin, [['Home', '/'], ['Invitations', '/create.html']]));
     out.replace.push(['<p class="studio-kicker">Made for your moment</p><h1 id="collection-title">Beautiful invitations</h1>', '<p class="studio-kicker">Made for your moment</p><h1 id="collection-title" data-seo-title="Digital invitation templates">Digital invitation templates</h1>'],
       ['</main>', '<nav class="occasion-index" aria-label="Invitations by occasion"><p class="studio-kicker">Browse by occasion</p><ul>' + stockedOccasions(catalog).map(o => '<li><a href="' + o.slug + '">' + escapeHtml(o.h1) + '</a></li>').join('') + '</ul></nav></main>']);

@@ -17,7 +17,7 @@
   });
   deck.innerHTML = first.concat(rest).map(function (t, i) {
     return '<a class="swiper-slide mz-slide" href="design.html?id=' + encodeURIComponent(t.id) + '">' +
-      '<img src="' + esc(t.poster) + '" alt="" width="600" height="900" decoding="async"' + (i > 2 ? ' loading="lazy"' : '') + '>' +
+      '<img src="' + esc(t.poster) + '" alt="" width="600" height="900" decoding="async"' + (i ? (i > 2 ? ' loading="lazy"' : '') : ' fetchpriority="high"') + '>' +
       '<span class="mz-slide-meta"><b>' + esc(t.name) + '</b><em>' + esc(cat ? cat.label(t.occasion) : t.occasion) + ' · ' + esc(C.localMoney(C.startingPrice(t.id))) + '</em></span></a>';
   }).join('');
 
@@ -32,21 +32,27 @@
       coverflowEffect: { rotate: 24, stretch: 0, depth: 220, modifier: 1, scale: .9, slideShadows: false },
       cardsEffect: { perSlideOffset: 9, perSlideRotate: 3, rotate: true, slideShadows: false },
       speed: still ? 0 : 750,
-      autoplay: still ? false : { delay: 3600, disableOnInteraction: false, pauseOnMouseEnter: true },
       keyboard: { enabled: true, onlyInViewport: true },
       a11y: { enabled: true, slideLabelMessage: 'Design {{index}} of {{slidesLength}}' },
       navigation: { prevEl: controls.querySelector('[data-dir=prev]'), nextEl: controls.querySelector('[data-dir=next]') },
       pagination: { el: controls.querySelector('.carousel-pagination'), clickable: true, bulletClass: 'carousel-dot', bulletActiveClass: 'is-active',
         renderBullet: function (i, cls) { return '<button type="button" class="' + cls + '" aria-label="Go to design ' + (i + 1) + '"></button>'; } }
     });
-    if (paused && !still) swiper.autoplay.stop();
     toggle.hidden = still;
   }
+
+  // Our own timer instead of Swiper autoplay, which runs a per-frame loop for its countdown.
+  // It also rests while the hero is off screen, hovered, paused or in a background tab.
+  var hero = root.closest('.mz-hero'), hovering = false, visible = true;
+  root.addEventListener('pointerenter', function () { hovering = true; });
+  root.addEventListener('pointerleave', function () { hovering = false; });
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { visible = e[0].isIntersecting; hero.classList.toggle('is-offscreen', !visible); }).observe(hero);
+  setInterval(function () { if (!paused && !hovering && visible && !document.hidden && !reduced.matches) swiper.slideNext(); }, 3600);
 
   // Rotating occasion word: screen readers get the fixed word "celebration" beside it.
   var word = document.querySelector('.mz-word'), words = word ? word.dataset.words.split(',') : [], at = 0;
   setInterval(function () {
-    if (!word || paused || reduced.matches || document.hidden) return;
+    if (!word || paused || !visible || reduced.matches || document.hidden) return;
     at = (at + 1) % words.length;
     word.classList.remove('is-in'); void word.offsetWidth;
     word.textContent = words[at]; word.classList.add('is-in');
@@ -54,8 +60,7 @@
 
   toggle.addEventListener('click', function () {
     paused = !paused;
-    if (paused) swiper.autoplay.stop(); else swiper.autoplay.start();
-    root.closest('.mz-hero').classList.toggle('is-paused', paused);
+    hero.classList.toggle('is-paused', paused);
     toggle.setAttribute('aria-label', paused ? 'Play' : 'Pause');
     toggle.firstElementChild.textContent = paused ? '▶' : '❚❚';
   });

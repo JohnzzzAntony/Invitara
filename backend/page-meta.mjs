@@ -19,7 +19,12 @@ export function pageHtml(file, origin, project, seo = {}) {
   let tags = '<link rel="canonical" href="' + escape(url) + '"><meta property="og:type" content="website"><meta property="og:title" content="' + escape(title) + '"><meta property="og:description" content="' + escape(description) + '"><meta property="og:url" content="' + escape(url) + '"><meta property="og:site_name" content="momentsiz"><meta property="og:locale" content="en_US">'
     + '<meta property="og:image" content="' + escape(image.url) + '"><meta property="og:image:alt" content="' + escape(image.alt) + '">'
     + '<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="' + escape(title) + '"><meta name="twitter:description" content="' + escape(description) + '"><meta name="twitter:image" content="' + escape(image.url) + '">'
-    + '<link rel="apple-touch-icon" href="/assets/momentsiz-icon.png">';
+    + '<link rel="apple-touch-icon" href="/assets/momentsiz-icon.png">'
+    // Every page paints in Manrope: fetch it alongside the CSS instead of after it.
+    + '<link rel="preload" href="/assets/fonts/manrope-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>';
+  // Installable everywhere (each invitation has its own manifest); the install prompt stays off the editor and checkout.
+  if (!(project && file === 'invite.html')) tags += '<link rel="manifest" href="/manifest.webmanifest">';
+  if (!['editor.html', 'checkout.html'].includes(file)) tags += '<script src="/js/install.js" defer></script>';
   if (project && file === 'invite.html') tags += '<link rel="manifest" href="/api/invites/' + encodeURIComponent(project.id) + '/manifest.webmanifest"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="' + escape(String(title).slice(0, 30)) + '">';
   if (process.env.PLAUSIBLE_DOMAIN) tags += '<script defer data-domain="' + escape(process.env.PLAUSIBLE_DOMAIN) + '" src="https://plausible.io/js/script.outbound-links.js"></script>';
   if (seo.keywords) tags += '<meta name="keywords" content="' + escape(seo.keywords) + '">';

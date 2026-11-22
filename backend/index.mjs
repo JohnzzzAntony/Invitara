@@ -289,7 +289,7 @@ app.get('/:file', (req, res, next) => {
     if (occasionByKey[key]) return res.redirect(301, occasionPath(key));
   }
   if (['index.html','create.html','design.html','pricing.html','account.html','dashboard.html','editor.html','checkout.html','demo.html','terms.html','privacy.html','contact.html'].includes(file)) return res.type('html').send(pageHtml(file, origin, null, seo(file, { query: { id: typeof req.query.id === 'string' ? req.query.id : '' } })));
-  if (/^[a-z0-9-]+\.html$/.test(req.params.file) || ['styles.css', 'robots.txt', 'sitemap.xml', 'sw.js'].includes(req.params.file)) return res.sendFile(path.join(publicRoot, req.params.file));
+  if (/^[a-z0-9-]+\.html$/.test(req.params.file) || ['styles.css', 'robots.txt', 'sitemap.xml', 'sw.js', 'manifest.webmanifest'].includes(req.params.file)) return res.sendFile(path.join(publicRoot, req.params.file));
   next();
 });
 app.use((req,res)=>{if(req.path.startsWith('/api/'))return res.status(404).json({error:'Not found.'});res.status(404).sendFile(path.join(publicRoot,'404.html'));});

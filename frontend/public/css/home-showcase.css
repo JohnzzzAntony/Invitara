@@ -5,11 +5,11 @@
 /* ---------- Hero ---------- */
 .mz-hero { position: relative; isolation: isolate; overflow: hidden; padding: 28px 0 0; background: var(--brand-cloud); }
 .mz-aura { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
-.mz-aura i { position: absolute; width: 80vmax; height: 80vmax; border-radius: 50%; animation: mz-drift 20s ease-in-out infinite alternate; }
+/* Static on purpose: drifting full-screen colour layers cost a steady share of CPU on phones for little visible gain. */
+.mz-aura i { position: absolute; width: 80vmax; height: 80vmax; border-radius: 50%; }
 .mz-aura i:nth-child(1) { top: -45vmax; left: -35vmax; background: radial-gradient(closest-side, rgba(245, 45, 145, .28), transparent); }
-.mz-aura i:nth-child(2) { top: -25vmax; right: -45vmax; background: radial-gradient(closest-side, rgba(112, 22, 216, .26), transparent); animation-delay: -7s; }
-.mz-aura i:nth-child(3) { bottom: -55vmax; left: 10%; background: radial-gradient(closest-side, rgba(255, 146, 56, .22), transparent); animation-delay: -14s; }
-@keyframes mz-drift { to { transform: translate3d(8vmax, 5vmax, 0) scale(1.15); } }
+.mz-aura i:nth-child(2) { top: -25vmax; right: -45vmax; background: radial-gradient(closest-side, rgba(112, 22, 216, .26), transparent); }
+.mz-aura i:nth-child(3) { bottom: -55vmax; left: 10%; background: radial-gradient(closest-side, rgba(255, 146, 56, .22), transparent); }
 
 .mz-hero-inner { display: grid; gap: 32px; width: min(100% - 40px, 1200px); margin: 0 auto; }
 .mz-hero-copy { min-width: 0; }
@@ -47,6 +47,9 @@
 
 /* Deck: phone-shaped cards with a soft white bezel. Swiper sets the slide transforms; nothing here animates a slide's transform. */
 .mz-deck { width: min(74vw, 300px); margin: 0 auto; padding: 8px 0 24px; overflow: visible; }
+/* Reserve the deck's final size (2:3 cards plus padding) so the page does not jump when js/hero.js builds it. */
+.mz-deck { min-height: calc(min(74vw, 300px) * 1.5 + 32px); }
+.mz-deck-controls { min-height: 44px; }
 .mz-deck .mz-slide { position: relative; display: block; height: auto; aspect-ratio: 2 / 3; overflow: hidden; border-radius: 28px; background: #fff; box-shadow: 0 0 0 6px #fff, 0 36px 60px -30px rgba(25, 21, 39, .6); text-decoration: none; }
 .mz-slide::before { content: ""; position: absolute; top: 12px; left: 50%; z-index: 1; width: 56px; height: 6px; margin-left: -28px; border-radius: 6px; background: rgba(25, 21, 39, .35); }
 .mz-slide img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.22, 1, .36, 1); }
@@ -72,7 +75,7 @@
 .mz-marquee-track span::after { content: "\2726"; font-size: 13px; color: var(--brand-orange); }
 @keyframes mz-marquee { to { transform: translateX(-50%); } }
 
-.mz-hero.is-paused :is(.mz-aura i, .mz-spark i, .mz-marquee-track) { animation-play-state: paused; }
+:is(.mz-hero.is-paused, .mz-hero.is-offscreen) :is(.mz-spark i, .mz-marquee-track) { animation-play-state: paused; }
 
 @media (min-width: 480px) { .mz-actions .studio-button { flex: 0 0 auto; } }
 @media (min-width: 1024px) {
@@ -86,10 +89,11 @@
   [data-page=home] .mz-lead { font-size: 18px; }
   .mz-deck { width: 100%; padding: 24px 0 40px; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
   .mz-deck .mz-slide { width: 270px; }
+  .mz-deck { min-height: 469px; }
   .mz-marquee { margin-top: 56px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .mz-aura i, .mz-spark i, .mz-hero-copy > *, .mz-stage, .mz-proof, .mz-word.is-in, .mz-marquee-track { animation: none !important; }
+  .mz-spark i, .mz-hero-copy > *, .mz-stage, .mz-proof, .mz-word.is-in, .mz-marquee-track { animation: none !important; }
   .mz-marquee-track { flex-wrap: wrap; justify-content: center; width: auto; row-gap: 8px; }
   .mz-marquee-track span:nth-child(n+12) { display: none; }
   .mz-slide img { transition: none; }

@@ -62,6 +62,9 @@ test('server enforces ownership, payments, expiry, immutable dates and signed we
     const manifest=await call('/invites/active/manifest.webmanifest','GET',null,false);assert.equal(manifest.status,200);
     const app=await manifest.json();assert.equal(app.start_url,'/invite.html?e=active');assert.equal(app.name,'Alex and Sam');assert.deepEqual(app.icons.map(i=>i.sizes),['192x192','512x512']);
     assert.match(await (await fetch(origin+'/invite.html?e=active')).text(),/rel="manifest" href="\/api\/invites\/active\/manifest\.webmanifest"/);
+    const home=await (await fetch(origin+'/')).text();assert.match(home,/rel="manifest" href="\/manifest\.webmanifest"/);assert.match(home,/src="\/js\/install\.js"/);
+    assert.doesNotMatch(await (await fetch(origin+'/editor.html')).text(),/install\.js/,'no install prompt while editing');
+    assert.equal((await (await fetch(origin+'/manifest.webmanifest')).json()).start_url,'/');
     const worker=await fetch(origin+'/sw.js');assert.equal(worker.status,200);assert.match(worker.headers.get('content-type'),/javascript/);
     assert.equal((await call('/invites/unpaid/manifest.webmanifest','GET',null,false)).status,404);
     const guest=await call('/invites/active','GET',null,false),guestCookie=guest.headers.get('set-cookie').split(';')[0];

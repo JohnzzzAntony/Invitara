@@ -22,10 +22,7 @@ body.studio::before, body.editor-page::before {
     radial-gradient(34vmax 30vmax at 88% 12%, rgba(112, 22, 216, .14), transparent 70%),
     radial-gradient(40vmax 36vmax at 78% 82%, rgba(53, 72, 237, .10), transparent 70%),
     radial-gradient(30vmax 28vmax at 20% 88%, rgba(255, 146, 56, .12), transparent 70%);
-  filter: blur(10px);
-  animation: glass-drift 36s ease-in-out infinite alternate;
 }
-@keyframes glass-drift { to { transform: translate3d(3vmax, -2vmax, 0) scale(1.06); } }
 
 /* Shared glass surface. */
 .studio-header, body.studio.ui-scrolled > .studio-header,
@@ -75,7 +72,7 @@ body.studio::before, body.editor-page::before {
 
 /* ---------------- Editor ---------------- */
 .editor-page .ed-bar { border-width: 0 0 1px; background-color: rgba(250, 246, 240, .62); }
-.editor-page .editor-journey { border-width: 0 0 1px; background-color: rgba(250, 246, 240, .4); box-shadow: none; }
+.editor-page .editor-journey { min-height: 56px; border-width: 0 0 1px; background-color: rgba(250, 246, 240, .4); box-shadow: none; }
 .editor-page .editor-journey button[aria-current=step] { background: rgba(112, 22, 216, .14); color: #5A10B0; }
 .editor-page .ed-canvas-wrap { background: transparent; }
 .editor-page .canvas-frame { overflow: hidden; border: 1px solid rgba(255, 255, 255, .8); box-shadow: 0 30px 80px -40px rgba(74, 40, 28, .45); }
@@ -185,3 +182,4 @@ body.studio::before, body.editor-page::before {
   .editor-page .ai-msg.ai-bot { border-bottom-left-radius: 6px !important; }
   .editor-page .ai-msg.ai-user { border-bottom-right-radius: 6px !important; }
 }
+@media (min-width: 768px) { .editor-page .editor-journey { min-height: 64px; } }

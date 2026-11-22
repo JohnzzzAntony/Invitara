@@ -12,9 +12,10 @@ try{
  assert.equal(await page.evaluate(()=>document.querySelector('.mz-deck').swiper.params.effect),'coverflow','wide screens get the coverflow');
  assert.ok(await page.locator('.mz-slide').count()>=5,'the deck shows real designs');
  const hero=page.locator('.mz-hero'),toggle=hero.locator('.mz-toggle');
- await toggle.click();assert.equal(await toggle.getAttribute('aria-label'),'Play');assert.equal(await page.evaluate(()=>document.querySelector('.mz-deck').swiper.autoplay.running),false,'pause stops the deck');
+ await toggle.click();assert.equal(await toggle.getAttribute('aria-label'),'Play');await page.mouse.move(0,0);const slide=await page.evaluate(()=>document.querySelector('.mz-deck').swiper.activeIndex);
  const word=await page.locator('.mz-word').textContent();await page.waitForTimeout(3000);assert.equal(await page.locator('.mz-word').textContent(),word,'pause holds the rotating word');
- await toggle.click();assert.equal(await page.evaluate(()=>document.querySelector('.mz-deck').swiper.autoplay.running),true);
+ assert.equal(await page.evaluate(()=>document.querySelector('.mz-deck').swiper.activeIndex),slide,'pause holds the deck');
+ await toggle.click();await page.waitForTimeout(4000);assert.notEqual(await page.evaluate(()=>document.querySelector('.mz-deck').swiper.activeIndex),slide,'play moves the deck again');
  const chips=page.locator('.fc-chip');assert.equal(await chips.count(),10);
  const active=()=>page.locator('.fc-chip.is-active').textContent();
  await chips.nth(5).click();await page.waitForTimeout(500);assert.equal(await active(),await chips.nth(5).textContent());

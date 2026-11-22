@@ -201,3 +201,17 @@ body.studio h2:not(.ws *) { font-weight: 700; }
 }
 
 
+
+/* Install prompt (js/install.js): a small card at the bottom; full width on phones, bottom-right on desktop. */
+.mz-install { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 200; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px; border: 1px solid rgba(112, 22, 216, .14); border-radius: 20px; background: #fff; color: #191527; font-family: 'Manrope', system-ui, sans-serif; box-shadow: 0 24px 60px -24px rgba(25, 21, 39, .45); opacity: 0; transform: translateY(16px); transition: opacity .25s ease-out, transform .25s ease-out; }
+.mz-install.is-in { opacity: 1; transform: none; }
+.mz-install img { flex: none; width: 44px !important; height: 44px !important; max-width: none; border-radius: 12px; filter: none; }
+.mz-install > div:first-of-type { flex: 1; min-width: 160px; }
+.mz-install strong { display: block; font-size: 15px; font-weight: 800; }
+.mz-install span { display: block; margin-top: 2px; font-size: 13px; line-height: 1.4; color: #615C6E; }
+.mz-install-actions { display: flex; gap: 8px; margin-left: auto; }
+.mz-install button { min-height: 44px; padding: 0 18px; border: 1px solid rgba(112, 22, 216, .22); border-radius: 999px !important; background: #fff; color: #191527; font: 700 14px 'Manrope', system-ui, sans-serif; cursor: pointer; }
+.mz-install .mz-install-go { border-color: transparent; background: linear-gradient(115deg, #7016D8 0%, #A3179F 50%, #C21C7A 100%); color: #fff; }
+.mz-install button:focus-visible { outline: 3px solid #F52D91; outline-offset: 2px; }
+@media (min-width: 768px) { .mz-install { left: auto; right: 24px; bottom: 24px; width: 420px; } }
+@media (prefers-reduced-motion: reduce) { .mz-install { transition: none; } }
