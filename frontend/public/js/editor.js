@@ -973,7 +973,7 @@
     var pubBack = document.getElementById('pub-back');
     if (pubBack) pubBack.addEventListener('click', closePublish);
     var pubGo = document.getElementById('pub-go');
-    if (pubGo) pubGo.addEventListener('click', doPublish);
+    if (pubGo) pubGo.addEventListener('click', function () { if (pubGo.dataset.pay) location.href = 'checkout.html'; else doPublish(); });
 
     var copy = document.getElementById('copy-url');
     if (copy) {
@@ -1029,7 +1029,9 @@
       if (!c.ok) {
         li.querySelector('button').addEventListener('click', function () {
           closePublish();
-          focusFix(c);
+          // A missing detail is one question away: the assistant asks for exactly that field.
+          if (c.path && window.MZ_ASSISTANT && !(access && c.path === 'basics.date')) window.MZ_ASSISTANT.ask(c.path);
+          else focusFix(c);
         });
       }
       list.appendChild(li);
@@ -1046,8 +1048,10 @@
       list.appendChild(li);
     }
 
-    goBtn.disabled = !(allOk && paid);
-    goBtn.textContent = allOk && paid ? 'Publish now' : 'Fix the items above';
+    // Details done but unpaid: the button goes straight to payment instead of a dead end.
+    if (allOk && !paid) goBtn.dataset.pay = '1'; else delete goBtn.dataset.pay;
+    goBtn.disabled = !allOk;
+    goBtn.textContent = !allOk ? 'Fix the items above' : paid ? 'Publish now' : 'Continue to payment';
 
     var reviews=document.getElementById('publish-device-checks');if(!reviews){reviews=document.createElement('div');reviews.id='publish-device-checks';reviews.className='publish-device-checks';['mobile','desktop'].forEach(function(device){var b=document.createElement('button');b.type='button';b.className='btn btn-ghost';b.textContent='Check '+device+' preview';b.addEventListener('click',function(){closePublish();document.querySelector('[data-dev="'+device+'"]').click();if(!window.EVER_visualEditor.isPreview())document.getElementById('full-preview-btn').click();});reviews.appendChild(b);});list.after(reviews);}
     overlay().hidden = false;
@@ -1299,7 +1303,16 @@
       if (!accessAllowed()) return;
       var ly = layout();
       ops.forEach(function (op) {
-        if (op.type === 'text' || op.type === 'photo') { if (!(access && op.path === 'basics.date')) setVal(state, op.path, op.value); }
+        var fact = op.type === 'text' && /^basics\./.test(op.path) && (ly.basics || []).find(function (f) { return f.fact && 'basics.' + f.k === op.path; });
+        if (fact) {
+          // Same as the sidebar: a quick detail (a name, the venue) also rewrites every copy of it in the design.
+          var from = getVal(state, op.path), to = String(op.value).trim();
+          if (from == null) from = ly.defaults().basics[fact.k];
+          if (!to) return;
+          window.INVITARA_replaceFact(state, from, to);
+          setVal(state, op.path, to);
+        }
+        else if (op.type === 'text' || op.type === 'photo') { if (!(access && op.path === 'basics.date')) setVal(state, op.path, op.value); }
         else if (op.type === 'style') { state.elementStyles = state.elementStyles || {}; state.elementStyles[op.path] = state.elementStyles[op.path] || {}; state.elementStyles[op.path][op.property] = op.value; }
         else if (op.type === 'theme') setTheme(op.key, op.value);
         else if (op.type === 'design') state[op.key] = op.value;

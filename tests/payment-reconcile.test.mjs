@@ -25,7 +25,7 @@ test('a paid Checkout Session unlocks publishing without a webhook, but only wit
     const registered=await fetch(origin+'/api/auth/register',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify({email:'reconcile@example.test',password:'reconcile-password'})});
     const cookie=registered.headers.getSetCookie().at(-1).split(';')[0];
     const {account}=await registered.json();
-    const state={templateId:'vellum',layoutId:'vellum',basics:{nameA:'Alex',nameB:'Sam',brand:'Alex and Sam celebrate',date:'2099-06-10',time:'14:00',venue:'Test venue'},sections:{rsvp:{on:true}},order:['hero','rsvp']};
+    const state={templateId:'vellum',layoutId:'vellum',basics:{nameA:'Alex',nameB:'Sam',title:'Alex and Sam',brand:'Alex and Sam celebrate',city:'Test city',date:'2099-06-10',time:'14:00',venue:'Test venue'},sections:{rsvp:{on:true}},order:['hero','rsvp']};
     db=new DatabaseSync(path.join(dir,'invitara.sqlite'));
     for(const [id,session] of [['p_paid','cs_paid'],['p_short','cs_short'],['p_open','cs_open']]){
       db.prepare('INSERT INTO projects VALUES (?,?,?)').run(id,account.id,JSON.stringify({id,themeId:'vellum',layoutId:'vellum',paid:false,published:false,amount:8295,eventDate:'2099-06-10',timezone:'Asia/Dubai',expiresAt:Date.parse('2099-06-11T00:00:00+04:00'),state}));

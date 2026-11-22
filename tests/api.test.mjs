@@ -20,7 +20,7 @@ test('server enforces ownership, payments, expiry, immutable dates and signed we
     const token = cookie.split('=')[1];
     const owner = createHash('sha256').update(token).digest('hex');
     db = new DatabaseSync(path.join(dir,'invitara.sqlite'));
-    const state = {templateId:'vellum',layoutId:'vellum',basics:{nameA:'Alex',nameB:'Sam',brand:'Alex and Sam celebrate',date:'2027-06-10',time:'14:00',venue:'Test venue'},sections:{rsvp:{on:true}},order:['hero','rsvp']};
+    const state = {templateId:'vellum',layoutId:'vellum',basics:{nameA:'Alex',nameB:'Sam',title:'Alex and Sam',brand:'Alex and Sam celebrate',city:'Test city',date:'2027-06-10',time:'14:00',venue:'Test venue'},sections:{rsvp:{on:true}},order:['hero','rsvp']};
     const base = {id:'active',themeId:'vellum',layoutId:'vellum',state,eventDate:'2027-06-10',timezone:'UTC',paid:true,expiresAt:Date.now()+86400000,amount:7140};
     for(const p of [base,{...base,id:'expired',expiresAt:Date.now()-1},{...base,id:'unpaid',paid:false}]) db.prepare('INSERT INTO projects VALUES (?,?,?)').run(p.id,owner,JSON.stringify(p));
     const call = (url,method='GET',body,auth=true) => fetch(origin+'/api'+url,{method,headers:{Origin:origin,'Content-Type':'application/json',...(auth?{Cookie:cookie}:{})},body:body?JSON.stringify(body):undefined});

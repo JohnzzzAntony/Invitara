@@ -470,9 +470,24 @@
    * placeholder venue is the real failure mode.
    *
    * So each item fails when the value is empty *or* still identical to the
-   * theme's default. Each names the editor section it belongs to, so a
-   * failing item can link straight there.
+   * theme's default. The list comes from the chosen template's own "basics"
+   * (its names, date, venue... under the keys and labels that template uses),
+   * so every template is checked on what it actually shows. Payment is the one
+   * common check and lives with the publish flow, not here.
    */
+  /* Basics a host may leave as they are: links, contact details, dress code, anything labelled optional. */
+  function optionalBasic(f) {
+    return /Url$/.test(f.k) || ['email', 'phone', 'dress'].indexOf(f.k) >= 0 || /optional/i.test(f.label || '');
+  }
+
+  /** The chosen template's must-personalise fields, in the template's order: [{ k, label, type }]. */
+  function essentials(state) {
+    var layout = state && window.EVER_findLayout ? window.EVER_findLayout(state.layoutId) : null;
+    var basics = (layout && layout.basics) || [{ k: 'date', label: 'Event date', type: 'date' }];
+    return basics.filter(function (f) { return f.k && ['text', 'date', undefined].indexOf(f.type) >= 0 && !optionalBasic(f); })
+      .map(function (f) { return { k: f.k, label: f.label || f.k, type: f.type || 'text' }; });
+  }
+
   function validate(state) {
     if (!state) return [{ ok: false, label: 'Start editing your invitation', section: '' }];
 
@@ -483,35 +498,25 @@
       defaults = (d && d.basics) || {};
     } catch (e) { defaults = {}; }
 
-    /* Filled in, and not left as the sample text. */
-    function done(key) {
-      var v = b[key];
+    /* Filled in, and not left as the sample text. A time may match the sample: events really do start at 18:30. */
+    function done(f) {
+      var v = b[f.k];
+      if (f.type === 'date') return /^\d{4}-\d{2}-\d{2}$/.test(v || '');
       if (v === undefined || v === null || String(v).trim() === '') return false;
-      if (defaults[key] !== undefined && String(v) === String(defaults[key])) return false;
+      if (f.k !== 'time' && defaults[f.k] !== undefined && String(v).trim() === String(defaults[f.k]).trim()) return false;
       return true;
     }
 
-    /* True when at least one of several equivalent fields is personalised —
-       layouts name the same idea differently (nameA/title/host/child). */
-    function anyDone(keys) {
-      for (var i = 0; i < keys.length; i++) if (done(keys[i])) return true;
-      return false;
-    }
-
-    var checks = [
-      { label: 'Your event name or title',  ok: anyDone(['title', 'name', 'brand']), section: '' },
-      { label: 'Host or couple names',      ok: anyDone(['nameA', 'nameB', 'host', 'family', 'child']), section: '' },
-      { label: 'Your event date',           ok: /^\d{4}-\d{2}-\d{2}$/.test(b.date || ''), section: '' },
-      { label: 'Your event time',           ok: done('time'), section: '' },
-      { label: 'Your venue or address',     ok: anyDone(['venue', 'address', 'city']), section: '' }
-    ];
-
-    var sections = state.sections || {};
-    checks.push({
-      label: 'RSVP section switched on',
-      ok: !!(sections.rsvp && sections.rsvp.on !== false),
-      section: 'rsvp'
+    var checks = essentials(state).map(function (f) {
+      return { label: f.label.replace(/\s*\(.*\)$/, ''), ok: done(f), section: '', path: 'basics.' + f.k };
     });
+
+    var layout = window.EVER_findLayout ? window.EVER_findLayout(state.layoutId) : null;
+    var hasRsvp = !layout || !layout.sections || layout.sections.some(function (s) { return s.id === 'rsvp'; });
+    if (hasRsvp) {
+      var sections = state.sections || {};
+      checks.push({ label: 'RSVP section switched on', ok: !!(sections.rsvp && sections.rsvp.on !== false), section: 'rsvp' });
+    }
 
     return checks;
   }
@@ -597,6 +602,7 @@
     findOrder: findOrder,
 
     validate: validate,
+    essentials: essentials,
     isValid: isValid,
     publish: publish,
     inviteUrl: inviteUrl,

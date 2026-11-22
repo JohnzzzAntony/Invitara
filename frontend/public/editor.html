@@ -60,38 +60,14 @@
         <a class="ed-plan-up" href="pricing.html" id="ed-plan-up">Compare plans</a>
       </div>
 
-      <div class="editor-help" id="editor-help">Ask the assistant, or click anything on the page to edit it. Saves automatically. <a href="checkout.html">Choose your date &amp; publish</a>.</div><div class="ed-tabs" role="tablist" aria-label="Editor panels">
-        <button class="ed-tab on" id="tab-ai" type="button" role="tab" aria-selected="true" aria-controls="panel-ai">Assistant</button>
-        <button class="ed-tab" id="tab-content" type="button" role="tab" aria-selected="false" aria-controls="panel-content">Content</button>
+      <div class="editor-help" id="editor-help">Fill in your details here, tap anything on the invitation to change it, or ask the assistant. Everything saves automatically.</div>
+<div class="ed-tabs" role="tablist" aria-label="Editor panels">
+        <button class="ed-tab on" id="tab-content" type="button" role="tab" aria-selected="true" aria-controls="panel-content">Details</button>
         <button class="ed-tab" id="tab-design" type="button" role="tab" aria-selected="false" aria-controls="panel-design">Style</button>
       </div>
 
-      <!-- ============ AI PANEL ============ -->
-      <div class="ed-panel" id="panel-ai" role="tabpanel" aria-labelledby="tab-ai">
-        <div class="ai-chat">
-          <div class="ai-log" id="ai-log" role="log" aria-live="polite">
-            <p class="ai-msg ai-bot">Tell me what you’d like. I can write every section, restyle colours and fonts, add, hide or reorder sections, place your photos and create new images. Select something on the page first to change just that.</p>
-          </div>
-          <div class="ai-suggest" id="ai-suggest" aria-label="Suggestions">
-            <button type="button" data-text="Write every section for our event. Names: , date: , time: , venue: . Details: ">Write everything</button>
-            <button type="button" data-text="Make the whole design feel more premium and luxurious.">Make it premium</button>
-            <button type="button" data-text="Create beautiful images for every empty photo.">Fill empty photos</button>
-            <button type="button" data-text="Rewrite all the text to be shorter and more elegant.">Polish the words</button>
-          </div>
-          <form class="ai-compose" id="ai-form">
-            <div class="ai-attached" id="ai-attached" hidden></div>
-            <label class="sr-only" for="ai-input">Message the assistant</label>
-            <textarea id="ai-input" rows="3" maxlength="4000" placeholder="e.g. We’re Anna &amp; Ben, 12 June 2027 at Al Habtoor Palace. Make it black-tie with gold accents." required></textarea>
-            <div class="ai-compose-row">
-              <label class="ai-attach"><input id="ai-photos" class="sr-only" type="file" accept="image/jpeg,image/png,image/webp" multiple />+ Photos</label>
-              <button class="btn btn-primary ai-go" id="ai-go" type="submit">Send</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
       <!-- ============ CONTENT PANEL ============ -->
-      <div class="ed-panel" id="panel-content" role="tabpanel" aria-labelledby="tab-content" hidden>
+      <div class="ed-panel" id="panel-content" role="tabpanel" aria-labelledby="tab-content">
 
         <details class="ed-group" open>
           <summary>Your details</summary>
@@ -159,6 +135,21 @@
     <aside class="visual-inspector" id="visual-inspector" aria-label="Selected element settings"><div class="inspector-heading"><span id="inspector-title">Element settings</span><button id="inspector-close" type="button" aria-label="Close element settings">×</button></div><div id="inspector-body"><div class="inspector-empty"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="m7 4 18 14-9 1-4 9Z"/></svg><strong>Make it yours.</strong><br>Click any text or photograph<br>to see its settings here.</div></div></aside>
   </main>
 
+  <!-- Floating assistant (js/ai-assistant.js) -->
+  <button class="mz-ai-fab" id="ai-fab" type="button" aria-expanded="false" aria-controls="ai-panel"><span class="mz-ai-spark" aria-hidden="true"><i></i><i></i><i></i></span><span class="mz-ai-fab-label">Assistant</span></button>
+  <section class="mz-ai-panel" id="ai-panel" role="dialog" aria-modal="false" aria-labelledby="ai-title" hidden>
+    <header class="mz-ai-head"><div><strong id="ai-title">Assistant</strong><span>Fills in your invitation as you answer</span></div><button type="button" class="mz-ai-close" id="ai-close" aria-label="Close assistant">&times;</button></header>
+    <div class="ai-log" id="ai-log" role="log" aria-live="polite"></div>
+    <div class="ai-suggest" id="ai-suggest" aria-label="Quick replies" hidden></div>
+    <form class="ai-compose" id="ai-form">
+      <div class="ai-attached" id="ai-attached" hidden></div>
+      <label class="sr-only" for="ai-input">Message the assistant</label>
+      <textarea id="ai-input" rows="1" maxlength="4000" placeholder="Type your answer…"></textarea>
+      <label class="ai-attach" title="Add photos"><input id="ai-photos" class="sr-only" type="file" accept="image/jpeg,image/png,image/webp" multiple /><span aria-hidden="true">+</span><span class="sr-only">Add photos</span></label>
+      <button class="btn btn-primary ai-go" id="ai-go" type="submit" aria-label="Send"><span aria-hidden="true">↑</span></button>
+    </form>
+  </section>
+
   <!-- Publish: validation checklist, then the shareable link -->
   <div class="modal-overlay" id="pub-overlay" hidden>
     <div class="modal pub-modal" role="dialog" aria-modal="true" aria-labelledby="pub-title">
@@ -211,5 +202,5 @@
 <script src="js/api.js"></script>
   <script src="js/app.js"></script>
   <script src="js/visual-editor.js"></script><script src="js/platform-editor.js"></script><script src="js/editor.js"></script><script src="js/ai-assistant.js"></script>
-<div class="editor-mobile-switch" role="group" aria-label="Editor view"><button id="mobile-edit" aria-pressed="true" type="button">Sections & Theme</button><button id="mobile-preview" aria-pressed="false" type="button">Edit on canvas</button></div><script src="js/editor-mobile.js"></script></body>
+<div class="editor-mobile-switch" role="group" aria-label="Editor view"><button id="mobile-edit" aria-pressed="true" type="button">Edit</button><button id="mobile-preview" aria-pressed="false" type="button">Preview</button></div><script src="js/editor-mobile.js"></script></body>
 </html>
