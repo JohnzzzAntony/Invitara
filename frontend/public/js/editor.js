@@ -1288,8 +1288,19 @@
         if (meta && meta.list) out.list = { key: meta.list.k, label: meta.list.label, count: Array.isArray(sec[meta.list.k]) ? sec[meta.list.k].length : 0, fields: (meta.list.fields || []).filter(function (f) { return f.k; }).map(function (f) { return { k: f.k, type: f.type || 'text', label: f.label }; }) };
         return out;
       });
+      // What the AI knows about this design: its identity, its quick details, what publishing needs, and the sample wording.
+      var tpl = window.EVER_findTemplate(state.templateId) || {}, sample = {}, required = {};
+      try { sample = window.EVER_siteDefaults(state.templateId) || {}; } catch (e) { sample = {}; }
+      (window.EVER_C ? window.EVER_C.essentials(state) : []).forEach(function (f) { required['basics.' + f.k] = true; });
+      var facts = (ly.basics || []).filter(function (f) { return f.fact; }).map(function (f) { return 'basics.' + f.k; });
       return {
-        fields: this.fields().map(function (f) { return f.type === 'photo' ? { path: f.path, type: f.type, label: f.label, filled: !!f.value } : f; }),
+        template: { name: tpl.name || '', occasion: tpl.occasion || '', style: tpl.style || '', description: tpl.description || '' },
+        fields: this.fields().map(function (f) {
+          var known = { fact: facts.indexOf(f.path) >= 0, required: !!required[f.path] };
+          if (f.type === 'photo') return Object.assign({ path: f.path, type: f.type, label: f.label, filled: !!f.value }, known);
+          var s = getVal(sample, f.path);
+          return Object.assign({}, f, known, { sample: typeof s === 'string' ? s : '' });
+        }),
         sections: sections.filter(function (s) { return /^[a-zA-Z0-9]{1,40}$/.test(s.id); }),
         theme: state.theme || {},
         themeSupported: state.layoutId === 'platform',

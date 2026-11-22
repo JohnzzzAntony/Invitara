@@ -93,3 +93,16 @@ test('AI edit drops theme operations for designs that do not use the theme', asy
   const out = await editInvitation({ message: 'Make it dark', context: { fields, sections: [{ id: 'story', label: 'Story' }], theme: { background: '#ffffff' } } }, 'key');
   assert.deepEqual(out.ops, [{ type: 'text', path: 'sections.story.bg', value: '#101010' }]);
 });
+
+test('AI edit is told which design it is editing, its quick details, required fields and samples', async () => {
+  let sent;
+  globalThis.fetch = async (url, init) => { sent = JSON.parse(init.body); return { ok: true, json: async () => ({ choices: [{ message: { content: JSON.stringify({ reply: 'Done.', ops: [] }) } }] }) }; };
+  const known = [{ path: 'basics.factFirstname', type: 'text', label: 'First name', value: 'Sofia', sample: 'Sofia', fact: true, required: true }, { path: 'sections.top.tg', type: 'text', label: 'First name', value: 'Sofia', sample: 'Sofia' }];
+  await editInvitation({ message: 'We are Noura and Omar', context: { template: { name: 'Moonlit Garden Gates', occasion: 'wedding', style: 'Luxury', description: 'A moonlit garden.' }, fields: known, sections: [{ id: 'top', label: 'Names' }] } }, 'key');
+  const prompt = sent.messages.at(-1).content[0].text;
+  assert.match(prompt, /Design: Moonlit Garden Gates \| occasion: wedding \| style: Luxury/);
+  assert.match(prompt, /basics\.factFirstname \| text \| First name \| Sofia \| QUICK DETAIL \| REQUIRED/);
+  assert.doesNotMatch(prompt, /sections\.top\.tg[^\n]*QUICK DETAIL/);
+  assert.match(sent.messages[0].content, /ONLY through its QUICK DETAIL path/);
+  await assert.rejects(editInvitation({ message: 'x', context: { fields: [{ ...known[0], sample: 5 }], sections: [] } }, 'key'), /Invalid template fields/);
+});

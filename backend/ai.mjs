@@ -26,8 +26,9 @@ async function nvidia(url, body, key) {
 function readFields(input) {
   if (!Array.isArray(input) || !input.length || input.length > 250) throw new AiError(400, 'This template has no editable fields.');
   return input.map(f => {
-    if (!f || typeof f.path !== 'string' || !PATH.test(f.path) || !TYPES.includes(f.type) || typeof f.label !== 'string' || f.label.length > 120 || (f.value != null && typeof f.value !== 'string')) throw new AiError(400, 'Invalid template fields.');
-    return f.type === 'photo' ? { path: f.path, type: f.type, label: f.label, filled: !!f.filled } : { path: f.path, type: f.type, label: f.label, value: String(f.value || '').slice(0, 600) };
+    if (!f || typeof f.path !== 'string' || !PATH.test(f.path) || !TYPES.includes(f.type) || typeof f.label !== 'string' || f.label.length > 120 || (f.value != null && typeof f.value !== 'string') || (f.sample != null && typeof f.sample !== 'string')) throw new AiError(400, 'Invalid template fields.');
+    const known = { fact: f.fact === true, required: f.required === true };
+    return f.type === 'photo' ? { path: f.path, type: f.type, label: f.label, filled: !!f.filled, ...known } : { path: f.path, type: f.type, label: f.label, value: String(f.value || '').slice(0, 600), sample: String(f.sample || '').slice(0, 200), ...known };
   });
 }
 
@@ -73,7 +74,9 @@ function readContext(c) {
     design[k] = short(c.design?.[k], 40);
   }
   for (const [k, v] of Object.entries(c.theme && typeof c.theme === 'object' ? c.theme : {})) if (validTheme(k, v)) theme[k] = v;
-  return { fields, sections, options, design, theme, themeSupported: c.themeSupported === true, selected: short(c.selected, 200) };
+  const t = c.template && typeof c.template === 'object' ? c.template : {};
+  const template = { name: short(t.name, 80), occasion: short(t.occasion, 40), style: short(t.style, 40), description: short(t.description, 400) };
+  return { fields, sections, options, design, theme, template, themeSupported: c.themeSupported === true, selected: short(c.selected, 200) };
 }
 
 /* Keeps only operations the editor can apply and the save endpoint will accept. */
@@ -127,6 +130,7 @@ const EDIT_GUIDE = [
   '{"type":"design","key":"nameFont|bodyFont|accent|btnShape|spacing","value":"<one of the allowed options listed with the invitation; accent may also be #rrggbb>"}',
   '{"type":"section","id":"<section id>","action":"up|down|hide|show|delete|duplicate"}',
   '{"type":"item","section":"<section id with a list>","action":"add"} or {"type":"item","section":"<id>","action":"remove","index":<n>}',
+  'How these templates work: each invitation is one design (named below, with its occasion and style). Fields marked QUICK DETAIL are the event facts (names, initials, how the date is written, venue, address): change a name, date or place ONLY through its QUICK DETAIL path; the editor then rewrites every copy of it across the design, so never edit those copies in the section texts. Fields marked REQUIRED must be personalised before the host can publish: a value still equal to its sample (shown as "sample: ...") counts as not done, so when the host gives you event facts, fill every REQUIRED field they cover. Write new text in the voice and length of the sample, for this occasion and style.',
   'Rules: only use paths, section ids and values that exist in the invitation below. Keep the host\'s names, dates, places and facts exactly; never invent phone numbers, emails or links. Keep text about as long as the design expects unless asked otherwise. Keep colors readable: text must contrast with its background. Whenever you change a section\'s background color, also set that section\'s text color with {"type":"style","path":"sections.<id>","property":"color","value":"#rrggbb"}; it applies to all text in the section. "This", "it" or "the selected element" means the selected element when one is given. Write in the language the host uses.',
   'Reply with JSON only: {"reply":"<one or two friendly sentences telling the host what you changed, or a question if the request is unclear>","ops":[...]}. If nothing should change, return an empty ops list and explain why in reply.'
 ].join('\n\n');
@@ -140,7 +144,8 @@ export async function editInvitation(body, key) {
     .map(m => ({ role: m.role, content: m.text.slice(0, 2000) }));
   const state = [
     'Current invitation:',
-    'Fields (path | type | label | current value):\n' + ctx.fields.map(f => f.path + ' | ' + f.type + ' | ' + f.label + ' | ' + (f.type === 'photo' ? (f.filled ? '[photo set]' : '[empty]') : f.value)).join('\n'),
+    ctx.template.name ? 'Design: ' + ctx.template.name + (ctx.template.occasion ? ' | occasion: ' + ctx.template.occasion : '') + (ctx.template.style ? ' | style: ' + ctx.template.style : '') + (ctx.template.description ? '\n' + ctx.template.description : '') : '',
+    'Fields (path | type | label | current value [| flags]):\n' + ctx.fields.map(f => f.path + ' | ' + f.type + ' | ' + f.label + ' | ' + (f.type === 'photo' ? (f.filled ? '[photo set]' : '[empty]') : f.value) + (f.fact ? ' | QUICK DETAIL' : '') + (f.required ? ' | REQUIRED' : '') + (f.sample && f.sample !== f.value ? ' | sample: ' + f.sample : '')).join('\n'),
     'Sections in page order:\n' + ctx.sections.map(s => s.id + ' | ' + s.label + (s.on ? '' : ' (hidden)') + (s.list ? ' | list "' + s.list.key + '" with ' + s.list.count + ' items, item fields: ' + s.list.fields.map(f => f.k + ' (' + f.type + ')').join(', ') : '')).join('\n'),
     ctx.themeSupported ? 'Theme now: ' + JSON.stringify(ctx.theme) : 'This design does not use theme operations. Change colors with the color fields (such as section backgrounds), the accent design option and text color styles instead.',
     'Design now: ' + JSON.stringify(ctx.design) + '. Allowed design options: ' + JSON.stringify(ctx.options),
