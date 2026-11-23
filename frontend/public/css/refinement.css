@@ -504,3 +504,6 @@ body.studio { font-family: var(--font-ui); font-size: 16px; line-height: 1.65; }
 .studio .collection-card .card-bottom > * { transition: transform .25s, background .25s, box-shadow .25s; }
 .studio .collection-card .card-bottom > *:hover { transform: translateY(-1px); }
 @media (prefers-reduced-motion: reduce) { .studio .collection-card:hover .collection-art, .experience-price-card:hover, .detail-copy .studio-button:hover { transform: none; } }
+.studio-shell .text-link { background: none; border: 0; padding: 0; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; min-height: 24px; }
+.studio-form-status { margin-top: 16px; padding: 14px; border-radius: var(--radius-sm); font-size: 14px; background: #e4ebd7; color: #303a29; }
+#recovery-new-form { margin-top: 28px; }

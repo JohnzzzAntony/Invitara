@@ -188,11 +188,11 @@
     };
   }
 
-  /** Lowest total a customer could pay for this theme — the "from" price. */
+  /** Lowest VAT-inclusive total a customer could pay for this theme — the "from" price. */
   function startingPrice(tplOrId) {
     var c = themeCommerce(tplOrId);
     if (!c) return 0;
-    return c.basePrice + findPlan(c.plans[0]).price;
+    return quote({ themeId: c.id, plan: c.plans[0] }).total;
   }
 
   /* ------------------------------------------------------------------ *

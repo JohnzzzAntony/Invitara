@@ -14,7 +14,7 @@ import { loadCatalog } from './catalog.mjs';
 import { invitationState } from './invitation-state.mjs';
 import { SECURITY_HEADERS } from '../config/security-headers.mjs';
 import { eventExpiry, editable } from './access.mjs';
-import { initAuth, accountFor, mountAuth } from './auth.mjs';
+import { initAuth, accountFor, mountAuth, emailResetEnabled } from './auth.mjs';
 import { mountAi } from './ai.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -115,7 +115,7 @@ for (const [route, maximum, message] of [
   if (limited(route + ':' + req.ip, maximum)) return res.status(429).json({ error: message });
   next();
 });
-mountAuth(app,db,production,limited);
+mountAuth(app,db,production,limited,origin);
 mountAi(app,limited);
 
 
@@ -248,7 +248,7 @@ app.post('/api/invites/:id/rsvp',(req,res)=>{
 });
 app.get('/api/projects/:id/replies',(req,res)=>{const p=owned(req,res);if(!p)return;res.json(db.prepare('SELECT body FROM replies WHERE project=?').all(p.id).map(r=>JSON.parse(r.body)));});
 app.get('/api/projects/:id/qr',async(req,res)=>{const p=owned(req,res);if(!p)return;if(!p.paid||!p.published)return res.status(409).json({error:'Publish your invitation before sharing.'});try{const svg=await QRCode.toString(origin+'/invite.html?e='+encodeURIComponent(p.id),{type:'svg',errorCorrectionLevel:'M',margin:4,color:{dark:'#6B3529',light:'#ffffff'}});res.type('image/svg+xml').send(svg);}catch(_){res.status(500).json({error:'Could not generate the QR code.'});}});
-app.get('/api/config',(req,res)=>res.json({businessName:process.env.BUSINESS_NAME||'momentsiz',supportEmail:process.env.SUPPORT_EMAIL||'',supportWhatsapp:(process.env.SUPPORT_WHATSAPP||'').replace(/\D/g,'')}));
+app.get('/api/config',(req,res)=>res.json({businessName:process.env.BUSINESS_NAME||'momentsiz',supportEmail:process.env.SUPPORT_EMAIL||'',supportWhatsapp:(process.env.SUPPORT_WHATSAPP||'').replace(/\D/g,''),emailReset:emailResetEnabled(production)}));
 app.get('/api/health',(req,res)=>{db.prepare('SELECT 1').get();res.json({ok:true,paymentsConfigured:!!stripe});});
 // Explicit public allowlist: never expose database, secrets, source or dependencies.
 // Template cards preview each template in a same-origin iframe.

@@ -12,7 +12,7 @@ test('the active collection retains all ten animated invitations',()=>{
  assert.deepEqual(Array.from(catalog.INVITARA_availableTemplates().filter(t=>!t.animated),t=>t.id),['edition-ink-and-olive']);
 });
 
-test('every visible text saves through server validation, with RSVP and AED 99 pricing',()=>{
+test('every visible text saves through server validation, with RSVP and AED 103.95 VAT-inclusive pricing',()=>{
  for(const theme of themes){
   const state=catalog.EVER_siteDefaults(theme.id),layout=catalog.EVER_findLayout(theme.id);
   const fields=layout.sections.flatMap(s=>s.fields.map(f=>[s.id,f.k]));
@@ -23,7 +23,7 @@ test('every visible text saves through server validation, with RSVP and AED 99 p
   assert.ok(saved.order.includes('rsvp'),theme.id+' needs an RSVP section for guest replies');
   assert.equal(catalog.EVER_C.quote({themeId:theme.id,plan:'studio',addons:[]}).total,103.95);
   const graph=JSON.parse(seoFor('design.html',{origin:'https://example.test',catalog,query:{id:theme.id}}).jsonLd('').split('>')[1].split('</script')[0])['@graph'];
-  assert.equal(graph.find(x=>x['@type']==='Product').offers.price,99);
+  assert.equal(graph.find(x=>x['@type']==='Product').offers.price,103.95);
   assert.ok(sitemapXml('https://example.test',catalog,'2026-11-03').includes(theme.id));
  }
 });
