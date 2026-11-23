@@ -507,3 +507,14 @@ body.studio { font-family: var(--font-ui); font-size: 16px; line-height: 1.65; }
 .studio-shell .text-link { background: none; border: 0; padding: 0; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; min-height: 24px; }
 .studio-form-status { margin-top: 16px; padding: 14px; border-radius: var(--radius-sm); font-size: 14px; background: #e4ebd7; color: #303a29; }
 #recovery-new-form { margin-top: 28px; }
+.invite-guest-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; align-items: center; padding: 28px 6% 40px; font: 15px/1.5 var(--studio-sans, Manrope, sans-serif); }
+.invite-guest-actions p { flex-basis: 100%; text-align: center; margin: 0; }
+.invite-guest-actions a, .invite-guest-actions button { min-height: 48px; padding: 12px 22px; border: 1px solid currentColor; border-radius: 999px; background: transparent; color: inherit; font: inherit; text-decoration: none; cursor: pointer; }
+.guest-deadline { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin: 16px 0; }
+.guest-deadline input { display: block; min-height: 48px; margin-top: 6px; }
+.guest-checkin { display: inline-flex; gap: 8px; align-items: center; min-height: 44px; font-size: 14px; }
+.personal-links { margin-top: 20px; }
+.personal-links summary { cursor: pointer; min-height: 44px; font-weight: 600; }
+.personal-links textarea { display: block; width: 100%; margin: 6px 0 12px; }
+#guest-links { list-style: none; padding: 0; display: grid; gap: 8px; max-height: 240px; overflow: auto; }
+#guest-links button, #guest-links a { min-height: 36px; padding: 6px 12px; }
