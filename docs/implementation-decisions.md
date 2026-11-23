@@ -15,7 +15,7 @@
 | # | Decision | Current state |
 |---|---|---|
 | D1 | Confirm VAT registration and that AED 103.95 including 5% VAT is the consumer price | Shown on all pages (pushed to `main` on 23 Nov) |
-| D2 | **Rescheduling policy.** One free date change per purchase is now in `terms.html` and the dashboard | Published to `main` on 23 Nov **without legal sign-off**. Approve, change, or ask for a revert |
+| D2 | **Rescheduling policy.** One free date change per purchase is now in `terms.html` and the dashboard | **Approved by the owner on 24 Nov 2026.** Live in `terms.html` and the dashboard |
 | D3 | Promo codes: whether to offer any | Checkout accepts Stripe promotion codes; none exist until created in Stripe |
 | D4 | Refunds: should a refunded order lose publish/editor access? Partial refunds? | Not handled. Refunded orders keep access |
 | D5 | Support email / WhatsApp values | Read from `SUPPORT_EMAIL` and `SUPPORT_WHATSAPP`; none invented |
