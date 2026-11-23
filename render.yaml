@@ -24,4 +24,4 @@ services:
       - key: BUSINESS_NAME
         sync: false
       - key: SUPPORT_EMAIL
-        sync: false
+        value: info@momentsiz.com

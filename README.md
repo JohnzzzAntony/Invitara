@@ -47,7 +47,7 @@ For Railway, follow [the deployment and variables guide](docs/RAILWAY.md). `rail
 Use the included Dockerfile or `render.yaml`. This application needs **one Node process and a persistent disk**, not static hosting or an ephemeral serverless function. The old Next/static-host scaffold has been removed.
 
 1. Set `APP_ORIGIN` to the exact HTTPS origin without a trailing slash.
-2. Set `NODE_ENV=production`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `BUSINESS_NAME`, and `SUPPORT_EMAIL`. Production boot rejects missing required settings.
+2. Set `NODE_ENV=production`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, and `BUSINESS_NAME` (`SUPPORT_EMAIL` defaults to `info@momentsiz.com`). Production boot rejects missing required settings.
 3. Mount a persistent volume at `/app/data`; set `DATA_DIR=/app/data`. Use a single instance. The process runs as the `node` user; the volume must allow that user to write.
 4. Terminate HTTPS at the hosting platform or reverse proxy. Set `TRUST_PROXY_HOPS=1` only when exactly one trusted proxy fronts the app. Do not expose the application port directly behind an untrusted proxy.
 5. Register `https://YOUR-DOMAIN/api/webhook` for `checkout.session.completed` and `checkout.session.async_payment_succeeded`. Test with Stripe test credentials before replacing them with live keys.

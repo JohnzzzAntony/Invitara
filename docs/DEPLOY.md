@@ -14,7 +14,7 @@ Copy `.env.example` for local development. Never commit populated environment fi
 | `DATA_DIR` | Persistent writable directory for `invitara.sqlite` and WAL files |
 | `STRIPE_SECRET_KEY` | Server-only payment credential |
 | `STRIPE_WEBHOOK_SECRET` | Server-only webhook signing secret |
-| `BUSINESS_NAME`, `SUPPORT_EMAIL` | Public operator contact details; required in production |
+| `BUSINESS_NAME`, `SUPPORT_EMAIL` | Public operator contact details. `BUSINESS_NAME` is required in production; `SUPPORT_EMAIL` defaults to `info@momentsiz.com` |
 | `TRUST_PROXY_HOPS` | Set only for the actual trusted proxy topology; Render uses one hop |
 
 Deploy a single instance with a persistent volume at `/app/data`. Terminate TLS at the trusted reverse proxy and prevent untrusted direct access to the backend port. Configure Stripe events `checkout.session.completed` and `checkout.session.async_payment_succeeded` at `/api/webhook`.

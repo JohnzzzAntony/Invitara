@@ -22,7 +22,8 @@ const publicRoot = path.join(root, 'frontend', 'public');
 const production = process.env.NODE_ENV === 'production';
 const origin = resolveOrigin(process.env.APP_ORIGIN, production);
 if (production && (!origin.startsWith('https://') || !process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET)) throw new Error('Production requires HTTPS APP_ORIGIN and Stripe secrets.');
-if(production&&(!process.env.BUSINESS_NAME||!process.env.SUPPORT_EMAIL))throw new Error('Production requires BUSINESS_NAME and SUPPORT_EMAIL.');
+if(production&&!process.env.BUSINESS_NAME)throw new Error('Production requires BUSINESS_NAME.');
+const supportEmail=(process.env.SUPPORT_EMAIL||'info@momentsiz.com').trim();
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 const dataDir = process.env.DATA_DIR || path.join(root, 'data');
 mkdirSync(dataDir, { recursive: true });
@@ -248,7 +249,7 @@ app.post('/api/invites/:id/rsvp',(req,res)=>{
 });
 app.get('/api/projects/:id/replies',(req,res)=>{const p=owned(req,res);if(!p)return;res.json(db.prepare('SELECT body FROM replies WHERE project=?').all(p.id).map(r=>JSON.parse(r.body)));});
 app.get('/api/projects/:id/qr',async(req,res)=>{const p=owned(req,res);if(!p)return;if(!p.paid||!p.published)return res.status(409).json({error:'Publish your invitation before sharing.'});try{const svg=await QRCode.toString(origin+'/invite.html?e='+encodeURIComponent(p.id),{type:'svg',errorCorrectionLevel:'M',margin:4,color:{dark:'#6B3529',light:'#ffffff'}});res.type('image/svg+xml').send(svg);}catch(_){res.status(500).json({error:'Could not generate the QR code.'});}});
-app.get('/api/config',(req,res)=>res.json({businessName:process.env.BUSINESS_NAME||'momentsiz',supportEmail:process.env.SUPPORT_EMAIL||'',supportWhatsapp:(process.env.SUPPORT_WHATSAPP||'').replace(/\D/g,'')}));
+app.get('/api/config',(req,res)=>res.json({businessName:process.env.BUSINESS_NAME||'momentsiz',supportEmail,supportWhatsapp:(process.env.SUPPORT_WHATSAPP||'').replace(/\D/g,'')}));
 app.get('/api/health',(req,res)=>{db.prepare('SELECT 1').get();res.json({ok:true,paymentsConfigured:!!stripe});});
 // Explicit public allowlist: never expose database, secrets, source or dependencies.
 // Template cards preview each template in a same-origin iframe.
@@ -268,7 +269,7 @@ app.get('/robots.txt',(req,res)=>res.type('text/plain').send(robots + '\n\nSitem
 const contentDate = new Date().toISOString().slice(0, 10);
 app.get('/sitemap.xml',(req,res)=>res.type('application/xml').send(sitemapXml(origin, catalog, contentDate)));
 app.get('/llms.txt',(req,res)=>res.type('text/plain; charset=utf-8').send(llmsTxt(origin, catalog)));
-const seo = (file, extra = {}) => seoFor(file, { origin, catalog, supportEmail: process.env.SUPPORT_EMAIL, ...extra });
+const seo = (file, extra = {}) => seoFor(file, { origin, catalog, supportEmail, ...extra });
 app.get('/', (req, res) => res.type('html').send(pageHtml('index.html', origin, null, seo('index.html'))));
 // Keyword landing pages: the catalogue pre-filtered to one occasion, with its own copy and structured data.
 app.get('/:slug', (req, res, next) => {

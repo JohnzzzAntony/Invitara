@@ -2,8 +2,7 @@
 fetch('/api/config').then(r => r.json()).then(c => {
   if (c.supportEmail) {
     const a = document.getElementById('contact-email');
-    a.href = 'mailto:' + c.supportEmail; a.textContent = c.supportEmail; a.hidden = false;
-    document.getElementById('contact-pending').hidden = true;
+    a.href = 'mailto:' + c.supportEmail; a.textContent = c.supportEmail;
   }
   if (c.supportWhatsapp) {
     document.getElementById('contact-whatsapp').href = 'https://wa.me/' + c.supportWhatsapp;
