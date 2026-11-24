@@ -51,3 +51,7 @@ artifacts/
 test-results/
 playwright-report/
 .arena/
+
+# Instagram reel footage and renders (regenerate with marketing/reels/*.mjs).
+marketing/reels/footage/
+marketing/reels/out/

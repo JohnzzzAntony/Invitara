@@ -1,0 +1,176 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>momentsiz reel composer</title>
+<style>html,body{margin:0;background:#111}canvas{display:block;width:540px;height:960px}</style>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="reels.js"></script>
+<script src="mp4.js"></script>
+<script>
+// Draws a reel from window.REELS onto a 1080x1920 canvas frame by frame and encodes it as H.264 MP4 (WebCodecs + mp4.js).
+(async function () {
+  'use strict';
+  var W = 1080, H = 1920, FPS = 30, BRAND = { purple: '#7016D8', pink: '#F52D91', orange: '#FF9238', blue: '#3548ED', ink: '#191527', cloud: '#F8F6FC' };
+  var name = new URLSearchParams(location.search).get('reel'), scenes = window.REELS[name];
+  var canvas = document.getElementById('c'), ctx = canvas.getContext('2d');
+  var font = new FontFace('Manrope', 'url(/site/assets/fonts/manrope-latin-wght-normal.woff2)', { weight: '200 800' });
+  document.fonts.add(await font.load());
+  var logo = new Image(); logo.src = '/site/assets/momentsiz-logo.svg'; await logo.decode();
+  var FONT = function (weight, size) { return weight + ' ' + size + 'px Manrope, "Segoe UI Emoji", sans-serif'; };
+
+  // Timeline: absolute start of each scene.
+  var t = 0; scenes.forEach(function (s) { s.start = t; s.len = s.end || s.clip[2]; t += s.len; }); var total = t;
+  var indexes = {};
+  for (var s of scenes) if (s.clip && !indexes[s.clip[0]]) indexes[s.clip[0]] = await (await fetch('/footage/' + s.clip[0] + '/frames.json')).json();
+
+  // Source frame for a scene at local time tau: binary search on capture timestamps, holding the last frame.
+  function frameFor(s, tau) {
+    var list = indexes[s.clip[0]], want = s.clip[1] + tau * (s.rate || 1), lo = 0, hi = list.length - 1;
+    while (lo < hi) { var mid = (lo + hi + 1) >> 1; if (list[mid][1] <= want) lo = mid; else hi = mid - 1; }
+    return s.clip[0] + '/' + list[lo][0];
+  }
+  var cache = new Map();
+  function load(key) { if (!cache.has(key)) cache.set(key, fetch('/footage/' + key).then(function (r) { return r.blob(); }).then(createImageBitmap)); return cache.get(key); }
+  function sceneAt(time) { for (var i = scenes.length - 1; i >= 0; i--) if (time >= scenes[i].start) return i; return 0; }
+  function neededAt(time) { var i = sceneAt(time), s = scenes[i], keys = []; if (s.clip) keys.push(frameFor(s, time - s.start)); var p = scenes[i - 1]; if (p && p.clip && time - s.start < FADE) keys.push(frameFor(p, time - p.start)); return keys; }
+  var FADE = 0.22;
+
+  var ease = { out: function (k) { return 1 - Math.pow(1 - k, 3); }, back: function (k) { var c = 1.70158; return 1 + (c + 1) * Math.pow(k - 1, 3) + c * Math.pow(k - 1, 2); } };
+  function clamp(k) { return Math.max(0, Math.min(1, k)); }
+
+  function drawFootage(s, tau, img, alpha) {
+    var z = s.zoom || [1, 1.06], k = clamp(tau / s.len), zoom = z[0] + (z[1] - z[0]) * ease.out(k), f = s.focus || [0.5, 0.5];
+    var w = W * zoom, h = H * zoom, x = (W - w) * f[0], y = (H - h) * f[1];
+    ctx.globalAlpha = alpha; ctx.imageSmoothingQuality = 'high'; ctx.drawImage(img, x, y, w, h); ctx.globalAlpha = 1;
+    if (s.dim) { ctx.fillStyle = 'rgba(25,21,39,' + s.dim + ')'; ctx.fillRect(0, 0, W, H); }
+  }
+
+  // Rich text: *word* highlighted. Returns lines of [{text, hi}] wrapped to maxWidth.
+  function layout(text, size, maxWidth) {
+    var words = [], hi = false;
+    text.split(/(\*)/).forEach(function (part) { if (part === '*') { hi = !hi; return; } part.split(/(\s+)/).forEach(function (w) { if (w.trim()) words.push({ text: w, hi: hi }); }); });
+    // Punctuation hugs the word before it ("*one link*." must not render as "link .").
+    words = words.reduce(function (all, w) { if (/^[.,!?:;]+$/.test(w.text) && all.length) all[all.length - 1] = { text: all[all.length - 1].text + w.text, hi: all[all.length - 1].hi }; else all.push(w); return all; }, []);
+    ctx.font = FONT(800, size); var space = ctx.measureText(' ').width, lines = [[]], width = 0;
+    words.forEach(function (w) { var ww = ctx.measureText(w.text).width; if (width && width + space + ww > maxWidth) { lines.push([]); width = 0; } lines[lines.length - 1].push(w); width += (width ? space : 0) + ww; });
+    return { lines: lines, space: space };
+  }
+  function roundRect(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+
+  // Instagram-style sticker caption: each line on its own white rounded box, highlights in brand gradient.
+  function caption(c, tau) {
+    var k = clamp((tau - c.at) / 0.32), out = clamp((c.to - tau) / 0.2); if (tau < c.at || tau > c.to) return;
+    var a = Math.min(clamp(k * 1.6), out), s = 0.82 + 0.18 * ease.back(k), cy = c.y;
+    ctx.save(); ctx.globalAlpha = a; ctx.translate(W / 2, cy); ctx.scale(s, s); ctx.translate(-W / 2, -cy);
+    if (c.chip) { chip(c.chip, cy); ctx.restore(); return; }
+    var size = c.size || 80, lh = size * 1.32, L = layout(c.text, size, 900), top = cy - (L.lines.length * lh) / 2;
+    if (c.step) { pill('STEP ' + c.step, top - 78); }
+    L.lines.forEach(function (line, i) {
+      ctx.font = FONT(800, size);
+      var widths = line.map(function (w) { return ctx.measureText(w.text).width; }), lw = widths.reduce(function (a, b) { return a + b; }, 0) + L.space * (line.length - 1);
+      var x = (W - lw) / 2, y = top + i * lh;
+      ctx.fillStyle = 'rgba(25,21,39,.22)'; roundRect(x - 30, y + 10, lw + 60, lh - 6, 26); ctx.fill();
+      ctx.fillStyle = '#fff'; roundRect(x - 30, y, lw + 60, lh - 6, 26); ctx.fill();
+      var g = ctx.createLinearGradient(x, 0, x + lw, 0); g.addColorStop(0, BRAND.purple); g.addColorStop(1, BRAND.pink);
+      ctx.textBaseline = 'middle';
+      line.forEach(function (w, j) { ctx.fillStyle = w.hi ? g : BRAND.ink; ctx.fillText(w.text, x, y + (lh - 6) / 2 + 2); x += widths[j] + L.space; });
+    });
+    if (c.sub) {
+      var subSize = 40, SL = layout(c.sub, subSize, 860), sy = top + L.lines.length * lh + 18;
+      ctx.font = FONT(700, subSize);
+      SL.lines.forEach(function (line, i) {
+        var text = line.map(function (w) { return w.text; }).join(' '), sw = ctx.measureText(text).width, y = sy + i * 58;
+        ctx.fillStyle = 'rgba(25,21,39,.86)'; roundRect((W - sw) / 2 - 24, y, sw + 48, 56, 18); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.textBaseline = 'middle'; ctx.fillText(text, (W - sw) / 2, y + 29);
+      });
+    }
+    ctx.restore();
+  }
+  function gradientFill(x, w) { var g = ctx.createLinearGradient(x, 0, x + w, 0); g.addColorStop(0, BRAND.purple); g.addColorStop(0.65, BRAND.pink); g.addColorStop(1, BRAND.orange); return g; }
+  function pill(text, y) { ctx.font = FONT(800, 34); var w = ctx.measureText(text).width + 56; ctx.fillStyle = gradientFill((W - w) / 2, w); roundRect((W - w) / 2, y, w, 60, 30); ctx.fill(); ctx.fillStyle = '#fff'; ctx.textBaseline = 'middle'; ctx.fillText(text, (W - w) / 2 + 28, y + 31); }
+  function chip(text, y) { ctx.font = FONT(800, 86); var w = ctx.measureText(text).width + 100, h = 136; ctx.fillStyle = 'rgba(25,21,39,.3)'; roundRect((W - w) / 2, y - h / 2 + 14, w, h, 68); ctx.fill(); ctx.fillStyle = gradientFill((W - w) / 2, w); roundRect((W - w) / 2, y - h / 2, w, h, 68); ctx.fill(); ctx.fillStyle = '#fff'; ctx.textBaseline = 'middle'; ctx.fillText(text, (W - w) / 2 + 50, y + 4); }
+
+  // Checklist scene: items pop in one by one over dimmed footage.
+  function list(L, tau) {
+    var top = 470; ctx.save(); ctx.globalAlpha = clamp((tau - L.at) / 0.3);
+    var T = layout(L.title, 76, 900); T.lines.forEach(function (line, i) { var text = line.map(function (w) { return w.text; }).join(' '); ctx.font = FONT(800, 76); var tw = ctx.measureText(text).width, x = (W - tw) / 2; line.forEach(function (w) { ctx.fillStyle = w.hi ? gradientFill(x, ctx.measureText(w.text).width) : '#fff'; ctx.textBaseline = 'middle'; ctx.fillText(w.text, x, top + i * 92); x += ctx.measureText(w.text).width + T.space; }); });
+    ctx.restore();
+    L.items.forEach(function (item, i) {
+      var at = L.at + 0.7 + i * L.every, k = clamp((tau - at) / 0.35); if (k <= 0) return;
+      var y = top + T.lines.length * 92 + 40 + i * 118, x = 120 + (1 - ease.out(k)) * 60;
+      ctx.save(); ctx.globalAlpha = k;
+      ctx.fillStyle = 'rgba(255,255,255,.96)'; roundRect(x, y, 840, 96, 30); ctx.fill();
+      ctx.fillStyle = gradientFill(x + 22, 52); ctx.beginPath(); ctx.arc(x + 56, y + 48, 28, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(x + 43, y + 49); ctx.lineTo(x + 53, y + 59); ctx.lineTo(x + 71, y + 38); ctx.stroke();
+      ctx.font = FONT(700, 44); ctx.fillStyle = BRAND.ink; ctx.textBaseline = 'middle'; ctx.fillText(item, x + 108, y + 50);
+      ctx.restore();
+    });
+  }
+
+  // End card: brand cloud with drifting colour, logo, headline, URL and price.
+  function endCard(s, tau) {
+    var k = clamp(tau / 0.35);
+    ctx.fillStyle = BRAND.cloud; ctx.fillRect(0, 0, W, H);
+    [[BRAND.purple, 200, 520, 620], [BRAND.pink, 900, 1300, 640], [BRAND.orange, 260, 1650, 420], [BRAND.blue, 880, 300, 380]].forEach(function (b, i) {
+      var x = b[1] + Math.sin(tau * 0.9 + i) * 40, y = b[2] + Math.cos(tau * 0.7 + i) * 40, g = ctx.createRadialGradient(x, y, 0, x, y, b[3]);
+      g.addColorStop(0, b[0] + '40'); g.addColorStop(1, b[0] + '00'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    });
+    ctx.save(); ctx.globalAlpha = k; var lw = 640 * (0.9 + 0.1 * ease.back(k)), lh = lw * 146 / 548; ctx.drawImage(logo, (W - lw) / 2, 520 - lh / 2, lw, lh); ctx.restore();
+    caption({ at: 0.25, to: s.len + 1, text: s.headline, y: 820, size: 76 }, tau);
+    var k2 = clamp((tau - 0.6) / 0.35);
+    ctx.save(); ctx.globalAlpha = k2; ctx.font = FONT(800, 64); var url = 'momentsiz.com', uw = ctx.measureText(url).width + 110, uy = 1040;
+    ctx.fillStyle = 'rgba(112,22,216,.25)'; roundRect((W - uw) / 2, uy + 14, uw, 124, 62); ctx.fill(); ctx.fillStyle = gradientFill((W - uw) / 2, uw); roundRect((W - uw) / 2, uy, uw, 124, 62); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.textBaseline = 'middle'; ctx.fillText(url, (W - uw) / 2 + 55, uy + 64);
+    ctx.font = FONT(700, 42); ctx.fillStyle = BRAND.ink; var price = 'AED 103.95 per event · VAT included', pw = ctx.measureText(price).width; ctx.fillText(price, (W - pw) / 2, uy + 210);
+    ctx.font = FONT(600, 38); ctx.fillStyle = '#5b5670'; var small = 'No subscription · Free to personalise first', sw = ctx.measureText(small).width; ctx.fillText(small, (W - sw) / 2, uy + 270);
+    ctx.restore();
+    var k3 = clamp((tau - 1.1) / 0.35); ctx.save(); ctx.globalAlpha = k3; ctx.font = FONT(800, 40); ctx.fillStyle = BRAND.purple; var cta = 'Link in bio  ↗', cw = ctx.measureText(cta).width; ctx.fillText(cta, (W - cw) / 2, uy + 360); ctx.restore();
+  }
+
+  function watermark() { var h = 56, w = h * 548 / 146, x = 56, y = 236; ctx.fillStyle = 'rgba(255,255,255,.92)'; roundRect(x - 22, y - 14, w + 44, h + 28, 30); ctx.fill(); ctx.drawImage(logo, x, y, w, h); }
+
+  async function draw(time) {
+    var i = sceneAt(time), s = scenes[i], tau = time - s.start, p = scenes[i - 1];
+    if (s.end) { endCard(s, tau); if (p && p.clip && tau < FADE) { drawFootage(p, time - p.start, await load(frameFor(p, time - p.start)), 1 - tau / FADE); } return; }
+    drawFootage(s, tau, await load(frameFor(s, tau)), 1);
+    if (p && p.clip && tau < FADE) drawFootage(p, time - p.start, await load(frameFor(p, time - p.start)), 1 - tau / FADE);
+    if (!/^(site-|dashboard|guest-link)/.test(s.clip[0])) watermark();  // site footage already shows the momentsiz header
+    (s.captions || []).forEach(function (c) { caption(c, tau); });
+    if (s.list) list(s.list, tau);
+  }
+
+  // Encode frame by frame with exact timestamps (WebCodecs), so render speed never affects timing.
+  function prefetch(from, seconds) { for (var f = 0; f < seconds * FPS; f++) neededAt(from + f / FPS).forEach(load); }
+  prefetch(0, 2.5); await Promise.all([...cache.values()]);
+  var samples = [], avcC = null, failure = null, lastTs = -1;
+  var encoder = new VideoEncoder({
+    output: function (chunk, meta) {
+      if (meta && meta.decoderConfig && meta.decoderConfig.description) avcC = new Uint8Array(meta.decoderConfig.description);
+      if (chunk.timestamp <= lastTs) failure = 'Encoder reordered frames (B-frames); mp4.js needs ctts support.';
+      lastTs = chunk.timestamp;
+      var data = new Uint8Array(chunk.byteLength); chunk.copyTo(data); samples.push({ data: data, key: chunk.type === 'key' });
+    },
+    error: function (e) { failure = String(e); }
+  });
+  encoder.configure({ codec: 'avc1.640028', width: W, height: H, bitrate: 12e6, framerate: FPS, avc: { format: 'avc' }, latencyMode: 'quality' });
+  var frames = Math.round(total * FPS);
+  for (var n = 0; n < frames; n++) {
+    var time = n / FPS;
+    if (n % (FPS / 2) === 0) {
+      // Keep only frames needed from a moment ago to 3.5 s ahead; decoded frames are 2.4 MB each.
+      var keep = new Set(); for (var f = -5; f < 3.5 * FPS; f++) neededAt(Math.max(0, time + f / FPS)).forEach(function (k) { keep.add(k); });
+      for (var [key, pending] of cache) if (!keep.has(key)) { cache.delete(key); pending.then(function (b) { b.close(); }); }
+      prefetch(time + 0.5, 3);
+    }
+    await draw(time);
+    var frame = new VideoFrame(canvas, { timestamp: Math.round(n * 1e6 / FPS), duration: Math.round(1e6 / FPS) });
+    encoder.encode(frame, { keyFrame: n % (FPS * 2) === 0 }); frame.close();
+    if (encoder.encodeQueueSize > 8) await new Promise(function (r) { encoder.addEventListener('dequeue', r, { once: true }); });
+    if (failure) throw new Error(failure);
+  }
+  await encoder.flush(); encoder.close();
+  if (failure || !avcC || samples.length !== frames) throw new Error(failure || 'Encoder produced ' + samples.length + ' of ' + frames + ' frames');
+  var blob = window.muxMp4(samples, avcC, W, H, FPS), a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name + '.mp4'; document.body.appendChild(a); a.click();
+  window.__result = { seconds: total, frames: frames, keyframes: samples.filter(function (s) { return s.key; }).length, bytes: blob.size };
+})().catch(function (e) { window.__result = { error: String(e && e.stack || e) }; });
+</script>

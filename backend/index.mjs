@@ -13,8 +13,8 @@ import { fileURLToPath } from 'node:url';
 import { loadCatalog } from './catalog.mjs';
 import { invitationState } from './invitation-state.mjs';
 import { SECURITY_HEADERS } from '../config/security-headers.mjs';
-import { eventExpiry, editable } from './access.mjs';
-import { initAuth, accountFor, mountAuth } from './auth.mjs';
+import { eventExpiry, editable, repliesOpen } from './access.mjs';
+import { initAuth, accountFor, mountAuth, emailResetEnabled } from './auth.mjs';
 import { mountAi } from './ai.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -30,6 +30,7 @@ mkdirSync(dataDir, { recursive: true });
 const db = new DatabaseSync(path.join(dataDir, 'invitara.sqlite'));
 db.exec('PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS projects (id TEXT PRIMARY KEY, owner TEXT NOT NULL, body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS sessions (id TEXT PRIMARY KEY, project TEXT NOT NULL);');
 db.exec('CREATE TABLE IF NOT EXISTS replies (project TEXT NOT NULL,guest TEXT NOT NULL,body TEXT NOT NULL,PRIMARY KEY(project,guest))');
+db.exec('CREATE TABLE IF NOT EXISTS guests (token TEXT PRIMARY KEY, project TEXT NOT NULL, name TEXT NOT NULL); CREATE INDEX IF NOT EXISTS guests_project ON guests(project)');
 db.exec('CREATE TABLE IF NOT EXISTS invitation_views (project TEXT NOT NULL, visitor TEXT NOT NULL, PRIMARY KEY(project,visitor))');
 initAuth(db);
 db.exec('CREATE INDEX IF NOT EXISTS projects_owner ON projects(owner); CREATE INDEX IF NOT EXISTS sessions_project ON sessions(project); CREATE INDEX IF NOT EXISTS account_sessions_owner ON account_sessions(owner)');
@@ -65,7 +66,7 @@ app.post('/api/webhook', express.raw({ type: 'application/json', limit: '1mb' })
 function fulfil(session) {
   const p = get(session.metadata?.projectId);
   const registered = db.prepare('SELECT project FROM sessions WHERE id=?').get(session.id);
-  if (p && !p.paid && registered?.project === p.id && session.payment_status === 'paid' && session.amount_total === p.amount && session.currency === 'aed') {
+  if (p && !p.paid && registered?.project === p.id && session.payment_status === 'paid' && (session.amount_total === p.amount || (session.total_details?.amount_discount > 0 && session.amount_subtotal === p.amount)) && session.currency === 'aed') {
     p.paid = true; p.status = 'PAID'; p.orderId = session.id; p.paidAt = new Date().toISOString(); save(p);
   }
 }
@@ -116,7 +117,7 @@ for (const [route, maximum, message] of [
   if (limited(route + ':' + req.ip, maximum)) return res.status(429).json({ error: message });
   next();
 });
-mountAuth(app,db,production,limited);
+mountAuth(app,db,production,limited,origin);
 mountAi(app,limited);
 
 
@@ -168,7 +169,7 @@ app.post('/api/checkout', async (req, res) => {
       idempotencyKey=id+':'+previous.id;
     }
     p.state=s;save(p);
-    const session = await stripe.checkout.sessions.create({ mode: 'payment', customer_email: email, metadata: { projectId: id }, line_items: [{ price_data: { currency: 'aed', unit_amount: p.amount, product_data: { name: theme.name + ' — ' + catalog.EVER_C.findPlan(plan).name, description: 'Editor access through ' + eventDate + ' (' + timezone + '). Includes VAT.' } }, quantity: 1 }], success_url: origin + '/editor.html?p=' + id, cancel_url: origin + '/checkout.html?cancelled=1' }, { idempotencyKey });
+    const session = await stripe.checkout.sessions.create({ mode: 'payment', allow_promotion_codes: true, customer_email: email, metadata: { projectId: id }, line_items: [{ price_data: { currency: 'aed', unit_amount: p.amount, product_data: { name: theme.name + ' — ' + catalog.EVER_C.findPlan(plan).name, description: 'Editor access through ' + eventDate + ' (' + timezone + '). Includes VAT.' } }, quantity: 1 }], success_url: origin + '/editor.html?p=' + id, cancel_url: origin + '/checkout.html?cancelled=1' }, { idempotencyKey });
     db.prepare('INSERT OR IGNORE INTO sessions VALUES (?,?)').run(session.id, id);
     res.json({ url: session.url });
   } catch (e) { console.error('Checkout failed:', e.type || 'provider error'); res.status(502).json({ error: 'Checkout is unavailable. Please try again.' }); }
@@ -218,7 +219,8 @@ app.get('/api/invites/:id', (req, res) => {
   const p = get(req.params.id);
   if (!p?.published || !p.paid) return res.status(404).json({ error: 'Invitation unavailable.' });
   if(req.owner!==db.prepare('SELECT owner FROM projects WHERE id=?').get(p.id).owner)db.prepare('INSERT OR IGNORE INTO invitation_views VALUES (?,?)').run(p.id,req.sessionHash);
-  res.json({ s: p.state, t: p.themeId, n: p.slug, closed:!editable(p) });
+  const guest = typeof req.query.g === 'string' ? db.prepare('SELECT name FROM guests WHERE token=? AND project=?').get(req.query.g, p.id) : null;
+  res.json({ s: p.state, t: p.themeId, n: p.slug, closed:!editable(p), repliesClosed:!repliesOpen(p), guest: guest?.name || null, z: p.timezone });
 });
 // Each published invitation installs as its own app: its title, opening straight to it.
 app.get('/api/invites/:id/manifest.webmanifest', (req, res) => {
@@ -237,7 +239,9 @@ app.get('/api/invites/:id/qr',async(req,res)=>{
  try{const svg=await QRCode.toString(origin+'/invite.html?e='+encodeURIComponent(p.id),{type:'svg',errorCorrectionLevel:'M',margin:4,color:{dark:'#6B3529',light:'#f8f3ea'}});res.type('image/svg+xml').send(svg);}catch(_){res.status(500).json({error:'Could not generate the QR code.'});}
 });
 app.post('/api/invites/:id/rsvp',(req,res)=>{
- const p=get(req.params.id);if(!p?.published||!editable(p))return res.status(403).json({error:'Guest replies are closed for this invitation.'});
+ const p=get(req.params.id);if(!p?.published||!repliesOpen(p))return res.status(403).json({error:'Guest replies are closed for this invitation.'});
+ const invited=req.body.g?db.prepare('SELECT name FROM guests WHERE token=? AND project=?').get(String(req.body.g),p.id):null;
+ if(req.body.g&&!invited)return res.status(400).json({error:'This personal invitation link is not valid. Ask the host for a new one.'});
  if(limited('rsvp:'+req.ip,30))return res.status(429).json({error:'Please wait a minute before sending another reply.'});
  if(p.state.sections.rsvp?.on===false||!p.state.order.includes('rsvp'))return res.status(403).json({error:'Guest replies are disabled for this invitation.'});
  const {name,attend,msg='',meal='',dietary='',accommodation='',phone=''}=req.body,guests=Number(req.body.guests);
@@ -245,11 +249,49 @@ app.post('/api/invites/:id/rsvp',(req,res)=>{
  if(typeof meal!=='string'||meal.length>120||(p.state.sections.rsvp.mealEnabled&&!String(p.state.sections.rsvp.mealOptions||'No preference').split(',').map(s=>s.trim()).includes(meal)))return res.status(400).json({error:'Choose a valid meal preference.'});
  if(typeof name!=='string'||!name.trim()||name.length>120||!(p.themeId==='edition-aangan'?['yes','no','maybe']:['yes','no']).includes(attend)||!Number.isInteger(guests)||guests<1||guests>Math.min(50,Number(p.state.sections.rsvp.guestsMax)||6)||typeof msg!=='string'||msg.length>2000)return res.status(400).json({error:'Add your name, attendance and a valid guest count. Keep your message under 2,000 characters.'});
  if(typeof dietary!=='string'||dietary.length>1000||!['','yes','no'].includes(accommodation))return res.status(400).json({error:'Use valid dietary and accommodation details.'});
- const reply={dietary:p.state.sections.rsvp.dietaryEnabled?dietary.trim():'',accommodation:p.state.sections.rsvp.accommodationEnabled?accommodation:'',name:name.trim(),attend,guests,msg:msg.trim(),phone:phone.trim(),meal:p.state.sections.rsvp.mealEnabled?meal:'',updatedAt:new Date().toISOString()};db.prepare('INSERT INTO replies VALUES (?,?,?) ON CONFLICT(project,guest) DO UPDATE SET body=excluded.body').run(p.id,req.sessionHash,JSON.stringify(reply));res.json({ok:true});
+ const reply={dietary:p.state.sections.rsvp.dietaryEnabled?dietary.trim():'',accommodation:p.state.sections.rsvp.accommodationEnabled?accommodation:'',name:name.trim(),attend,guests,msg:msg.trim(),phone:phone.trim(),meal:p.state.sections.rsvp.mealEnabled?meal:'',updatedAt:new Date().toISOString(),...(invited?{invited:invited.name}:{})};
+ // A personal link keys the reply to the invited guest, so it updates from any device instead of duplicating.
+ db.prepare('INSERT INTO replies VALUES (?,?,?) ON CONFLICT(project,guest) DO UPDATE SET body=excluded.body').run(p.id,invited?'g:'+req.body.g:req.sessionHash,JSON.stringify(reply));res.json({ok:true});
 });
-app.get('/api/projects/:id/replies',(req,res)=>{const p=owned(req,res);if(!p)return;res.json(db.prepare('SELECT body FROM replies WHERE project=?').all(p.id).map(r=>JSON.parse(r.body)));});
+app.get('/api/projects/:id/replies',(req,res)=>{const p=owned(req,res);if(!p)return;res.json(db.prepare('SELECT rowid AS id,body FROM replies WHERE project=?').all(p.id).map(r=>({...JSON.parse(r.body),id:r.id})));});
+app.post('/api/projects/:id/replies/:reply/checkin',(req,res)=>{
+ const p=owned(req,res);if(!p)return;
+ const row=db.prepare('SELECT body FROM replies WHERE project=? AND rowid=?').get(p.id,Number(req.params.reply));
+ if(!row)return res.status(404).json({error:'Reply not found.'});
+ const reply={...JSON.parse(row.body),checkedIn:req.body.checkedIn===true};
+ db.prepare('UPDATE replies SET body=? WHERE project=? AND rowid=?').run(JSON.stringify(reply),p.id,Number(req.params.reply));res.json(reply);
+});
+app.get('/api/projects/:id/guests',(req,res)=>{const p=owned(req,res);if(!p)return;res.json(db.prepare('SELECT name,token FROM guests WHERE project=? ORDER BY rowid').all(p.id));});
+app.post('/api/projects/:id/guests',(req,res)=>{
+ const p=owned(req,res);if(!p)return;
+ if(!p.paid)return res.status(403).json({error:'Personal guest links are available after payment.'});
+ const names=Array.isArray(req.body.names)?req.body.names.map(n=>String(n).trim()).filter(Boolean):[];
+ if(!names.length||names.some(n=>n.length>120))return res.status(400).json({error:'Add one guest name per line, up to 120 characters each.'});
+ if(db.prepare('SELECT COUNT(*) AS n FROM guests WHERE project=?').get(p.id).n+names.length>1000)return res.status(400).json({error:'An invitation can have up to 1,000 personal links.'});
+ const add=db.prepare('INSERT INTO guests VALUES (?,?,?)');for(const name of names)add.run(randomBytes(16).toString('hex'),p.id,name);
+ res.json(db.prepare('SELECT name,token FROM guests WHERE project=? ORDER BY rowid').all(p.id));
+});
+app.post('/api/projects/:id/settings',(req,res)=>{
+ const p=owned(req,res);if(!p)return;
+ if(!editable(p))return res.status(403).json({error:'Active paid editor access is required.'});
+ const deadline=req.body.rsvpDeadline||'';
+ if(deadline&&(!/^\d{4}-\d{2}-\d{2}$/.test(deadline)||deadline>p.eventDate))return res.status(400).json({error:'Choose a reply deadline on or before your event date.'});
+ p.rsvpDeadline=deadline||undefined;save(p);res.json(publicProject(p));
+});
+// Postponed events: one self-service date change per purchase; editor access and RSVP close follow the new date.
+app.post('/api/projects/:id/reschedule',(req,res)=>{
+ const p=owned(req,res);if(!p)return;
+ if(!p.paid)return res.status(403).json({error:'Only purchased invitations can be rescheduled.'});
+ if((p.reschedules||0)>=1)return res.status(409).json({error:'This invitation has already been rescheduled once. Contact support for another change.'});
+ const eventDate=req.body.eventDate;let expiresAt;
+ try{expiresAt=eventExpiry(eventDate,p.timezone);}catch(e){return res.status(400).json({error:e.message});}
+ if(eventDate===p.eventDate)return res.status(400).json({error:'Choose a different date.'});
+ Object.assign(p,{eventDate,expiresAt,reschedules:(p.reschedules||0)+1,rescheduledAt:new Date().toISOString(),state:{...p.state,basics:{...p.state.basics,date:eventDate}}});
+ if(p.rsvpDeadline>eventDate)delete p.rsvpDeadline;
+ save(p);res.json(publicProject(p));
+});
 app.get('/api/projects/:id/qr',async(req,res)=>{const p=owned(req,res);if(!p)return;if(!p.paid||!p.published)return res.status(409).json({error:'Publish your invitation before sharing.'});try{const svg=await QRCode.toString(origin+'/invite.html?e='+encodeURIComponent(p.id),{type:'svg',errorCorrectionLevel:'M',margin:4,color:{dark:'#6B3529',light:'#ffffff'}});res.type('image/svg+xml').send(svg);}catch(_){res.status(500).json({error:'Could not generate the QR code.'});}});
-app.get('/api/config',(req,res)=>res.json({businessName:process.env.BUSINESS_NAME||'momentsiz',supportEmail,supportWhatsapp:(process.env.SUPPORT_WHATSAPP||'').replace(/\D/g,'')}));
+app.get('/api/config',(req,res)=>res.json({businessName:process.env.BUSINESS_NAME||'momentsiz',supportEmail,supportWhatsapp:(process.env.SUPPORT_WHATSAPP||'').replace(/\D/g,''),emailReset:emailResetEnabled(production)}));
 app.get('/api/health',(req,res)=>{db.prepare('SELECT 1').get();res.json({ok:true,paymentsConfigured:!!stripe});});
 // Explicit public allowlist: never expose database, secrets, source or dependencies.
 // Template cards preview each template in a same-origin iframe.

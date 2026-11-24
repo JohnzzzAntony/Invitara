@@ -13,3 +13,10 @@ export function eventExpiry(date, zone, now = Date.now()) {
 export function editable(project, now = Date.now()) {
   return !!project?.paid && Number.isFinite(project.expiresAt) && now < project.expiresAt;
 }
+
+// Replies close when editor access ends, or earlier at the end of the host's RSVP deadline day in the event timezone.
+export function repliesOpen(project, now = Date.now()) {
+  if (!editable(project, now)) return false;
+  if (!project.rsvpDeadline) return true;
+  return now < DateTime.fromISO(project.rsvpDeadline, { zone: project.timezone }).plus({ days: 1 }).startOf('day').toMillis();
+}
