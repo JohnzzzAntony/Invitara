@@ -25,7 +25,8 @@
     "test:editions": "node scripts/editions-check.mjs",
     "lint": "eslint . --max-warnings=0",
     "test:couture": "node scripts/couture-check.mjs",
-    "test:home": "node scripts/home-showcase-check.mjs"
+    "test:home": "node scripts/home-showcase-check.mjs",
+    "test:mobile": "node scripts/mobile-check.mjs"
   },
   "dependencies": {
     "compression": "1.8.2",

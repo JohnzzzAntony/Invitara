@@ -1,5 +1,45 @@
 (function () {
   'use strict';
+  // Footer link groups become accordions on phones; desktop keeps plain headings and open columns.
+  // Built from the server-rendered links, so without JavaScript every link stays visible.
+  var footerGroups = Array.prototype.slice.call(document.querySelectorAll('.studio-footer .footer-column'));
+  if (footerGroups.length) {
+    var phone = matchMedia('(max-width: 767px)');
+    var groups = footerGroups.map(function (column) {
+      var heading = column.querySelector('.footer-heading');
+      var panel = column.querySelector('.footer-links');
+      return heading && panel ? { column: column, heading: heading, panel: panel, label: heading.textContent.trim() } : null;
+    }).filter(Boolean);
+    var setOpen = function (group, open) {
+      group.column.classList.toggle('is-open', open);
+      group.panel.inert = !open;
+      var toggle = group.heading.querySelector('.footer-toggle');
+      if (toggle) toggle.setAttribute('aria-expanded', String(open));
+    };
+    var applyFooterMode = function () {
+      groups.forEach(function (group) {
+        if (phone.matches) {
+          if (group.heading.querySelector('.footer-toggle')) return;
+          var toggle = document.createElement('button');
+          toggle.type = 'button';
+          toggle.className = 'footer-toggle';
+          toggle.setAttribute('aria-controls', group.panel.id);
+          toggle.innerHTML = '<span></span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg>';
+          toggle.firstChild.textContent = group.label;
+          toggle.addEventListener('click', function () { setOpen(group, !group.column.classList.contains('is-open')); });
+          group.heading.replaceChildren(toggle);
+          group.column.classList.add('is-accordion');
+          setOpen(group, false);
+        } else {
+          group.heading.textContent = group.label;
+          group.column.classList.remove('is-accordion', 'is-open');
+          group.panel.inert = false;
+        }
+      });
+    };
+    applyFooterMode();
+    phone.addEventListener('change', applyFooterMode);
+  }
   var button = document.querySelector('.studio-menu');
   var nav = document.querySelector('.studio-links');
   if (!button || !nav) return;

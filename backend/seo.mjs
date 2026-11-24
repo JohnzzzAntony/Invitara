@@ -189,7 +189,8 @@ export function seoFor(file, { origin, catalog, query = {}, occasion, supportEma
   } else if (file === 'terms.html' || file === 'privacy.html' || file === 'contact.html') {
     graph.push(breadcrumbs(origin, [['Home', '/'], [{ 'terms.html': 'Terms', 'privacy.html': 'Privacy', 'contact.html': 'Contact' }[file], '/' + file]]));
     // Server-render support details so they show without JavaScript and are crawlable.
-    if (file === 'contact.html' && supportEmail) out.replace.push(['<a id="contact-email" href="#" hidden></a><span id="contact-pending">', '<a id="contact-email" href="mailto:' + escapeHtml(supportEmail) + '">' + escapeHtml(supportEmail) + '</a><span id="contact-pending" hidden>']);
+    // contact.html ships with the default address; swap it for the configured one (text and mailto links).
+    if (file === 'contact.html' && supportEmail) { const safe = escapeHtml(supportEmail); out.replace.push([/info@momentsiz\.com/g, () => safe]); }
   }
   out.graph = out.graph || (() => graph);
   out.jsonLd = html => jsonLd({ '@context': 'https://schema.org', '@graph': out.graph(html) });
